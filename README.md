@@ -1,31 +1,28 @@
-# tooltils
-A lightweight python utility library built on standard modules.\
-\
-This is a very early project in heavy development so there may be some bugs.
+# tooltils v1.1.0
+A lightweight python utility library built on standard modules.
 
-## Requirements
-Both are optional if you are not going to use the `miniCompiler`.
+## Installation & Usage
 ```
-pip install PyInstaller
-https://ftp.gnu.org/gnu/gcc/
+pip(3) install tooltils
 ```
 
-## Usage
-There are currently `6` different classes of functions:
-- Requests (Basic http interaction)
-- JSON (json file interaction)
-- Time (System clock and timer actions)
-- Logging (Basic terminal colours and events)
-- miniCompiler ([My other github project](https://github.com/feetbots/miniCompiler))
-- Interpereter (A small custom interpereter for python)
+There are `8` different class methods:
+- Requests (Basic http methods)
+- Files (Custom file methods)
+- JSON (JSON file methods)
+- Time (Custom time related methods)
+- Logging (Logging and ANSI escape sequence methods)
+- Wave (WAVE sound file methods)
+- String (Custom string modifiers)
+- Types (Custom type modifiers)
 
-## Planned Features
-- More support for Windows and Unix systems [0%]
-- Faster performance utilising Cython [0%]
-- POST method for http functions [25%]
+## Roadmap
+- An audio player utilising inbuilt tools on MacOS and Windows
+- Faster performance utilising Cython
+- More wave file methods
 
 ## Info
-Project maintained by ebots (repository owner)\
+Project maintained by feetbots (repository owner)\
 You can contact me on [Discord](https://discord.com/) at `ebots#7424` or `ebots#6157`
 
 ## License
