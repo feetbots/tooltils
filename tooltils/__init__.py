@@ -1,39 +1,31 @@
-# Copyright(c) 2023 ebots
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files(the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and / or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
-
-__title__:   str = 'tooltils'
-__author__:  str = 'feetbots'
-__version__: str = '1.1.0'
-__license__: str = 'MIT'
-
-f"""
-# tooltils | v{__version__}
+"""
+# tooltils | v1.2.0
 A lightweight python utility library built on standard modules
+
+### Available classes:
+- Errors (General errors for better information use)
+- Files (Custom file method wrapper)
+- JSON (Custom JSON method wrapper)
+- Requests (Basic http access functions)
+- Time (Time modifying and informative functions)
+- Logging (Terminal modifiers)
+- Wave (Custom WAVE file methods)
+- String (Custom string modifying methods)
+- Types (Custom type modifying and converting)
 """
 
+__title__   : str = 'tooltils'
+__author__  : str = 'feetbots'
+__version__ : str = '1.2.0'
+__license__ : str = 'MIT'
+
 class bm:
+    from datetime import datetime, timezone, timedelta
     from io import TextIOWrapper, UnsupportedOperation
     from time import time as ctime, localtime, sleep
+    from json import dumps, load as jload, loads
     from urllib.request import urlopen, Request
     from json.decoder import JSONDecodeError
-    from json import dumps, load as jload
     from urllib.error import URLError
     from os.path import getsize
     from json import dumps
@@ -41,15 +33,22 @@ class bm:
 
 
 class errors:
-    class ConnectionError(Exception):
-        """Unable to connect to server"""
+    """
+    General errors used for better information use
+    
+    ### Available Errors:
+    - HTTPError > Unspecified http error
+    - JSONDecoderError > Unable to parse JSON data
+    """
+    class HTTPError(Exception):
+        """Unspecified http error"""
         def __init__(self, message=None, *args):
             self.message = message
 
         def __str__(self):
             if self.message:
                 return self.message
-            return 'Unable to connect'
+            return 'HTTP connection failed'
 
     class JSONDecoderError(Exception):
         """Unable to decode JSON input"""
@@ -61,79 +60,15 @@ class errors:
                 return self.message
             return 'Unable to decode JSON'
 
-
-class requests:
-    """Basic http methods"""
-
-    def get(_url: str, _params: dict={}):
-        """Call a URL and return JSON data"""
-
-        try:
-            if not _url.startswith('https://') and not _url.startswith('http://'):
-                _url = 'https://' + _url
-
-            if _params != {}:
-                if _url[-1] == '?':
-                    _furl: str = _url
-                else:
-                    _furl: str = _url + '?'
-
-                for i in _params.keys():
-                    if i + '=' not in _furl:
-                        _furl += i + '=' + _params[i] + '&'
-
-                data = bm.urlopen(_furl[0:-1])
-            else:
-                data = bm.urlopen(_url)
-        except bm.URLError:
-            raise errors.ConnectionError('Nodename nor servername provided, or not known')
-
-        try:
-            tempJSON: dict = eval((str(data.read()).replace('true', 'True').replace('false', 'False').replace('null', 'None'))[2:-1])
-        except:
-            raise errors.JSONDecoderError('Unable to parse JSON data from given url({0})'.format(_url))
-
-        class response:
-            code:   int = data.getcode()
-            json:  dict = tempJSON
-            pretty: str = bm.dumps(json, indent=2)
-            text:   str = data.read()
-
-        return response
-    
-    def post(_url: str, _params: dict={}):
-        """Post dictionary data to a URL and return JSON data"""
-
-        if not _url.startswith('https://') and not _url.startswith('http://'):
-            _url: str = 'https://' + _url
-        
-        try:
-            req = bm.Request(_url, method='POST')
-            if _params != {}:
-                jdata: dict = bm.dumps(_params).encode()
-                req.add_header('Content-Type', 'application/json')
-                req.add_header('Content-Length', len(jdata))
-            
-            data = bm.urlopen(_url, data=jdata)
-            tempJSON: dict = eval((str(data.read()).replace('true', 'True').replace('false', 'False').replace('null', 'None'))[2:-1])
-        except (bm.URLError, bm.JSONDecodeError, SyntaxError, NameError, TypeError, ValueError, ZeroDivisionError) as err:
-            if type(err) is bm.URLError:
-                raise errors.ConnectionError('Nodename nor servername provided, or not known')
-            else:
-                raise errors.JSONDecoderError('Unable to parse JSON data from given url({0})'.format(_url))
-        
-        class response:
-            code:   int = data.getcode()
-            json:  dict = tempJSON
-            pretty: str = bm.dumps(json, indent=2)
-            text:   str = data.read()
-        
-        return response
-
 class files:
-    """Custom file methods"""
+    """
+    Custom file method wrapper
+    
+    ### Available Methods:
+    - clear() > Clear a file while avoiding null character error
+    """
 
-    def clear(_file: bm.TextIOWrapper):
+    def clear(_file: bm.TextIOWrapper | str) -> None:
         """Clear a file using truncate"""
 
         if type(_file) is not bm.TextIOWrapper:
@@ -146,18 +81,36 @@ class files:
             raise bm.UnsupportedOperation('File is not writeable or has been closed')
 
 class json:
-    """Custom JSON methods"""
+    """
+    Custom JSON method wrapper
+    
+    ### Available Methods:
+    - sload() > Convert a string to valid JSON data
+    - load() > Load JSON data from a file
+    - set() > Set a key in a JSON file
+    - add() > Add a key value pair to a JSON file
+    - remove() > Remove a key value pair from a JSON file
+    """
+
+    def sload(_jdata: str) -> dict | list:
+        """Convert a string to JSON data"""
+        
+        try:
+            return bm.loads(str(_jdata))
+        except bm.JSONDecodeError:
+            raise errors.JSONDecoderError('JSON file was typed incorrectly or was dangerous')
 
     def load(_file: bm.TextIOWrapper) -> dict | list:
-        """Load data as a dictionary or list type"""
+        """Load JSON data as a dictionary or list type"""
 
         if type(_file) is not bm.TextIOWrapper:
-            raise TypeError('Expected type _io.TextIOWrapper but received {0}'.format(type(_file)))
+            with open(_file, 'r') as _file:
+                pass
         elif _file.mode[0] == 'w':
             raise TypeError('Cannot read from file in write mode')
         try:
             return bm.jload(_file)
-        except (bm.JSONDecodeError, SyntaxError, NameError, TypeError, ValueError, ZeroDivisionError):
+        except bm.JSONDecodeError:
             raise errors.JSONDecoderError('JSON file was typed incorrectly or was dangerous')
 
     def set(_file: bm.TextIOWrapper, _settings: dict) -> None:
@@ -165,7 +118,6 @@ class json:
 
         data: dict | list = json.load(_file)
         listdata: list = []
-        appljson: str = ''
 
         if type(data) is dict:
             data.update(_settings)
@@ -216,70 +168,191 @@ class json:
         files.clear(_file)
         _file.write(appljson)
 
+class requests:
+    """
+    Basic http access functions
+    
+    ### Available Methods:
+    - get() > Call a URL and return a class method
+    - post() > POST JSON data to a URL and return a class method
+    """
+
+    def get(_url: str, _params: dict={}):
+        """Call a URL and return a class method"""
+
+        try:
+            if not _url.startswith('https://') and not _url.startswith('http://'):
+                _url = 'http://' + _url
+            elif _url[-1] != '?':
+                _url += '?'
+
+            if _params != {}:
+                for i in _params.keys():
+                    if i + '=' not in _url:
+                        _url += i + '=' + _params[i] + '&'
+
+                data = bm.urlopen(_url[:-1])
+            else:
+                data = bm.urlopen(_url)
+        except bm.URLError as err:
+            raise errors.HTTPError(err)
+
+        class response:
+            code:   int = data.getcode()
+            json:  dict = json.sload(data.read().decode())
+            pretty: str = bm.dumps(json, indent=2)
+            raw:  bytes = data.read()
+            text:   str = data.read().decode()
+
+        return response
+    
+    def post(_url: str, _params: dict={}):
+        """Post dictionary data to a URL and return a class method"""
+
+        if not _url.startswith('https://') and not _url.startswith('http://'):
+            _url = 'http://' + _url
+        
+        try:
+            req = bm.Request(_url, method='POST')
+            if _params != {}:
+                jdata: dict = bm.dumps(_params).encode()
+                req.add_header('Content-Type', 'application/json')
+                req.add_header('Content-Length', len(jdata))
+            
+            data = bm.urlopen(_url, data=jdata)
+        except bm.URLError as err:
+            raise errors.HTTPError(err)
+        
+        class response:
+            code:   int = data.getcode()
+            json:  dict = json.sload(data.read().decode())
+            pretty: str = bm.dumps(json, indent=2)
+            raw:  bytes = data.read()
+            text:   str = data.read().decode()
+        
+        return response
+
 class time:
-    """Time related methods"""
+    """
+    Time modifying and informative functions
+    
+    ### Available Methods:
+    - epoch() > Return epoch based off system clock
+    - date() > Convert epoch to human readable date
+    - sleep() > Block thread execution for specified time in ms
+    """
 
     def epoch() -> float:
-        """Return epoch based off system clock (If applicable)"""
+        """Return epoch based off system clock"""
 
         return bm.ctime()
 
-    def getdate(format: int=0, timestamp: float=bm.ctime()) -> str:
-        """Convert epoch to human formatted date"""
+    def date(_epoch: float | None=epoch(), _tz: str='local', _format: int=1) -> str:
+        """
+        Convert epoch to human formatted date
+        
+        ### Examples:
+        - date() -> Local Timezone
+        - date(_epoch=0) -> January 1st, 1970
+        - date(_tz='-05:00') -> New York, USA
+        - date(_tz='+11:00') -> Sydney, Australia
+        """
 
-        date = bm.localtime(timestamp)
-        month = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
-                 'August', 'September', 'October', 'November', 'December'][date.tm_mon - 1]
-        day_end = ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th',
-                   'th'][int(str(date.tm_mday)[-1])] if str(date.tm_mday) not in ['11', '12', '13'] else 'th'
-        hour = date.tm_hour % 12 if date.tm_hour % 12 != 0 else 12
-        min = str(date.tm_min) if len(str(date.tm_min)) != 1 else f'0{date.tm_min}'
-        sec = str(date.tm_sec + 1) if len(str(date.tm_sec + 1)) != 1 else f'0{date.tm_sec + 1}'
-        formats = ['{0}-{1}-{2} {3}:{4}:{5}'.format(date.tm_year, date.tm_mon if len(str(date.tm_mon)) != 1 else f'0{date.tm_mon}',
-                                                    date.tm_mday, date.tm_hour if len(str(date.tm_hour)) != 1 else f'0{date.tm_hour}', min, sec),
-                   '{0}:{1} {2} on the {3}{4} of {5}, {6}'.format(hour, min, 'PM' if date.tm_hour >= 12 else 'AM',
-                                                                  date.tm_mday, day_end, month, date.tm_year)]
-        return formats[format]
+        try:
+            if _tz.lower() == 'local':
+                sdate = bm.localtime(_epoch)
+            elif _tz.startswith('+') or _tz.startswith('-'):
+                try:
+                    timezone = bm.timezone(bm.timedelta(
+                            hours=int(_tz[:3]), minutes=int(_tz[4:])))
+                    sdate = bm.datetime.fromtimestamp(_epoch, 
+                            tz=timezone).timetuple()
+                except (ValueError, IndexError):
+                    raise TypeError('Timezone (\'{}\') not found'.format(_tz))
+            else:
+                raise TypeError('Timezone (\'{}\') not found'.format(_tz))
+        except (OverflowError, TypeError) as err:
+            if type(err) is OverflowError:
+                raise TypeError('Epoch timestamp too large')
+            else:
+                raise TypeError('Unable to parse epoch timestamp')
 
-    def sleep(ms: float) -> None:
-        """Delay execution for x amount of milliseconds (If applicable)"""
+        def fv(val: int) -> str:
+            return val if val > 9 else f'0{val}'
 
-        bm.sleep(ms / 1000)
+        if _format == 1:
+            return '{}-{}-{} {}:{}:{}'.format(sdate.tm_year,
+                fv(sdate.tm_mon), fv(sdate.tm_mday), fv(sdate.tm_hour),
+                fv(sdate.tm_min), fv(sdate.tm_sec))
+
+        elif _format == 2:
+            hour: int = sdate.tm_hour % 12 if sdate.tm_hour % 12 != 0 else 12
+            mon: list = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+                        'August', 'September', 'October', 'November', 'December'][sdate.tm_mon - 1]
+            end: list = ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th',
+                        'th'][int(str(sdate.tm_mday)[-1])]
+            if sdate.tm_mday in [11, 12, 13]:
+                end: str = 'th'
+            
+            return '{}:{} {} on the {}{} of {}, {}'.format(hour, fv(sdate.tm_min), 
+                   'PM' if sdate.tm_hour >= 12 else 'AM', sdate.tm_mday, end, mon, sdate.tm_year)
+        else:
+            raise TypeError('Format ({}) not found'.format(_format))
+
+    def sleep(_ms: float) -> None:
+        """Delay current thread execution for x amount of milliseconds"""
+
+        bm.sleep(_ms / 1000)
 
 class logging:
-    """General logging functions and ANSI escape sequence colour codes"""
+    """
+    Terminal modifiers
+    
+    ### Available Methods:
+    - colours > List of supported terminal colours
+    - cvalues > List of corresponding colour values
+    - ctext() > Return text in the specified colour
+    - log() > Log text to the terminal
+    """
 
     colours: list = ['pink', 'green', 'blue', 'yellow',
                      'red', 'white', 'cyan', 'gray', '']
     cvalues: list = ['35', '32', '34', '33',
                      '31', '38', '36', '30', '0']
 
-    def ctext(text: str='', colour: str='', bold: bool=False) -> str:
+    def ctext(_text: str='', _colour: str='', _bold: bool=False) -> str:
         """Return text in specified colour"""
 
         try:
-            cvalue = logging.cvalues[logging.colours.index(colour)]
+            cvalue = logging.cvalues[logging.colours.index(_colour)]
         except ValueError:
-            cvalue = colour
+            cvalue = _colour
 
         bm.system('')
-        return '\u001b[{0}{1}{2}\u001b[0m'.format(cvalue, ';1m' if bold else 'm', text)
+        return '\u001b[{0}{1}{2}\u001b[0m'.format(cvalue, ';1m' if _bold else 'm', _text)
 
-    def log(type: int, header: str, details: str) -> None:
+    def log(_header: str, _details: str, _type: int=1) -> None:
         """Log text to the terminal as an info, warning or error type"""
 
         try:
             data = [[logging.ctext('INFO', 'blue', True), '     '],
                     [logging.ctext('WARNING', 'yellow', True), '  '],
-                    [logging.ctext('ERROR', 'red', True), '    ']][type - 1]
+                    [logging.ctext('ERROR', 'red', True), '    ']][_type - 1]
         except IndexError:
-            raise IndexError('Unknown type ({0})'.format(type))
+            raise IndexError('Unknown type ({})'.format(_type))
 
         bm.system('')
         print('{0} {1}{2}{3} {4}'.format(logging.ctext(time.getdate(), 'gray', True), data[0], data[1],
-                                         logging.ctext(header, 'pink'), details))
+                                         logging.ctext(_header, 'pink'), _details))
 
 class wave:
+    """
+    Custom WAVE file methods
+    
+    ### Available Methods:
+    - length() > Get the length of a wave file in seconds
+    """
+
     def length(_file: bm.TextIOWrapper | str) -> float:
         """Return the length of a wave file in seconds"""
 
@@ -294,32 +367,25 @@ class wave:
         return round((bm.getsize(_file) - 44) * 1000 / rate / 1000, 2)
 
 class string:
-    """Custom string modifying methods"""
-
-    def reverse(_text: str) -> str:
-        """Reverse a string"""
-
-        text: str = ''
-        inc: int = -1
-        for i in _text:
-            text += _text[inc]
-            inc -= 1
-        return text
-
+    """
+    Custom string modifying methods
+    
+    ### Available Methods:
+    - cstrip() > Caveman regex replacement
+    - mreplace() > Replace multiple keywords in a string using a dict
+    - cipher() > A simple caeser cipher
+    - halve() > Halve a string and return halves as a list
+    """
 
     def cstrip(_text: str, _chars: str) -> str:
         """Strip a string using a character list as a filter"""
 
-        for i in _chars:
-            _text = _text.replace(i, '')
-        return _text
+        return [_text.replace(i, '') for i in _chars]
 
     def mreplace(_text: str, _chars: dict) -> str:
         """Multi replace words in a string using a dictionary"""
 
-        for i in _chars.keys():
-            _text = _text.replace(i, _chars[i])
-        return _text
+        return [_text.replace(i, _chars[i]) for i in _chars.keys()]
 
     def cipher(_text: str, _shift: int) -> str:
         """A simple caeser cipher utilising place shifting"""
@@ -336,7 +402,15 @@ class string:
             return [_text[0:(i // 2 + 1)], _text[(i // 2 + 1):]]
 
 class types:
-    """Custom type methods"""
+    """
+    Custom type modifying and converting
+    
+    ### Available Methods:
+    - list() > Convert a dict or tuple to a list
+    - tuple() > Convert a dict or list to a tuple
+    - dict() > Convert a tuple or list to a dict
+    - bool() > Return a bool from most standard data types
+    """
 
     class list():
         """Convert a dictionary or tuple to a list"""
