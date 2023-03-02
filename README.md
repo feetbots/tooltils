@@ -1,4 +1,4 @@
-# tooltils v1.1.0
+# tooltils v1.2.0
 A lightweight python utility library built on standard modules.
 
 ## Installation & Usage
@@ -6,24 +6,23 @@ A lightweight python utility library built on standard modules.
 pip(3) install tooltils
 ```
 
-There are `8` different class methods:
-- Requests (Basic http methods)
-- Files (Custom file methods)
-- JSON (JSON file methods)
-- Time (Custom time related methods)
-- Logging (Logging and ANSI escape sequence methods)
-- Wave (WAVE sound file methods)
-- String (Custom string modifiers)
-- Types (Custom type modifiers)
+There are `9` different class methods:
+- Errors (General errors for better information use)
+- Files (Custom file method wrapper)
+- JSON (Custom JSON method wrapper)
+- Requests (Basic http access functions)
+- Time (Time modifying and informative functions)
+- Logging (Terminal modifiers)
+- Wave (Custom WAVE file methods)
+- String (Custom string modifying methods)
+- Types (Custom type modifying and converting)
 
 ## Roadmap
-- An audio player utilising inbuilt tools on MacOS and Windows
+- An audio player utilising API's on MacOS, Windows and Linux
 - Faster performance utilising Cython
-- More wave file methods
+- More methods for each class
 
 ## Info
-Project maintained by feetbots (repository owner)\
-You can contact me on [Discord](https://discord.com/) at `ebots#7424` or `ebots#6157`
-
-## License
-- [MIT](https://choosealicense.com/licenses/mit/)
+- Project maintained by `ebots#6157`
+- License: [MIT](https://choosealicense.com/licenses/mit/)
+- PyPi: [tooltils](https://pypi.org/project/tooltils/1.2.0/)
