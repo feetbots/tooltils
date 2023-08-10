@@ -276,13 +276,16 @@ def epoch(date: str) -> float:
         splitDate: list = str(date).replace('-', '/').split(' ')
     else:
         try:
+            # Remove '1st' to avoid stripping Augu[st]
             sdate: list = mstrip(date, 
                           {':': ' ', ' on the': '', 
                            ' of': '', ',': '',
-                           'th': '', 'st': '',
+                           'th': '', '1st': '',
                            'nd': '', 'rd': ''}).split(' ')
             hours, minutes, meridan, days, month, year = sdate
-            
+
+            if '1st' in date:
+                days = '1'
             if meridan == 'PM':
                 hours = str(int(hours) + 12)
 
@@ -294,7 +297,6 @@ def epoch(date: str) -> float:
     try:
         sdate = _bm.datetime(*[int(i) for i in splitDate[0].split(
                              '/') + splitDate[1].split(':')])
-        print(sdate.time())
     except IndexError:
         raise TypeError('Invalid date argument')
 
@@ -302,7 +304,7 @@ def epoch(date: str) -> float:
                              sdate.day, sdate.hour,
                              sdate.minute, sdate.second).toordinal(
                              ) - _bm.datetime(1970, 1, 1).toordinal() - 1
-    hours = days * 24 + sdate.hour
+    hours = days * 24 + sdate.hour + 14
     minutes = hours * 60 + sdate.minute
     epoch = minutes * 60 + sdate.second
     

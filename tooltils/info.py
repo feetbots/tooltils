@@ -5,7 +5,7 @@ from os import listdir
 
 
 author:  str = 'feetbots'
-version: str = '1.4.1'
+version: str = '1.4.2'
 lines:   int = 0
 license: str = """
 MIT License
@@ -32,8 +32,7 @@ SOFTWARE.
 """
 
 files: list = listdir('./') + ['tooltils/' + i for i in listdir('./tooltils')] + \
-              ['tooltils/sys/' + i for i in listdir('./tooltils/sys')] + \
-              ['docs/source/' + i for i in listdir('./docs/source/')]
+              ['tooltils/sys/' + i for i in listdir('./tooltils/sys')]
 
 for i in files:
     if '.DS_Store' in i or '__pycache__' in i:
