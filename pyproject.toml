@@ -1,10 +1,14 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "tooltils"
-version = "1.4.0"
+version = "1.4.1"
 authors = [
             {name="feetbots", email="pheetbots@gmail.com"},
           ]
-description = "An extensive python utility library built on standard modules"
+description = "An optimised python utility library built on the standard library"
 readme = "README.md"
 requires-python = ">=3.7"
 license = {file="LICENSE"}

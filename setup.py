@@ -1,5 +1,6 @@
-from .tooltils.info import version
 from setuptools import setup
+
+from .tooltils.info import version
 
 
 with open('README.md') as _f:
@@ -7,7 +8,7 @@ with open('README.md') as _f:
 
 setup(
       name='tooltils',
-      description='An extensive python utility library built on standard modules',
+      description='An optimised python utility library built on the standard library',
       long_description=desc,
       version=version,
       license='MIT',
@@ -15,4 +16,5 @@ setup(
       author_email='pheetbots@gmail.com',
       packages=['tooltils',],
       ext_modules=[],
+      package_dir={'':"tooltils"},
 )
