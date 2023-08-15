@@ -5,7 +5,7 @@ from os import listdir
 
 
 author:  str = 'feetbots'
-version: str = '1.4.2'
+version: str = '1.4.3'
 lines:   int = 0
 license: str = """
 MIT License

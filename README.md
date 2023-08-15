@@ -1,21 +1,21 @@
-# tooltils | v1.4.2
+# tooltils | v1.4.3
 
 [![python](https://img.shields.io/pypi/pyversions/tooltils.svg)](https://pypi.org/project/tooltils/)
 [![downloads](https://static.pepy.tech/personalized-badge/tooltils?period=total&units=international_system&left_color=grey&right_color=red&left_text=downloads)](https://pepy.tech/project/tooltils)
 
-An optimised python utility library built on the standard library
+An optimised python utility package built on the standard library
 
 ```py
 >>> import tooltils
 >>> req = tooltils.get('httpbin.org/get/')
 >>> req
->>> '<Request GET [200]>'
+'<Request GET [200]>'
 >>> req.url
->>> 'https://httpbin.org/get'
+'https://httpbin.org/get'
 >>> req.status_code
->>> '200 OK'
+'200 OK'
 >>> req.headers
->>> {'Accept': 'application/json', ...}
+{'Accept': '*/*', 'User-Agent': 'tooltils/1.4.3', ...}
 ```
 
 ## Installation

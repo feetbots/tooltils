@@ -1,7 +1,7 @@
 """
-# tooltils | v1.4.0
+# tooltils | v1.4.3
 
-An extensive python utility library built on standard modules
+An optimised python utility package built on the standard library
 
 ```py
 >>> import tooltils
@@ -13,12 +13,12 @@ An extensive python utility library built on standard modules
 >>> req.status_code
 '200 OK'
 >>> req.headers
-{'Accept': 'application/json', ...}
+{'Accept': '*/*', 'User-Agent': 'tooltils/1.4.3', ...}
 ```
 
 ## API
 
-[readthedocs.org](https://tooltils.readthedocs.io/en/latest/)
+Read the full documentation on `API.md` in the project files
 """
 
 
@@ -30,8 +30,8 @@ import tooltils.sys as sys
 
 class _bm:
     from datetime import datetime, timezone, timedelta
+    from time import time, localtime, gmtime
     from os.path import getsize, exists
-    from time import time, localtime
     from typing import Any, Union
     from io import TextIOWrapper
     
@@ -41,23 +41,21 @@ class _bm:
     class url_response:
         pass
     
-    class UnixEPOCH_Seconds:
+    class EPOCH_seconds:
         pass
 
 
-styles: dict[str, str] = {
-    "pink":   "35", 
-    "green":  "32", 
-    "blue":   "34", 
-    "yellow": "33", 
-    "red":    "31", 
-    "white":  "38",
-    "cyan":   "36", 
-    "gray":   "2",
-    "italic": "3",
-    "none":   "0"
+colours: dict[str, str] = {
+    "white":  97,
+    "cyan":   36,
+    "pink":   35,
+    "blue":   34,
+    "yellow": 33,
+    "green":  32,
+    "red":    31,
+    "gray":   30,
 }
-"""List of supported ANSI styles"""
+"""List of the main colours as ANSI integer codes"""
 
 months: list[str] = [
     'January', 'February', 
@@ -71,9 +69,14 @@ months: list[str] = [
 
 python_version: str = sys.info.python_version
 """Current Python interpereter version"""
+platform:       str = sys.info.platform
+"""Name of current operating system"""
 
 def length(file: _bm.FileDescriptorOrPath) -> float:
     """Get the length of a wave file in seconds"""
+
+    if not isinstance(file, (str, _bm.TextIOWrapper)):
+        raise TypeError('File must be a readable instance')
 
     file: str = file.name if type(file) is _bm.TextIOWrapper else file
 
@@ -93,13 +96,13 @@ def length(file: _bm.FileDescriptorOrPath) -> float:
 
     return round((_bm.getsize(file) - 44) * 1000 / rate / 1000, 2)
 
-def get(url: _bm.Union[str, bytes], 
+def get(url: _bm.Union[str, bytes],
         auth: tuple=None,
         data: dict=None,
         headers: dict=None,
         cookies: dict=None,
         cert: _bm.FileDescriptorOrPath=None, 
-        timeout: int=10, 
+        timeout: int=15, 
         encoding: str='utf-8',
         mask: bool=False,
         agent: str=None,
@@ -119,7 +122,7 @@ def post(url: _bm.Union[str, bytes],
          headers: dict=None,
          cookies: dict=None,
          cert: _bm.FileDescriptorOrPath=None, 
-         timeout: int=10, 
+         timeout: int=15, 
          encoding: str='utf-8',
          mask: bool=False,
          agent: str=None,
@@ -140,7 +143,7 @@ def download(url: _bm.Union[str, bytes],
              cookies: dict=None,
              cert: _bm.FileDescriptorOrPath=None, 
              file_name: _bm.FileDescriptorOrPath=None,
-             timeout: int=10, 
+             timeout: int=15, 
              encoding: str='utf-8',
              mask: bool=False,
              agent: str=None,
@@ -155,21 +158,40 @@ def download(url: _bm.Union[str, bytes],
                             mask, agent, verify, redirects)
 
 def style(text: str, 
-          style: str='white', 
-          bold: bool=False, 
+          style: str, 
+          fill: bool=False,
+          bold: bool=False,
+          italic: bool=False,
+          crossed: bool=False,
+          underline: bool=False,
+          double_underline: bool=False,
           flush: bool=True
           ) -> str:
-    """Return text in the specified style"""
+    """Create text in the specified colour and or style"""
 
     try:
-        value = styles[str(style).lower()]
+        code = colours[str(style).lower()]
     except KeyError:
-        value = style
+        code = style
+
+    style: str = ''
 
     if flush:
-        sys.call('')
+        sys.call('', shell=True)
+    if fill:
+        code += 10
+    if bold:
+        style += ';1'
+    if italic:
+        style += ';3'
+    if crossed:
+        style += ';9'
+    if underline:
+        style += ';4'
+    if double_underline:
+        style += ';21'
 
-    return '\u001b[{0}{1}{2}\u001b[0m'.format(value, ';1m' if bold else 'm', text)
+    return '\u001b[{0}{1}{2}\u001b[0m'.format(code, style + 'm', text)
 
 def halve(text: str) -> list:
     """Return the halves of a string"""
@@ -218,7 +240,7 @@ def mstrip(text: str,
     
     return text
 
-def date(epoch: _bm.UnixEPOCH_Seconds=..., 
+def date(epoch: _bm.EPOCH_seconds=..., 
          timezone: str='local', 
          format: int=1
          ) -> str:
@@ -231,14 +253,16 @@ def date(epoch: _bm.UnixEPOCH_Seconds=...,
         tz = timezone
         if tz.lower() == 'local':
             sdate = _bm.localtime(epoch)
-        elif tz.startswith('+') or tz.startswith('-') or tz == '00:00':
+        elif tz.lower() == 'gm' or '00:00' in tz.lower():
+            sdate = _bm.gmtime(epoch)
+        elif tz.startswith('+') or tz.startswith('-'):
             timezone = _bm.timezone(_bm.timedelta(
                        hours=int(tz[:3]), 
                        minutes=int(tz[4:])))
             sdate    = _bm.datetime.fromtimestamp(epoch, 
                        tz=timezone).timetuple()
         else:
-            raise TypeError('Timezone not found')
+            raise ValueError
     except (ValueError, IndexError):
         raise TypeError('Timezone not found')
     except OverflowError:
@@ -304,6 +328,7 @@ def epoch(date: str) -> float:
                              sdate.day, sdate.hour,
                              sdate.minute, sdate.second).toordinal(
                              ) - _bm.datetime(1970, 1, 1).toordinal() - 1
+    # Add 14 hours because of obscure bug
     hours = days * 24 + sdate.hour + 14
     minutes = hours * 60 + sdate.minute
     epoch = minutes * 60 + sdate.second

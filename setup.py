@@ -8,7 +8,7 @@ with open('README.md') as _f:
 
 setup(
       name='tooltils',
-      description='An optimised python utility library built on the standard library',
+      description='An optimised python utility package built on the standard library',
       long_description=desc,
       version=version,
       license='MIT',

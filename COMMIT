@@ -1,0 +1,7 @@
+git add .
+git commit -m "{version} {msg}"
+git push origin main
+python3.11 -m build
+python3.11 -m twine upload --repository pypi dist/*
+: User = __token__
+: Pass = {pypi token}

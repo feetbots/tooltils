@@ -15,7 +15,7 @@ class _bm:
 
     from .errors import (ConnectionError, StatusCodeError, 
                          UnicodeDecodeError, TimeoutExpired)
-    from .sys.info import platform
+    from .sys.info import platform, cpu
     from .info import version
     
     class FileDescriptorOrPath:
@@ -76,7 +76,8 @@ def ctx(verify: bool=True, cert: str=None):
     """Create a custom SSLContext instance"""
 
     try:
-        if cert is not None and not cert is type(tuple):
+        if type(cert) is not str and (
+            cert is not None and not cert is type(tuple)):
             raise TypeError('Certificate must be a valid file path')
 
         ctx = _bm.create_default_context(cafile=cert)
@@ -157,7 +158,7 @@ class request():
                  cookies: dict=None,
                  cert: _bm.FileDescriptorOrPath=None, 
                  file_name: _bm.FileDescriptorOrPath=None,
-                 timeout: int=10, 
+                 timeout: int=15, 
                  encoding: str='utf-8',
                  mask: bool=False,
                  agent: str=None,
@@ -166,6 +167,7 @@ class request():
 
         self.verified:  bool = bool(verify)
         self.redirects: bool = bool(redirects)
+        self.mask:      bool = bool(mask)
 
         u = method.upper()
         if u not in ['GET', 'POST', 'PUT', 'FILE', 
@@ -175,11 +177,12 @@ class request():
         elif type(method) is not str:
             raise TypeError('Method must be a valid string instance')
         else:
-            if u == 'HEAD' or u == 'HEADER':
-                method = 'HEAD'
-            elif u == 'FILE' or u == 'DOWNLOAD':
-                method = 'FILE'
-            self.method: str = u
+            if u == 'HEADER':
+                self.method = 'HEAD'
+            elif u == 'DOWNLOAD':
+                self.method = 'FILE'
+            else:
+                self.method: str = u
         if data is None:
             self.data: dict = {}
         elif type(data) is not dict:
@@ -232,12 +235,11 @@ class request():
         if agent is None:
             self.agent: str = f'Python-tooltils/{_bm.version}'
         if mask:
-            self.mask: bool = True
             if _bm.platform == 'Windows':
                 self.agent: str = 'Mozilla/5.0 (Windows NT 10.0; ' + \
                                   'rv:10.0) Gecko/20100101 Firefox/10.0'
             elif _bm.platform == 'MacOS':
-                self.agent: str = 'Mozilla/5.0 (Macintosh; Intel Mac OS X ' + \
+                self.agent: str = f'Mozilla/5.0 (Macintosh; {_bm.cpu} Mac OS' + \
                                   '10.15; rv:10.0) Gecko/20100101 Firefox/10.0'
             else:
                 self.agent: str = 'Mozilla/5.0 (X11; Linux x86_64; rv:10.0) ' + \
@@ -254,8 +256,6 @@ class request():
             raise TypeError('Encoding must be a valid string instance')
         else:
             self.encoding: str = encoding
-        
-        del u
         
         self.url: str = prep_url(url, data)
 
@@ -275,7 +275,7 @@ class request():
             req.add_header('Content-Length', str(len(self.data)))
 
         headers: dict = {'User-Agent': self.agent, 
-                         'Accept': 'application/json', 
+                         'Accept': '*/*', 
                          'Accept-Encoding': 'gzip, deflate'}
         headers.update(self.headers)
 
@@ -286,8 +286,6 @@ class request():
             req.add_header('Cookie', '{}={}'.format(i, self.cookies[i]))
 
         man = _bm.u.HTTPPasswordMgrWithDefaultRealm()
-
-        self.headers: _bm.MutableMapping[str, str] = req.headers
 
         if self.auth is not None:
             man.add_password(None, self.url, self.auth[0], self.auth[1])
@@ -328,43 +326,53 @@ class request():
         except (KeyboardInterrupt, EOFError):
             return None
 
-        code:        int = rdata.getcode()
-        reason:      str = status_codes[code]
-        status_code: str = f'{code} {reason}'
+        self._rdata           = rdata
+        self.code:        int = rdata.getcode()
+        self.reason:      str = status_codes[self.code]
+        self.status_code: str = f'{self.code} {self.reason}'
+        self.headers: _bm.MutableMapping[str, str] = rdata.headers['headers']
         
         if method != 'FILE':
-            text:  str = rdata.read().decode(self.encoding)
-            raw: bytes = text.encode(self.encoding)
-            html       = None
-            path       = None
+            self.text:  str = rdata.read().decode(self.encoding)
+            self.raw: bytes = self.text.encode(self.encoding)
+            self.html       = None
+            self.path       = None
         else:
-            def read() -> bytes:
-                """Read the file and return the data in bytes"""
-                return rdata.read()
-
-            def readlines() -> list:
-                """Read the file and return the data as a list split at every newline"""
-                return rdata.read().decode(self.encoding).splitlines()
-
             with open(self.file_name, 'wb+') as _f:
-                _bm.copyfileobj(data, _f)
-            path: str = _bm.abspath(self.file_name)
+                _f.write(rdata.read())
+
+            self.path: str = _bm.abspath(self.file_name)
 
         try:
-            json: dict = _bm.loads(text)
-        except (_bm.JSONDecodeError, UnicodeDecodeError,
-                UnicodeEncodeError) as err:
-            if type(err) is _bm.JSONDecodeError:
-                json = None
-                if text[0] == '<' or text[-1] == '>':
-                    html: str = text
-            else:
-                raise _bm.UnicodeDecodeError('Unable to decode ' + 
-                                             'URL data from codec \'{}\''.
-                                             format(self.encoding))
+            self.json: dict = _bm.loads(self.text)
+            self.headers: _bm.MutableMapping[str, str] = self.json['headers']
+        except _bm.JSONDecodeError:
+            self.json = None
+            self.headers: _bm.MutableMapping[str, str] = req.headers
+            if self.text[0] == '<' or self.text[-1] == '>':
+                self.html: str = self.text
+        except (UnicodeDecodeError, UnicodeEncodeError):
+            raise _bm.UnicodeDecodeError('Unable to decode ' + 
+                                         'URL data from codec \'{}\''.
+                                         format(self.encoding))
+        except AttributeError:
+            self.json = None
+            self.text = None
+            self.raw  = None
+            self.html = None
     
     def __str__(self):
         return f'<Request {self.method} [{self.code}]>'
+    
+    def read(self) -> bytes:
+        """Read the file and return the data in bytes"""
+
+        return self.rdata.read()
+
+    def readlines(self) -> list:
+        """Read the file and return the data as a list split at every newline"""
+    
+        return self.rdata.read().decode(self.encoding).splitlines()
 
 
 def get(url: _bm.Union[str, bytes], 
@@ -373,7 +381,7 @@ def get(url: _bm.Union[str, bytes],
         headers: dict=None,
         cookies: dict=None,
         cert: _bm.FileDescriptorOrPath=None, 
-        timeout: int=10, 
+        timeout: int=15, 
         encoding: str='utf-8',
         mask: bool=False,
         agent: str=None,
@@ -393,7 +401,7 @@ def post(url: _bm.Union[str, bytes],
          headers: dict=None,
          cookies: dict=None,
          cert: _bm.FileDescriptorOrPath=None, 
-         timeout: int=10, 
+         timeout: int=15, 
          encoding: str='utf-8',
          mask: bool=False,
          agent: str=None,
@@ -414,7 +422,7 @@ def download(url: _bm.Union[str, bytes],
              cookies: dict=None,
              cert: _bm.FileDescriptorOrPath=None, 
              file_name: _bm.FileDescriptorOrPath=None,
-             timeout: int=10, 
+             timeout: int=15, 
              encoding: str='utf-8',
              mask: bool=False,
              agent: str=None,
@@ -434,7 +442,7 @@ def put(url: _bm.Union[str, bytes],
         headers: dict=None,
         cookies: dict=None,
         cert: _bm.FileDescriptorOrPath=None, 
-        timeout: int=10, 
+        timeout: int=15, 
         encoding: str='utf-8',
         mask: bool=False,
         agent: str=None,
@@ -454,7 +462,7 @@ def patch(url: _bm.Union[str, bytes],
           headers: dict=None,
           cookies: dict=None,
           cert: _bm.FileDescriptorOrPath=None, 
-          timeout: int=10, 
+          timeout: int=15, 
           encoding: str='utf-8',
           mask: bool=False,
           agent: str=None,
@@ -468,33 +476,13 @@ def patch(url: _bm.Union[str, bytes],
                    None, timeout, encoding, 
                    mask, agent, verify, redirects)
 
-def header(url: _bm.Union[str, bytes], 
-           auth: tuple=None,
-           data: dict=None,
-           headers: dict=None,
-           cookies: dict=None,
-           cert: _bm.FileDescriptorOrPath=None, 
-           timeout: int=10, 
-           encoding: str='utf-8',
-           mask: bool=False,
-           agent: str=None,
-           verify: bool=True,
-           redirects: bool=True
-           ) -> _bm.url_response:
-    """Send a HEADER request"""
-
-    return request(url, 'HEADER', auth, data, 
-                   headers, cookies, cert, 
-                   None, timeout, encoding, 
-                   mask, agent, verify, redirects)
-
 def delete(url: _bm.Union[str, bytes], 
            auth: tuple=None,
            data: dict=None,
            headers: dict=None,
            cert: _bm.FileDescriptorOrPath=None,
            cookies: dict=None,
-           timeout: int=10, 
+           timeout: int=15, 
            encoding: str='utf-8',
            mask: bool=False,
            verify: bool=True,

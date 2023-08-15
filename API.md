@@ -6,9 +6,10 @@ Methods that dont need it’s own directory
 
 Properties:
 
-- styles dict - List of supported coloured ASCII codes
+- colours dict - List of the main colours as ANSI integer codes
 - months list - List of months in the year
 - python_version str - Current Python interpreter version
+- platform str - Name of current operating system
 
 Methods:
 
@@ -93,13 +94,18 @@ Returns: A class method <br>
 Return type: tooltils.requests.url_response <br>
 
 **style(text)** <br>
-Return text in the specified style
+Create text in the specified colour and or style
 
 Parameters:
 
 - text str - Text to style
-- style str = ‘white’ - Colour or font to use
+- style str - Colour or font to use
+- fill bool = False - Whether to fill the text background with the specified colour
 - bold bool = False - Whether to make the text bold
+- italic bool = False - Whether to italicise the text
+- crossed bool = False - Whether to cross the text
+- underline bool = False - Whether to underline the text
+- double_underline bool = False - Whether to double underline the text
 - flush bool = True - Whether to call ‘’ in the shell to make sure the text shows properly
 
 Returns: Styled text <br>
@@ -218,10 +224,8 @@ Exit the current thread with details
 
 Parameters:
 
-- details *str - String(s) to print before exiting
+- details str = '' - Text to print before exiting
 - code int = 0 — Exit code to use
-- sep str = ‘ ‘ - Detail string(s) seperator
-- end str = ‘\n’ - Detail string(s) end character(s)
 
 Returns: Nothing <br>
 Return type: NoReturn <br>
@@ -243,6 +247,8 @@ Parameters:
 - shell bool = False - Whether to use the shell(terminal)
 - timeout int = 10 - How long the process should last
 - check bool = False - Whether to raise an error if the returncode is not 0
+- clean bool = False - Whether to remove empty values from the output as a list
+- capture bool = True - Whether to capture the output of the program/command
 
 shell_response:
 
@@ -264,6 +270,7 @@ Parameters:
 - timeout int = 10 - How long the process should last
 - check bool = False - Whether to raise an error if the returncode is not 0
 - raw bool = False - Whether to return raw bytes output
+- clean bool = False - Whether to remove empty values from the output as a list
 
 Returns: List or bytes of stdout output <br>
 Return type: list | bytes <br>
@@ -277,6 +284,7 @@ Parameters:
 - shell bool = False - Whether to use the shell(terminal)
 - timeout int = 10 - How long the process should last
 - check bool = False - Whether to raise an error if the returncode is not 0
+- clean bool = False - Whether to remove empty values from the output as a list
 
 Returns: Exit code of command <br>
 Return type: int <br>
