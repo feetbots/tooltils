@@ -2,8 +2,9 @@
 
 
 class _bm:
-    from ssl import (create_default_context, CERT_NONE, 
-                     get_default_verify_paths, SSLError)              
+    from socket import create_connection#, socket, AF_INET, SOCK_STREAM 
+    from ssl import (SSLContext, SSLError, create_default_context,
+                     get_default_verify_paths, CERT_NONE)    
     from urllib.error import URLError, HTTPError
     from json.decoder import JSONDecodeError
     from typing import Union, MutableMapping
@@ -14,8 +15,8 @@ class _bm:
     import urllib.request as u
 
     from .errors import (ConnectionError, StatusCodeError, 
-                         UnicodeDecodeError, TimeoutExpired)
-    from .sys.info import platform, cpu
+                         UnicodeDecodeError, ConnectionTimeoutExpired)
+    from .sys.info import platform
     from .info import version
     
     class FileDescriptorOrPath:
@@ -70,7 +71,37 @@ status_codes: dict[int, str] = {
     504: 'Gateway Timeout',
     505: 'HTTP Version Not Supported',
 }
-"""List of valid HTTP response status codes (100-505)"""
+"""List of official valid HTTP response status codes (100-505)"""
+
+def where() -> _bm.certifs:
+    """Return default certificate file and path locations used by Python"""
+
+    data = _bm.get_default_verify_paths()
+
+    class certifs:
+        cafile: str = data.cafile
+        capath: str = data.capath
+
+    return certifs
+
+def connected() -> bool:
+    """Return whether the system has a valid internet connection"""
+    
+    try:
+        # connect to google's dns to make sure of long-term stability
+        _bm.create_connection(('8.8.8.8', 53), 1.5).close()
+        # have fallback method incase `create_connection()` doesn't work 
+        # conn = _bm.socket(_bm.AF_INET, _bm.SOCK_STREAM)
+        # conn.settimeout(3)
+        # conn.connect(('8.8.8.8', 53))
+        # conn.close()
+
+        return True
+    except OSError as e:
+        if 'timed out' in str(e):
+            return True
+        else:
+            return False
 
 def ctx(verify: bool=True, cert: str=None):
     """Create a custom SSLContext instance"""
@@ -79,26 +110,35 @@ def ctx(verify: bool=True, cert: str=None):
         if type(cert) is not str and (
             cert is not None and not cert is type(tuple)):
             raise TypeError('Certificate must be a valid file path')
+        elif cert is None:
+            cert: str = where().cafile
 
         ctx = _bm.create_default_context(cafile=cert)
     except (FileNotFoundError, IsADirectoryError, _bm.SSLError):
         raise FileNotFoundError('Not a valid certificate file path')
     
-    if not bool(verify):
+    if not verify:
         ctx.check_hostname = False
         ctx.verify_mode    = _bm.CERT_NONE
         ctx.                 set_ciphers('RSA')
     
     return ctx
 
+unverified: _bm.SSLContext = ctx(False)
+verified:   _bm.SSLContext = ctx()
+
 def prep_url(url: _bm.Union[str, bytes], 
              data: dict=None,
-             https: bool=True
+             https: bool=True,
+             order: bool=False
              ) -> str:
-    """Configure a URL making it viable for requests"""
+    """Configure a URL making it viable for requesting"""
 
-    if url[-1] == '/':
-        url = url[:-1]
+    try:
+        if url[-1] == '/':
+            url = url[:-1]
+    except IndexError:
+        raise ValueError('URL must contain a valid http URI object')
 
     if data is None:
         data = {}
@@ -114,13 +154,13 @@ def prep_url(url: _bm.Union[str, bytes],
             raise TypeError('URL must be a valid string instance')
 
     if data != {}:
-        url += '?' + _bm.urlencode(data, doseq=True, safe='/')
+        url += '?' + _bm.urlencode(data, doseq=order, safe='/')
     if url[0] == '/':
         if not _bm.exists(url):
-            raise _bm.StatusCodeError(404, 'Not Found')
+            raise _bm.StatusCodeError(404)
     elif url.startswith('file:///'):
         if not _bm.exists(url[7:]):
-            raise _bm.StatusCodeError(404, 'Not Found')
+            raise _bm.StatusCodeError(404)
     elif not st('https://') and not st('http://'):
         if https:
             url = 'https://' + url
@@ -128,17 +168,6 @@ def prep_url(url: _bm.Union[str, bytes],
             url = 'http://' + url
     
     return str(url)
-
-def where() -> _bm.certifs:
-    """Return default certificate file and path locations used by Python"""
-
-    data = _bm.get_default_verify_paths()
-
-    class certifs:
-        cafile: str = data.cafile
-        capath: str = data.capath
-
-    return certifs
 
 class Redirects(_bm.u.HTTPRedirectHandler):
     """A handler to stop redirects in urllib"""
@@ -169,20 +198,14 @@ class request():
         self.redirects: bool = bool(redirects)
         self.mask:      bool = bool(mask)
 
-        u = method.upper()
-        if u not in ['GET', 'POST', 'PUT', 'FILE', 
-                     'DOWNLOAD', 'PATCH', 'HEAD',
-                     'HEADER', 'DELETE']:
-            raise ValueError('Invalid http method \'{}\''.format(method))
-        elif type(method) is not str:
-            raise TypeError('Method must be a valid string instance')
-        else:
-            if u == 'HEADER':
-                self.method = 'HEAD'
-            elif u == 'DOWNLOAD':
-                self.method = 'FILE'
+        try:
+            if method.upper() not in ['GET', 'POST', 'PUT', 'DOWNLOAD',
+                                      'HEADER', 'PATCH', 'DELETE']:
+                raise ValueError('Invalid http method \'{}\''.format(method))
             else:
-                self.method: str = u
+                self.method: str = method.upper()
+        except AttributeError:
+            raise TypeError('Method must be a valid string instance')
         if data is None:
             self.data: dict = {}
         elif type(data) is not dict:
@@ -239,7 +262,7 @@ class request():
                 self.agent: str = 'Mozilla/5.0 (Windows NT 10.0; ' + \
                                   'rv:10.0) Gecko/20100101 Firefox/10.0'
             elif _bm.platform == 'MacOS':
-                self.agent: str = f'Mozilla/5.0 (Macintosh; {_bm.cpu} Mac OS' + \
+                self.agent: str = f'Mozilla/5.0 (Macintosh; Apple M1 Mac OS' + \
                                   '10.15; rv:10.0) Gecko/20100101 Firefox/10.0'
             else:
                 self.agent: str = 'Mozilla/5.0 (X11; Linux x86_64; rv:10.0) ' + \
@@ -265,13 +288,13 @@ class request():
 
         if rmethod == 'POST' or rmethod == 'PUT':
             data = _bm.dumps(self.data).encode()
-        elif rmethod == 'FILE':
+        elif rmethod == 'DOWNLOAD':
             rmethod = 'GET'
 
         req = _bm.u.Request(self.url, data=data, method=rmethod)
 
         if self.method == 'POST':
-            req.add_header('Content-Type', 'application/json; charset=UTF-8')
+            req.add_header('Content-Type', 'application/json; charset=utf8')
             req.add_header('Content-Length', str(len(self.data)))
 
         headers: dict = {'User-Agent': self.agent, 
@@ -302,25 +325,19 @@ class request():
             rdata = _bm.u.urlopen(req, context=_ctx, 
                                   timeout=self.timeout)
         except _bm.HTTPError as err:
-            raise _bm.StatusCodeError(err.code, 
-                                      status_codes[err.code])
+            raise _bm.StatusCodeError(err.code)
         except _bm.URLError as err:
             if '[Errno 8]' in str(err):
-                try:
-                    _bm.u.urlopen('https://httpbin./get', timeout=10, 
-                                  context=ctx(False))
-
-                    raise _bm.StatusCodeError(404, 'Not Found')
-                except (_bm.URLError, TimeoutError):
+                if connected():
+                    raise _bm.StatusCodeError(404)
+                else:
                     raise _bm.ConnectionError('Internet connection not found')
-                except _bm.HTTPError:
-                    raise _bm.ConnectionError('Unspecified urlopen error')
             elif 'SSL' in str(err).upper():
                 raise _bm.ConnectionError('SSL Certificate not verified correctly')
             else:
                 raise _bm.ConnectionError('Unspecified urlopen error')
         except TimeoutError:
-            raise _bm.TimeoutExpired('The request read operation timed out')
+            raise _bm.ConnectionTimeoutExpired('The request connection operation timed out')
         except ValueError:
             raise ValueError('Invalid URL \'' + request.url + '\'')
         except (KeyboardInterrupt, EOFError):
@@ -332,47 +349,61 @@ class request():
         self.status_code: str = f'{self.code} {self.reason}'
         self.headers: _bm.MutableMapping[str, str] = rdata.headers['headers']
         
-        if method != 'FILE':
-            self.text:  str = rdata.read().decode(self.encoding)
-            self.raw: bytes = self.text.encode(self.encoding)
-            self.html       = None
-            self.path       = None
+        if self.method != 'HEADER':
+            if self.method != 'FILE':
+                self.text:  str = rdata.read().decode(self.encoding)
+                self.raw: bytes = self.text.encode(self.encoding)
+                self.html       = None
+                self.path       = None
+            else:
+                with open(self.file_name, 'wb+') as _f:
+                    _bm.copyfileobj(rdata, _f)
+
+                self.path: str = _bm.abspath(self.file_name)
+
+            try:
+                self.json: dict = _bm.loads(self.text)
+                self.headers: _bm.MutableMapping[str, str] = self.json['headers']
+            except _bm.JSONDecodeError:
+                self.json = None
+                self.headers: _bm.MutableMapping[str, str] = req.headers
+                if self.text[0] == '<' or self.text[-1] == '>':
+                    self.html: str = self.text
+            except UnicodeDecodeError:
+                raise _bm.UnicodeDecodeError('Unable to decode ' + 
+                                            'URL data from codec \'{}\''.
+                                            format(self.encoding))
+            # Make sure if the response is html otherwise set json to None
+            except AttributeError:
+                self.json = None
+                self.text = None
+                self.raw  = None
+                self.html = None
         else:
-            with open(self.file_name, 'wb+') as _f:
-                _f.write(rdata.read())
-
-            self.path: str = _bm.abspath(self.file_name)
-
-        try:
-            self.json: dict = _bm.loads(self.text)
             self.headers: _bm.MutableMapping[str, str] = self.json['headers']
-        except _bm.JSONDecodeError:
-            self.json = None
-            self.headers: _bm.MutableMapping[str, str] = req.headers
-            if self.text[0] == '<' or self.text[-1] == '>':
-                self.html: str = self.text
-        except (UnicodeDecodeError, UnicodeEncodeError):
-            raise _bm.UnicodeDecodeError('Unable to decode ' + 
-                                         'URL data from codec \'{}\''.
-                                         format(self.encoding))
-        except AttributeError:
-            self.json = None
             self.text = None
             self.raw  = None
             self.html = None
-    
+            self.json = None
+            self.path = None
+        
     def __str__(self):
-        return f'<Request {self.method} [{self.code}]>'
-    
+        return '<{} {} [{}]>'.format(self.method, self.url.split('/')[2], self.code)
+
     def read(self) -> bytes:
         """Read the file and return the data in bytes"""
 
-        return self.rdata.read()
+        return self._rdata.read()
 
     def readlines(self) -> list:
         """Read the file and return the data as a list split at every newline"""
-    
-        return self.rdata.read().decode(self.encoding).splitlines()
+
+        try:
+            return self._rdata.read().decode(self.encoding).splitlines()
+        except UnicodeDecodeError:
+            raise _bm.UnicodeDecodeError('Unable to decode ' + 
+                                         'URL data from codec \'{}\''.
+                                         format(self.encoding))
 
 
 def get(url: _bm.Union[str, bytes], 
@@ -434,6 +465,26 @@ def download(url: _bm.Union[str, bytes],
     return request(url, 'FILE', auth, data, 
                    headers, cookies, cert, 
                    file_name, timeout, encoding, 
+                   mask, agent, verify, redirects)
+
+def header(url: _bm.Union[str, bytes], 
+           auth: tuple=None,
+           data: dict=None,
+           headers: dict=None,
+           cookies: dict=None,
+           cert: _bm.FileDescriptorOrPath=None, 
+           timeout: int=15, 
+           encoding: str='utf-8',
+           mask: bool=False,
+           agent: str=None,
+           verify: bool=True,
+           redirects: bool=True
+           ) -> _bm.url_response:
+    """Send a HEADER request"""
+
+    return request(url, 'HEADER', auth, data, 
+                   headers, cookies, cert, 
+                   None, timeout, encoding, 
                    mask, agent, verify, redirects)
 
 def put(url: _bm.Union[str, bytes], 

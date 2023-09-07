@@ -47,7 +47,7 @@ python_version_tuple: tuple = tuple(python_version.split('.'))
 name:                   str = _bm.gethostname()
 """The network name of computer"""
 bitsize                     = 32 if not (_bm.maxsize > 2 ** 32) else 64
-"""Determine if your computer is 32 or 64-bit"""
+"""Whether the current Python interpreter computer is 32 or 64-bit"""
 interpreter:            str = _bm.executable
 """Location of current Python interpereter"""
 

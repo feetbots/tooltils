@@ -6,11 +6,11 @@ class _bm:
     from typing import NoReturn, Union
     from sys import exit
     
-    from ..errors import ShellCodeError, ShellCommandError, ShellTimeoutExpired
+    from ..errors import (ShellCodeError, ShellTimeoutExpired,
+                          ShellCommandError, ShellCommandNotFound)
     
     class shell_response:
         pass
-
 
 import tooltils.sys.info as info
 
@@ -52,25 +52,25 @@ def system(cmds: _bm.Union[list, str],
                        capture_output=capture, timeout=timeout)
 
         class shell_response:
-            args            = cmds
-            code:       int = data.returncode
-            raw:      bytes = data.stdout
-            text: list[str] = data.stdout.decode().splitlines()
+            args: _bm.Union[list, str] = cmds
+            code:         int = data.returncode
+            raw:        bytes = data.stdout
 
+            if capture:
+                output: list[str] = data.stdout.decode().splitlines()
+            else:
+                output: list = []
             if clean:
-                text = list(filter(None, text))
+                output = list(filter(None, output))
 
     except TypeError:
         raise TypeError('Unable to call type {}'.format(type(cmds)))
     except _bm.CalledProcessError as err:
-        code: int = err.returncode
-
-        raise _bm.ShellCodeError(code, 'Shell command return non-zero exit code {}'
-                                       .format(code))
+        raise _bm.ShellCodeError(err.returncode)
     except _bm.TimeoutExpired:
         raise _bm.ShellTimeoutExpired('Shell command timeout reached and the process expired')
     except FileNotFoundError:
-        raise _bm.ShellCommandError('Binary not found in program files')
+        raise _bm.ShellCommandNotFound('Binary not found in program files')
     except OSError:
         raise _bm.ShellCommandError('An unknown error occured')
 
@@ -90,7 +90,7 @@ def check(cmds: _bm.Union[list, str],
     if raw:
         return data.raw
     else:
-        return data.text
+        return data.output
 
 def call(cmds: _bm.Union[list, str], 
          shell: bool=False, 
@@ -99,7 +99,7 @@ def call(cmds: _bm.Union[list, str],
          ) -> int:
     """Call a system program and return the exit code"""
     
-    return system(cmds, shell, timeout, check).code
+    return system(cmds, shell, timeout, check, False, False).code
 
 def pID(name: str) -> _bm.Union[list[int], int]:
     """Get the process ID of an app or binary by name"""
@@ -109,7 +109,7 @@ def pID(name: str) -> _bm.Union[list[int], int]:
         pID:  list = [int(i) for i in check(f'ps -ax | awk \'/{cname}/' + '{print $1}\'', shell=True)]
 
         for i in pID:
-            data: str = check(f'ps -p {i}', shell=True)[1]
+            data: str = check(f'ps {i}', shell=True)[1]
             if data.split('/')[-1].lower() == name.lower():
                 pID: int = i
                 break

@@ -1,5 +1,5 @@
 """
-# tooltils | v1.4.3
+# tooltils | v1.4.4
 
 An optimised python utility package built on the standard library
 
@@ -13,12 +13,12 @@ An optimised python utility package built on the standard library
 >>> req.status_code
 '200 OK'
 >>> req.headers
-{'Accept': '*/*', 'User-Agent': 'tooltils/1.4.3', ...}
+{'Accept': '*/*', 'User-Agent': 'tooltils/1.4.4', ...}
 ```
 
 ## API
 
-Read the full documentation on `API.md` in the project files
+Read the full documentation within `API.md` included in the project directory
 """
 
 
@@ -152,13 +152,13 @@ def download(url: _bm.Union[str, bytes],
              ) -> _bm.url_response:
     """Download a file onto the disk"""
 
-    return requests.request(url, 'FILE', auth, data,
+    return requests.request(url, 'DOWNLOAD', auth, data,
                             headers, cookies, cert,
                             file_name, timeout, encoding, 
                             mask, agent, verify, redirects)
 
 def style(text: str, 
-          style: str, 
+          colour: str='', 
           fill: bool=False,
           bold: bool=False,
           italic: bool=False,
@@ -170,14 +170,15 @@ def style(text: str,
     """Create text in the specified colour and or style"""
 
     try:
-        code = colours[str(style).lower()]
+        code = colours[str(colour).lower()]
     except KeyError:
-        code = style
+        if colour == '':
+            code = 0
+        else:
+            code = colour
 
     style: str = ''
 
-    if flush:
-        sys.call('', shell=True)
     if fill:
         code += 10
     if bold:
@@ -190,6 +191,9 @@ def style(text: str,
         style += ';4'
     if double_underline:
         style += ';21'
+
+    if flush:
+        sys.call('', shell=True)
 
     return '\u001b[{0}{1}{2}\u001b[0m'.format(code, style + 'm', text)
 
@@ -218,7 +222,7 @@ def call(cmds: _bm.Union[list, str],
          ) -> int:
     """Call a system command and return the exit code"""
 
-    return sys.system(cmds, shell, timeout, check).code
+    return sys.system(cmds, shell, timeout, check, False, False).code
 
 def cstrip(text: str, 
            chars: _bm.Union[str, list]
@@ -242,7 +246,7 @@ def mstrip(text: str,
 
 def date(epoch: _bm.EPOCH_seconds=..., 
          timezone: str='local', 
-         format: int=1
+         format: str='standard'
          ) -> str:
     """Convert epoch to a readable date"""
 
@@ -270,13 +274,13 @@ def date(epoch: _bm.EPOCH_seconds=...,
     except TypeError:
         raise TypeError('Invalid timezone')
 
-    def fv(val: int) -> str:
-        return str(val) if val > 9 else f'0{val}'
+    def fv(*values) -> tuple:
+        return [str(i) if i > 9 else f'0{i}' for i in values]
 
     if format == 1:
         return '{}/{}/{} {}:{}:{}'.format(sdate.tm_year,
-            fv(sdate.tm_mon), fv(sdate.tm_mday), fv(sdate.tm_hour),
-            fv(sdate.tm_min), fv(sdate.tm_sec))
+               *fv(sdate.tm_mon, sdate.tm_mday, sdate.tm_hour,
+               sdate.tm_min, sdate.tm_sec))
 
     elif format == 2:
         hour: int = sdate.tm_hour % 12 if sdate.tm_hour % 12 != 0 else 12
@@ -285,13 +289,13 @@ def date(epoch: _bm.EPOCH_seconds=...,
         if sdate.tm_mday in [11, 12, 13]:
             end: str = 'th'
 
-        return '{}:{} {} on the {}{} of {}, {}'.format(hour, fv(sdate.tm_min), 
+        return '{}:{} {} on the {}{} of {}, {}'.format(hour, *fv(sdate.tm_min), 
                'PM' if sdate.tm_hour >= 12 else 'AM', sdate.tm_mday, end, months[sdate.tm_mon - 1], 
                sdate.tm_year)
     else:
         raise TypeError('Format ({}) not found'.format(format))
 
-def epoch(date: str) -> float:
+def epoch(date: str, seconds: bool=True) -> float:
     """Get epoch from a formatted date (`strftime` etc.)"""
 
     if '/' in date:
@@ -333,7 +337,10 @@ def epoch(date: str) -> float:
     minutes = hours * 60 + sdate.minute
     epoch = minutes * 60 + sdate.second
     
-    return epoch
+    if seconds:
+        return epoch
+    else:
+        return epoch * 1000
 
 def createfile(name: str, 
                extension: str=None,
@@ -393,3 +400,25 @@ def squeeze(array: _bm.Union[list, tuple, set, dict],
                     array.pop(i)
 
         return op(array)
+
+def reverseDictSearch(array: dict, value: _bm.Any) -> _bm.Any:
+    """Find the unknown key(s) of a value in a dictionary"""
+
+    if type(array) is not dict:
+        raise TypeError('Array must be a valid dictionary instance')
+
+    # Create an isolated dict inside of the list to avoid
+    # duplicate values getting merged/deleted
+    swappedDict: list = [{v: k} for (k, v) in array.items()]
+    results:     list = []
+
+    for i in range(len(swappedDict)):
+        try:
+            results.append(swappedDict[i][value])
+        except KeyError:
+            continue
+    else:
+        if results == []:
+            raise IndexError('There was no key matching the specified value')
+        else:
+            return results

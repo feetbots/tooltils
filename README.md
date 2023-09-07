@@ -1,4 +1,4 @@
-# tooltils | v1.4.3
+# tooltils | v1.4.4
 
 [![python](https://img.shields.io/pypi/pyversions/tooltils.svg)](https://pypi.org/project/tooltils/)
 [![downloads](https://static.pepy.tech/personalized-badge/tooltils?period=total&units=international_system&left_color=grey&right_color=red&left_text=downloads)](https://pepy.tech/project/tooltils)
@@ -15,7 +15,7 @@ An optimised python utility package built on the standard library
 >>> req.status_code
 '200 OK'
 >>> req.headers
-{'Accept': '*/*', 'User-Agent': 'tooltils/1.4.3', ...}
+{'Accept': '*/*', 'User-Agent': 'tooltils/1.4.4', ...}
 ```
 
 ## Installation
@@ -34,10 +34,10 @@ pip install . --user
 
 ## API
 
-The full API is available on **API.md**
+The full API is available on [**API.md**](api.md)
 
 ## Roadmap
 
+- <b>*Add Linux implementation of `.sys.info`*</b> properties
 - Faster performance using the Cython compiler
 - Adding more modules and methods within
-- Optimise current source code further
