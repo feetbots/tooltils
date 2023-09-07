@@ -659,4 +659,15 @@
 &nbsp; Return type: **str** <br>
 &nbsp; Returns:
 - Default Message: **"Unable to decode text input"**
-- Specified Message
+- Specified Message <br><br>
+
+## &nbsp; <span style="font-family: Trebuchet MS;">Info</span>
+
+&nbsp; *General installation information*
+
+&nbsp; Properties:
+- **`author`** str – The creator of tooltils
+- **`version`** str – The current installation version
+- **`released`** str – The release date of the current installation
+- **`lines`** lines – How many lines of code in this installation
+- **`license`** str – The content of the currently used license
