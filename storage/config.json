@@ -1,0 +1,14 @@
+{
+    "errors": {},
+    "global": {},
+    "info": {},
+    "main": {},
+    "requests": {
+        "verifiableCachingCheck": 50,
+        "connectedCachingCheck": 50,
+        "verifiableCaching": false,
+        "connectedCaching": false
+    },
+    "sys.info": {},
+    "sys": {}
+}

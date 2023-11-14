@@ -1,99 +1,31 @@
-# &nbsp;<span style="font-family: Trebuchet MS;">tooltils – api</span>
+# <span style="font-family: Trebuchet MS;">tooltils – api</span>
 
-## &nbsp;<span style="font-family: Trebuchet MS;">Tooltils</span>
+*<b>NOTE:</b> If a property has a star sign in front of it, it can have a value of none*
 
-&nbsp; *Methods that don't need their own directory* <br><br>
+## <span style="font-family: Trebuchet MS;">Tooltils</span>
 
-&nbsp; Properties:
-- **`colours`** dict – List of the main colours as ANSI integer codes
-- **`months`** list – List of months in the year
-- **`python_version`** str – Current Python interpreter version
-- **`platform`** str – Name of current operating system
+*Broad methods that aren't big enough for their own module* <br><br>
+
+Properties:
+- **`ANSI_colours`** dict – List of the main colours as ANSI integer codes
 
 <br>
 
-&nbsp; Methods:
+Methods:
 
-&nbsp; **`length(file)`** <br>
-&nbsp; Get the length of a wave file in seconds
+**`length(file)`** <br>
+Get the length of a wave file in seconds
 
-&nbsp; Parameters:
+Parameters:
 - **`file`** str - Path to WAVE file
 
-&nbsp; Returns: **Length of file in seconds** <br>
-&nbsp; Return type: **float** <br><br>
+Returns: **Length of file in seconds** <br>
+Return type: **float** <br><br>
 
-&nbsp; **`get(url)`** <br>
-&nbsp; Send a GET request
+**`style(text)`** <br>
+Create text in the specified colour and or style
 
-&nbsp; *The same as `tooltils.requests.get()`*
-
-&nbsp; Parameters:
-- **`url`** str | bytes – URL to send the request to
-- **`auth`** tuple = None – Authentication in a username password pair
-- **`data`** dict = None – JSON data to send with the request(Added to url)
-- **`headers`** dict = None – Headers to add to the request(Overwrites defaults if the same are present)
-- **`cookies`** dict = None – Cookies to include in the headers
-- **`cert`** str = None – Path to certificate.pem file(Will use default if None)
-- **`timeout`** int = 10 – When to terminate the request
-- **`encoding`** str = ‘utf-8’ – Codec used to decode the response text
-- **`mask`** bool = False – Decide whether to use an anonymous user agent header
-- **`agent`** str = None – Overwrite for the agent header
-- **`verify`** bool = True – Whether to check the hostname and verify the request
-- **`redirects`** bool = True – Whether to allow redirects
-
-&nbsp; Returns: **A request class** <br>
-&nbsp; Return type: **tooltils.requests.url_response** <br><br>
-
-&nbsp; **`post(url)`** <br>
-&nbsp; Send a POST request
-
-&nbsp; *The same as `tooltils.requests.post()`*
-
-&nbsp; Parameters:
-- **`url`** str | bytes – URL to send the request to
-- **`auth`** tuple = None – Authentication in a username password pair
-- **`data`** dict = None – JSON data to send with the request(Encoded in the request data)
-- **`headers`** dict = None – Headers to add to the request(Overwrites defaults if the same are present)
-- **`cookies`** dict = None – Cookies to include in the headers
-- **`cert`** str = None – Path to certificate.pem file(Will use default if None)
-- **`timeout`** int = 10 – When to terminate the request
-- **`encoding`** str = ‘utf-8’ – Codec used to decode the response text
-- **`mask`** bool = False – Decide whether to use an anonymous user agent header
-- **`agent`** str = None – Overwrite for the agent header
-- **`verify`** bool = True – Whether to check the hostname and verify the request
-- **`redirects`** bool = True – Whether to allow redirects
-
-&nbsp; Returns: **A request class** <br>
-&nbsp; Return type: **tooltils.requests.url_response** <br><br>
-
-&nbsp; **`download(url)`** <br>
-&nbsp; Download a file onto the disk
-
-&nbsp; *The same as `tooltils.requests.download()`*
-
-&nbsp; Parameters:
-- **`url`** str | bytes – URL to send the request to
-- **`auth`** tuple = None – Authentication in a username password pair
-- **`data`** dict = None – JSON data to send with the request (Added to url)
-- **`headers`** dict = None – Headers to add to the request (Overwrites defaults if the same are present)
-- **`cookies`** dict = None – Cookies to include in the headers
-- **`cert`** str = None – Path to certificate.pem file (Will use default if None)
-- **`file_name`** str = None – Path to download the file (Will use URL file name if None)
-- **`timeout`** int = 10 – When to terminate the request
-- **`encoding`** str = ‘utf-8’ – Codec used to decode the response text
-- **`mask`** bool = False – Decide whether to use an anonymous user agent header
-- **`agent`** str = None – Overwrite for the agent header
-- **`verify`** bool = True – Whether to check the hostname and verify the request
-- **`redirects`** bool = True – Whether to allow redirects
-
-&nbsp; Returns: **A class method** <br>
-&nbsp; Return type: **tooltils.requests.url_response** <br><br>
-
-&nbsp; **`style(text)`** <br>
-&nbsp; Create text in the specified colour and or style
-
-&nbsp; Parameters:
+Parameters:
 - **`text`** str – Text to style
 - **`colour`** str = '' – Colour to use
 - **`fill`** bool = False – Whether to fill the text background with the specified colour
@@ -104,202 +36,242 @@
 - **`double_underline`** bool = False – Whether to double underline the text
 - **`flush`** bool = True – Whether to apply a fix to the terminal because of a display bug
 
-&nbsp; Returns: **Styled text** <br>
-&nbsp; Return type: **str** <br><br>
+Returns: **Styled text** <br>
+Return type: **str** <br><br>
 
-&nbsp; **`halve(text)`** <br>
-&nbsp; Return the halves of a string
+**`halve(object)`** <br>
+Return the halves of a string or list
 
-&nbsp; Parameters:
-- **`text`** str – Text to halve
+Parameters:
+- **`text`** str | list – Object to halve
 
-&nbsp; Returns: **Both halves of text** <br>
-&nbsp; Return type: **list** <br><br>
+Returns: **Either half of object** <br>
+Return type: **list** <br><br>
 
-&nbsp; **`cipher(text, shift)`** <br>
-&nbsp; A simple caeser cipher
+**`cipher(text, shift)`** <br>
+A simple caeser cipher
 
-&nbsp; Parameters:
+Parameters:
 - **`text`** str – Text to cipher
 - **`shift`** int – Amount of letters to shift in the alphabet
 
-&nbsp; Returns: **Ciphered text** <br>
-&nbsp; Return type: **str** <br><br>
+Returns: **Ciphered text** <br>
+Return type: **str** <br><br>
 
-&nbsp; **`call(cmds)`** <br>
-&nbsp; Call a system command and return the exit code
+**`mstrip(text, values)`** <br>
+Change some text from a dictionary pair of values
 
-&nbsp; *The same as `tooltils.sys.call()`*
+Parameters:
+- **`text`** str – Text to be changed
+- **`values`** dict – List of characters to change
 
-&nbsp; Parameters:
-- **`cmds`** list | str – Commands/program/arguments to call
-- **`shell`** bool = False – Whether to use the shell
-- **`timeout`** int = 10 – How long the subprocess should last
-- **`check`** bool = False – Whether to raise an error if the returncode is not 0
+Returns: **Changed text** <br>
+Return type: **str** <br><br>
 
-&nbsp; Returns: **Exit code of command** <br>
-&nbsp; Return type: **int** <br><br>
+**`date()`** <br>
+Convert epoch to human formatted date
 
-&nbsp; **`cstrip(text, chars)`** <br>
-&nbsp; Strip a string or list of characters from some text
-
-&nbsp; Parameters:
-- **`text`** str – Text to be replaced
-- **`chars`** str | list – List of characters to strip
-
-&nbsp; Returns: **Stripped text** <br>
-&nbsp; Return type: **str** <br><br>
-
-&nbsp; **`mstrip(text, charlist)`** <br>
-&nbsp; Strip/change a dictionary of string pairs from some text
-
-&nbsp; Parameters:
-- **`text`** str – Text to be replaced
-- **`chars`** dict – List of characters to strip/change
-
-&nbsp; Returns: **Changed text** <br>
-&nbsp; Return type: **str** <br><br>
-
-&nbsp; **`date()`** <br>
-&nbsp; Convert epoch to human formatted date
-
-&nbsp; Parameters:
+Parameters:
 - **`epoch`** float = time.time() – Epoch in seconds to use
-- **`timezone`** str = ‘local’ – Timezone offset to use (e.g. ‘+11:00’, local means your current timezone, gm or '00:00' means no offset time)
+- **`timezone`** str = ‘local’ – Timezone offset to use (e.g. ‘+11:00’, local means your current timezone, gm means no offset time)
 - **`format`** str = ‘standard’ – How to format the output date ('standard', 'fancy')
 
-&nbsp; Returns: **Formatted date** <br>
-&nbsp; Return type: **str** <br><br>
+Returns: **Formatted date** <br>
+Return type: **str** <br><br>
 
-&nbsp; **`epoch(date)`** <br>
-&nbsp; Convert a formatted date to an epoch value
+**`epoch(date)`** <br>
+Get epoch from a formatted date (`strftime` etc.)
 
-&nbsp; Parameters:
+Parameters:
 - **`date`** str – The formatted date to convert
-- **`seconds`** bool = True – Whether to return the epoch in seconds or milliseconds
 
-&nbsp; Returns: **Epoch in seconds or milliseconds of the input date** <br>
-&nbsp; Return type: **int** <br><br>
+Returns: **Epoch in seconds of the input date** <br>
+Return type: **int | float** <br><br>
 
-&nbsp; **`createfile(name)`** <br>
-&nbsp; Create a file with the specified name
+**`squeeze(array)`** <br>
+Remove empty or the specified item(s) from an array
 
-&nbsp; Parameters:
-- **`name`** str – The name and or extension of the file
-- **`extension`** str = None – The extension of the file
-- **`data`** str = None – The data to write to the file
-- **`keep`** bool = False – Whether to keep the file open and return the TextIOWrapper class
-
-&nbsp; Returns: **Nothing or the file class** <br>
-&nbsp; Return type: **None | TextIOWrapper** <br><br>
-
-&nbsp; **`squeeze(array)`** <br>
-&nbsp; Remove empty or the specified item(s) from an array
-
-&nbsp; Parameters:
+Parameters:
 - **`array`** list | tuple | set | dict – The array to change
 - **`item`** Any | None – The item to remove
 
-&nbsp; Returns: **Edited array** <br>
-&nbsp; Return type: **Same as input type** <br><br>
+Returns: **Edited array** <br>
+Return type: **Same as input type** <br><br>
 
-&nbsp; **`reverseDictSearch(array, value)`** <br>
-&nbsp; Find the unknown key(s) of a value in a dictionary
+**`reverseDictSearch(array, value)`** <br>
+Find the unknown key(s) of a value in a dictionary
 
-&nbsp; Parameters:
+Parameters:
 - **`array`** dict – The dictionary to search
 - **`value`** Any – The value to find the key(s) for
 
-&nbsp; Returns: **Key(s) found | Raise an error if no key is found** <br>
-&nbsp; Return type: **Any** <br><br>
+Returns: **Key(s) found | Raise an error if no key is found** <br>
+Return type: **Any** <br><br>
 
-## &nbsp; <span style="font-family: Trebuchet MS;">Sys</span>
+**`getArrayValues(array)`** <br>
+Recursively obtain all of the values of any keys or items within an array
 
-&nbsp; *System specific methods and information*
+Parameters:
+- **`array`** list | tuple | dict – The array to search
 
-&nbsp; **`exit(details)`** <br>
-&nbsp; Exit the current thread with details
+Returns: **All base-level values in the array (recursed)** <br>
+Return type: **tuple** <br><br>
 
-&nbsp; Parameters:
+**`timeTest(method, method2)`** <br>
+Run two different methods x amount of times, sum then divide to estimate accurate run-time
+
+Parameters:
+- **`method`** function – The first method to test
+- **`method2`** function – The second method to test
+- **`params`** dict = {} – Kwargs for the first method
+- **`params2`** dict = {} – Kwargs for the second method
+- **`accuracy`** int = 10 – The amount of times to test each method
+
+Returns: **Average run-time for each method (method, method2)** <br>
+Return type: **tuple** <br><br>
+
+**`varName(**vars)`** <br>
+Get the namespace name of one or more variables
+
+Parameters:
+- **`**vars`** dict – The variables to get the name for
+
+Usage:
+- Input a variable that has been declared earlier as the kward argument, then put that variable as the value of the argument. Example `varName(data=data)`
+
+Returns: **Names of variables input** <br>
+Return type: **str | list[str]** <br><br>
+
+**`interpreter(file)`** <br>
+Custom top-level Python interpereter to add niche features from other languages
+
+Parameters:
+- **`file`** str – The Python file to convert
+- **`output`** str = ‘%(name)s.interpereted.py’ – The name of the converted Python file
+- **`override`** bool = False – Whether to override the content of an existing output file with the same name
+
+Return properties:
+- **`file`** str – The Python file that was converted
+- **`output`** str – The name of the converted Python file
+- **`full_output`** str – The full file path of the convert Python file
+- **`override`** bool – Whether an existing file was overrid
+
+Return methods:
+- **`.read()`** str – Read the output file and return the content as a string
+- **`.readlines()`** list[str] – Read the output file and return the content as a list containing strings split at every newline
+
+Current features:
+- **Ternary Operations** – Javascript like ternary operators
+- **JS Comments** – Javascript like comments using `//` as a prefix
+
+Returns: **Interpreter instance** <br>
+Return type: **tooltils.interpreter** <br><br>
+
+## <span style="font-family: Trebuchet MS;">Sys</span>
+
+*System specific methods and information*
+
+**`exit(details)`** <br>
+Exit the current thread with details
+
+Parameters:
 - **`details`** str = ‘’ – Text to print before exiting
 - **`code`** int = 0 – Exit code to use
 
-&nbsp; Returns: **Nothing** <br>
-&nbsp; Return type: **NoReturn** <br><br>
+Returns: **Nothing** <br>
+Return type: **NoReturn** <br><br>
 
-&nbsp; **`clear()`** <br>
-&nbsp; OS independent terminal clearing
+**`clear()`** <br>
+OS independent terminal clearing
 
-&nbsp; No parameters
+No parameters
 
-&nbsp; Returns: **None** <br>
-&nbsp; Return type: **NoneType** <br><br>
+Returns: **None** <br>
+Return type: **None** <br><br>
 
-&nbsp; **`system(cmds)`** <br>
-&nbsp; Call a system program and return some information
+**`system(cmds)`** <br>
+Call a system program and return some information
 
-&nbsp; Parameters:
-- **`cmds`** list | str – Commands to call
-- **`shell`** bool = False – Whether to use the shell(terminal)
+Parameters:
+- **`cmds`** str | list – Commands/program to call
+- **`shell`** bool = False – Whether to use the shell (sh)
+- **`timeout`** int = 10 – How long the command/program should last before cancelling
+- **`check`** bool = False – Whether to raise an error if the returncode is not 0
+- **`capture`** bool = True – Whether to capture the output of the command/program
+- **`print`** bool = True – Whether command/program can print to stdout
+
+Return properties:
+- **`cmds`** str | list – Command/programs that were called
+- **`shell`** bool – Whether shell was used to call the command/program
+- **`timeout`** bool – How long the command/program should last before cancelling
+- **`check`** bool – Whether to raise an error if the returncode is not 0
+- **`capture`** bool – Whether to capture the the output of the command/program
+- **`print`** bool – Whether command/program can print to stdout
+- **`code`** int – Exit code of command/program
+- **`raw`** bytes – Raw bytes text of stdout output
+- **`text`** str – String containing text of stdout output
+- **`list_text`** list[str] – List containing text of stdout output split at every newline
+- **`clean_list_text`** list[str] – List containing text of stdout output split at every newline but with the empty items removed
+
+Returns: **A system class** <br>
+Return type: **tooltils.sys.system** <br><br>
+
+**`check(cmds)`** <br>
+Call a system program and return the output
+
+Parameters:
+- **`cmds`** str | list – Commands/program to call
+- **`shell`** bool = False – Whether to use the shell (sh)
 - **`timeout`** int = 10 – How long the process should last
 - **`check`** bool = False – Whether to raise an error if the returncode is not 0
 - **`clean`** bool = False – Whether to remove empty values from the output as a list
-- **`capture`** bool = True – Whether to capture the output of the program/command
-
-&nbsp; shell_response:
-- **`args`** list | str – Arguments that were called
-- **`code`** int – Exit code of command
-- **`raw`** bytes – Raw byte text of stdout output
-- **`output`** list[str] – A list containing each line of output as a string
-
-&nbsp; Returns: **Response Class** <br>
-&nbsp; Return type: **tooltils.sys.shell_response** <br><br>
-
-&nbsp; **`check(cmds)`** <br>
-&nbsp; Call a system program and return the output
-
-&nbsp; Parameters:
-- **`cmds`** list | str – Commands to call
-- **`shell`** bool = False – Whether to use the shell(terminal)
-- **`timeout`** int = 10 – How long the process should last
-- **`check`** bool = False – Whether to raise an error if the returncode is not 0
+- **`listify`** bool = True – Whether to convert the stdout output to a list (.list_text)
 - **`raw`** bool = False – Whether to return raw bytes output
-- **`clean`** bool = False – Whether to remove empty values from the output as a list
+- **`print`** bool = True – Whether command/program can print to stdout
 
-&nbsp; Returns: **List or bytes containing stdout output** <br>
-&nbsp; Return type: **list | bytes** <br><br>
+Returns: **List of lines or bytes containing stdout output** <br>
+Return type: **str | bytes | list[str]** <br><br>
 
-&nbsp; **`call(cmds)`** <br>
-&nbsp; Call a system program and return the exit code
+**`call(cmds)`** <br>
+Call a system program and return the exit code
 
-&nbsp; Parameters:
-- **`cmds`** list | str – Commands to call
-- **`shell`** bool = False – Whether to use the shell(terminal)
+Parameters:
+- **`cmds`** str | list – Commands to call
+- **`shell`** bool = False – Whether to use the shell (sh)
 - **`timeout`** int = 10 – How long the process should last
 - **`check`** bool = False – Whether to raise an error if the returncode is not 0
-- **`clean`** bool = False – Whether to remove empty values from the output as a list
+- **`print`** bool = True – Whether command/program can print to stdout
 
-&nbsp; Returns: **Exit code of command** <br>
-&nbsp; Return type: **int** <br><br>
+Returns: **Exit code of program call** <br>
+Return type: **int** <br><br>
 
-&nbsp; **`pID(name)`** <br>
-&nbsp; Get the process ID of an app or binary by name
+**`pID(name)`** <br>
+Get the process ID of an app or binary by name
 
-&nbsp; *May return a list if multiple processes are found*
+*May return a list if multiple processes are found*
 
-&nbsp; Parameters:
+Parameters:
 - **`name`** str – Name of app or binary
 
-&nbsp; Returns: **Process ID or list of found IDs** <br>
-&nbsp; Return type: **list | int** <br><br>
+Returns: **Process ID or list of found IDs** <br>
+Return type: **int | list[int]** <br><br>
 
-## &nbsp; <span style="font-family: Trebuchet MS;">Sys.info</span>
+**`getCurrentWifiName()`** <br>
+Get the currently connected wifi name
 
-&nbsp; *Identifying system information*
+*Will return None if not connected or nothing was found*
 
-&nbsp; <u>*Note: Some variables may be None or empty if the value could not be determined*</u>
+Parameters:
+- None
 
-&nbsp; Properties:
+Returns: **Wifi Name** <br>
+Return type: **str | None** <br><br>
+
+## <span style="font-family: Trebuchet MS;">Sys.info</span>
+
+*Identifying system information*
+
+Properties:
 - **`macOS_releases`** dict[str, str] – List of all current MacOS versions
 - **`python_version`** str – Current Python interpereter version
 - **`python_version_tuple`** tuple – Current Python interpereter version seperated into major, minor, patch
@@ -314,17 +286,99 @@
 - **`model`** str – The model or manufacturer of your computer
 - **`cores`** int – The amount of cores in your computer cpu
 - **`ram`** int – The amount of ram in megabytes in your computer
-- **`serial_number`** str – The identifiable code or tag string of your computer
+- **`manufacturer`** str – The organisation or company that created your computer
+- **`serial_number`** str – The identifiable code or tag string of your computer (This is unobtainable without sudo on Linux)
 - **`boot_drive`** str – The location of the boot drive currently being used on your computer
 
 <br>
 
-## &nbsp; <span style="font-family: Trebuchet MS;">Requests</span>
+## <span style="font-family: Trebuchet MS;">Requests</span>
 
-&nbsp; *If a property has a star sign in front of it, it can have a value of none*
+*Internet requesting access methods*
 
-&nbsp; url_response:
-- **`verified`** bool – Whether the request used https or http
+Properties:
+- **`status_codes`** dict – List of official valid HTTP response status codes (100-511)
+
+Methods:
+
+**`ctx()`** <br>
+Create a custom SSLContext instance
+
+Parameters:
+- **`verify`** bool = True – Whether to check hostname and verify SSL request
+- **`cert`** str = None – Location of certificate.pem file
+
+Returns: **An SSLContext instance** <br>
+Return type: **ssl.SSLContext** <br><br>
+
+**`connected()`** <br>
+Get the connectivity status of the currently connected wifi network
+
+*When caching is enabled, it will used the cached value 50 times by default and then create a new one and cache that instead.*
+
+No Parameters
+
+Returns: **The result of the internet test** <br>
+Return type: **bool** <br><br>
+
+**`prep_url(url)`** <br>
+Configure a URL making it viable for requests
+
+Parameters:
+- **`url`** str | bytes – URL to configure
+- **`data`** dict = {} – Data to include in the URL
+- **`https`** bool = True – Whether to guess https as the protocol if not specified
+- **`order`** bool = False – Whether to alphabetically order the url items
+
+Returns: **Corrected URL** <br>
+Return type: **str** <br><br>
+
+**`where()`** <br>
+Return default certificate file and path locations used by Python
+
+No parameters
+
+Returns: **Class method** <br>
+Return type: **tooltils.requests.certifs** <br>
+
+**`verifiable()`** <br>
+Determine whether requests can be verified with a valid ssl certificate on the current connection
+
+*This function will use the cached value 50 times by default and then create a new one and cache that instead.*
+
+No parameters
+
+Returns: **Whether requests can use a valid ssl certificate** <br>
+Return type: **bool** <br>
+
+**`NoRedirects()`** <br>
+An opener to prevent redirects in urllib requests
+
+You can install this as an opener to use in urllib to prevent redirects by the requested url <br><br>
+
+**`request(url, method)`** <br>
+Prepare and send a http[s] request
+
+Parameters:
+- **`url`** str – URL to send the request to
+- **`method`** str – The http method to make the request with
+- **`auth`** tuple = None – Authentication in a username password pair
+- **`data`** dict = None – JSON data to send with the request (Added to url)
+- **`headers`** dict = None – Headers to add to the request (Overwrites defaults if the same are present)
+- **`cookies`** dict = None – Cookies to include in the headers
+- **`cert`** str = None – Path to certificate.pem file (Will use default if None)
+- **`file_name`** str = None – Path to download the file (Will use URL file name if None)
+- **`timeout`** int = 10 – When to terminate the request
+- **`encoding`** str = ‘utf-8’ – Codec used to decode the response text
+- **`mask`** bool = False – Decide whether to use an anonymous user agent header
+- **`agent`** str = None – Overwrite for the agent header
+- **`verify`** bool = True – Whether to check the hostname and verify the request
+- **`redirects`** bool = True – Whether to allow redirects
+
+Return properties:
+- **`verified`** bool – Whether the request was verified with SSL
+- **`port`** int = 443 – The port used to send the request on
+- **`https`** bool = True - Whether https was used for the request
 - **`redirects`** bool – Whether url redirects are enabled
 - **`mask`** bool – Whether the user agent header should be replaced with a more conventional one (firefox browser)
 - **`method`** str – The method used in the request
@@ -338,6 +392,7 @@
 - **`headers`** dict – The data sent as the configuration of the request
 - **`encoding`** str – The text encoding to use when decoding the response text
 - **`url`** str – The configured url used to sent the request to
+- **`sent`** bool – Whether the request has been used
 - **`code`** int – The status code of the request
 - **`reason`** str – The reason of the request's status code
 - **`status_code`** str – The status code and reason of the requets combined
@@ -346,63 +401,64 @@
 - **`*html`** str – The html of the request url (if applicable)
 - **`*path`** str – The output path of the file if the download method was used
 - **`*json`** dict – The json of the request response containing all the data
-- **`_rdata`** urllib.request._Urlopenret – The urllib base response class
+- **`rdata`** http.client.HTTPResponse – The http base response class containing all the data read
 
-&nbsp; Properties:
-- **`status_codes`** dict – List of official valid HTTP response status codes (100-505)
-- **`unverified`** SSLContext – An unverified default SSLContext instance to use in `urlopen`
-- **`verified`** SSLContext – A verified default SSLContext instance to use in `urlopen`
+Return methods:
+- **`.read()`** – Read the request file and return the raw data
+- **`.readlines()`** list – Read the request file and return the data as a list split at every newline
 
-&nbsp; Methods:
+Returns: **A request class** <br>
+Return type: **tooltils.requests.request** <br><br>
 
-&nbsp; **`ctx()`** <br>
-&nbsp; Create a custom SSLContext instance
+**`get(url)`** <br>
+Send a GET request
 
-&nbsp; Parameters:
-- **`verify`** bool = True – Whether to check hostname and verify SSL request
-- **`cert`** str = None – Location of certificate.pem file
+*Calls `.requests.request(method='GET', ...).send()` and returns the result*
 
-&nbsp; Returns: **An SSLContext instance** <br>
-&nbsp; Return type: **ssl.SSLContext** <br><br>
+**`post(url)`** <br>
+Send a POST request
 
-&nbsp; **`connected()`** <br>
-&nbsp; Return whether the system has a valid internet connection
+*Calls `.requests.request(method='POST', ...).send()` and returns the result*
 
-&nbsp; No Parameters
+**`download(url)`** <br>
+Download a file onto the disk
 
-&nbsp; Returns: **The result of the internet test** <br>
-&nbsp; Return type: **bool** <br><br>
+*Calls `.requests.request(method='DOWNLOAD', ...).send()` and returns the result*
+*This uses the `file_name` parameter aswell as any request ones*
 
-&nbsp; **`prep_url(url)`** <br>
-&nbsp; Configure a URL making it viable for requests
+Parameters:
+- **`file_name`** str = None – Path to download the file (Will use URL file name if None)
 
-&nbsp; Parameters:
-- **`url`** str | bytes – URL to configure
-- **`data`** dict = {} – Data to include in the URL
-- **`https`** bool = True – Whether to guess https as the protocol if not specified
-- **`order`** bool = False – Whether to alphabetically order the url items
+**`head(url)`** <br>
+Send a HEAD request
 
-&nbsp; Returns: **Corrected URL** <br>
-&nbsp; Return type: **str** <br><br>
+*Calls `.requests.request(method='HEAD', ...).send()` and returns the result*
 
-&nbsp; **`where()`** <br>
-&nbsp; Return default certificate file and path locations used by Python
+**`put(url)`** <br>
+Send a PUT request
 
-&nbsp; No parameters
+*Calls `.requests.request(method='PUT', ...).send()` and returns the result*
 
-&nbsp; Returns: **Class method** <br>
-&nbsp; Return type: **tooltils.requests.certifs** <br>
+**`patch(url)`** <br>
+Send a PATCH request
 
-&nbsp; **`Redirects()`** <br>
-&nbsp; A handler to stop redirects in urllib
+*Calls `.requests.request(method='PATCH', ...).send()` and returns the result*
 
-&nbsp; You can install this as an opener to use in urllib <br>
-&nbsp; to prevent redirects by the requested url <br><br>
+**`delete(url)`** <br>
+Send a DELETE request
 
-&nbsp; **`request(url, method)`** <br>
-&nbsp; Prepare and send a http request
+*Calls `.requests.request(method='DELETE', ...).send()` and returns the result*
 
-&nbsp; Parameters:
+## <span style="font-family: Trebuchet MS;">requests.http</span>
+
+*Internet requesting access methods - http.client version (alpha)*
+
+***Note: This version of the requests module has a few different features than the urllib implementation***
+
+**`request(url)`** <br>
+Prepare and send a http[s] request
+
+Parameters:
 - **`url`** str | bytes – URL to send the request to
 - **`auth`** tuple = None – Authentication in a username password pair
 - **`data`** dict = None – JSON data to send with the request (Added to url)
@@ -414,260 +470,408 @@
 - **`encoding`** str = ‘utf-8’ – Codec used to decode the response text
 - **`mask`** bool = False – Decide whether to use an anonymous user agent header
 - **`agent`** str = None – Overwrite for the agent header
-- **`verify`** bool = True – Whether to check the hostname and verify the request
+- **`verify`** bool = True – Whether to use SSL in the request
 - **`redirects`** bool = True – Whether to allow redirects
+- **`https`** bool = True – Whether https should be used in the request
+- **`port`** int – The port to send the request from
 
-&nbsp; Returns: **A request class** <br>
-&nbsp; Return type: **tooltils.requests.url_response** <br><br>
+Return properties:
+- **`verified`** bool – Whether the request was verified with SSL
+- **`port`** int – The port used to send the request on
+- **`https`** bool - Whether https was used for the request
+- **`redirects`** bool – Whether url redirects are enabled
+- **`mask`** bool – Whether the user agent header should be replaced with a more conventional one (firefox browser)
+- **`method`** str – The method used in the request
+- **`*data`** dict – Data to send with the request
+- **`*cookies`** dict – Cookies to include in the request header
+- **`cert`** str – The location of the certificate used in the request
+- **`*auth`** tuple – The authentication of the request [user pass tuple pair] (none if not specified)
+- **`timeout`** int – The amount of seconds the request should last for before being terminated
+- **`*file_name`** str – The name and directory of the file if the download method is being used
+- **`agent`** str – The user agent to send in the headers of the request
+- **`headers`** dict – The data sent as the configuration of the request
+- **`encoding`** str – The text encoding to use when decoding the response text
+- **`url`** str – The configured url used to sent the request to
+- **`sent`** bool – Whether the request has been used
+- **`code`** int – The status code of the request
+- **`reason`** str – The reason of the request's status code
+- **`status_code`** str – The status code and reason of the requets combined
+- **`*text`** str – The text of the request response
+- **`*raw`** bytes – The encoded text of the request response
+- **`*html`** str – The html of the request url (if applicable)
+- **`*path`** str – The output path of the file if the download method was used
+- **`*json`** dict – The json of the request response containing all the data
+- **`rdata`** http.client.HTTPResponse – The http base response class containing all the data read
 
-&nbsp; **`get(url)`** <br>
-&nbsp; Send a GET request
+Return methods:
+- **`.read()`** – Read the request file and return the raw data
+- **`.readlines()`** list – Read the request file and return the data as a list split at every newline
 
-&nbsp; Parameters:
-- **`url`** str | bytes – URL to send the request to
-- **`auth`** tuple = None – Authentication in a username password pair
-- **`data`** dict = None – JSON data to send with the request(Added to url)
-- **`headers`** dict = None – Headers to add to the request(Overwrites defaults if the same are present)
-- **`cookies`** dict = None – Cookies to include in the headers
-- **`cert`** str = None – Path to certificate.pem file(Will use default if None)
-- **`timeout`** int = 10 – When to terminate the request
-- **`encoding`** str = ‘utf-8’ – Codec used to decode the response text
-- **`mask`** bool = False – Decide whether to use an anonymous user agent header
-- **`agent`** str = None – Overwrite for the agent header
-- **`verify`** bool = True – Whether to check the hostname and verify the request
-- **`redirects`** bool = True – Whether to allow redirects
+Returns: **A request class** <br>
+Return type: **tooltils.requests.http.request** <br><br>
 
-&nbsp; Returns: **A request class** <br>
-&nbsp; Return type: **tooltils.requests.url_response** <br><br>
+**`get(url)`** <br>
+Send a GET request
 
-&nbsp; **`post(url)`** <br>
-&nbsp; Send a POST request
+*Calls `.requests.http.request(method='GET', ...).send()` and returns the result*
 
-&nbsp; Parameters:
-- **`url`** str | bytes – URL to send the request to
-- **`auth`** tuple = None – Authentication in a username password pair
-- **`data`** dict = None – JSON data to send with the request(Added to url)
-- **`headers`** dict = None – Headers to add to the request(Overwrites defaults if the same are present)
-- **`cookies`** dict = None – Cookies to include in the headers
-- **`cert`** str = None – Path to certificate.pem file(Will use default if None)
-- **`timeout`** int = 10 – When to terminate the request
-- **`encoding`** str = ‘utf-8’ – Codec used to decode the response text
-- **`mask`** bool = False – Decide whether to use an anonymous user agent header
-- **`agent`** str = None – Overwrite for the agent header
-- **`verify`** bool = True – Whether to check the hostname and verify the request
-- **`redirects`** bool = True – Whether to allow redirects
+**`post(url)`** <br>
+Send a POST request
 
-&nbsp; Returns: **A request class** <br>
-&nbsp; Return type: **tooltils.requests.url_response** <br><br>
+*Calls `.requests.http.request(method='POST', ...).send()` and returns the result*
 
-&nbsp; **`download(url)`** <br>
-&nbsp; Download a file onto the disk
+**`download(url)`** <br>
+Download a file onto the disk
 
-&nbsp; Parameters:
-- **`url`** str | bytes – URL to send the request to
-- **`auth`** tuple = None – Authentication in a username password pair
-- **`data`** dict = None – JSON data to send with the request (Added to url)
-- **`headers`** dict = None – Headers to add to the request (Overwrites defaults if the same are present)
-- **`cookies`** dict = None – Cookies to include in the headers
-- **`cert`** str = None – Path to certificate.pem file (Will use default if None)
+*Calls `.requests.http.request(method='DOWNLOAD', ...).send()` and returns the result*
+*This uses the `file_name` parameter aswell as any request ones*
+
+Parameters:
 - **`file_name`** str = None – Path to download the file (Will use URL file name if None)
-- **`timeout`** int = 10 – When to terminate the request
-- **`encoding`** str = ‘utf-8’ – Codec used to decode the response text
-- **`mask`** bool = False – Decide whether to use an anonymous user agent header
-- **`agent`** str = None – Overwrite for the agent header
-- **`verify`** bool = True – Whether to check the hostname and verify the request
-- **`redirects`** bool = True – Whether to allow redirects
 
-&nbsp; Returns: **A request class** <br>
-&nbsp; Return type: **tooltils.requests.url_response** <br><br>
+**`head(url)`** <br>
+Send a HEAD request
 
-&nbsp; **`header(url)`** <br>
-&nbsp; Send a HEADER request
+*Calls `.requests.http.request(method='HEAD', ...).send()` and returns the result*
 
-&nbsp; Parameters:
-- **`url`** str | bytes – URL to send the request to
-- **`auth`** tuple = None – Authentication in a username password pair
-- **`data`** dict = None – JSON data to send with the request(Added to url)
-- **`headers`** dict = None – Headers to add to the request(Overwrites defaults if the same are present)
-- **`cookies`** dict = None – Cookies to include in the headers
-- **`cert`** str = None – Path to certificate.pem file(Will use default if None)
-- **`timeout`** int = 10 – When to terminate the request
-- **`encoding`** str = ‘utf-8’ – Codec used to decode the response text
-- **`mask`** bool = False – Decide whether to use an anonymous user agent header
-- **`agent`** str = None – Overwrite for the agent header
-- **`verify`** bool = True – Whether to check the hostname and verify the request
-- **`redirects`** bool = True – Whether to allow redirects
+**`put(url)`** <br>
+Send a PUT request
 
-&nbsp; Returns: **A request class** <br>
-&nbsp; Return type: **tooltils.requests.url_response** <br><br>
+*Calls `.requests.http.request(method='PUT', ...).send()` and returns the result*
 
-&nbsp; **`put(url)`** <br>
-&nbsp; Send a PUT request
+**`patch(url)`** <br>
+Send a PATCH request
 
-&nbsp; Parameters:
-- **`url`** str | bytes – URL to send the request to
-- **`auth`** tuple = None – Authentication in a username password pair
-- **`data`** dict = None – JSON data to send with the request(Added to url)
-- **`headers`** dict = None – Headers to add to the request(Overwrites defaults if the same are present)
-- **`cookies`** dict = None – Cookies to include in the headers
-- **`cert`** str = None – Path to certificate.pem file(Will use default if None)
-- **`timeout`** int = 10 – When to terminate the request
-- **`encoding`** str = ‘utf-8’ – Codec used to decode the response text
-- **`mask`** bool = False – Decide whether to use an anonymous user agent header
-- **`agent`** str = None – Overwrite for the agent header
-- **`verify`** bool = True – Whether to check the hostname and verify the request
-- **`redirects`** bool = True – Whether to allow redirects
+*Calls `.requests.http.request(method='PATCH', ...).send()` and returns the result*
 
-&nbsp; Returns: **A request class** <br>
-&nbsp; Return type: **tooltils.requests.url_response** <br><br>
+**`delete(url)`** <br>
+Send a DELETE request
 
-&nbsp; **`patch(url)`** <br>
-&nbsp; Send a PATCH request
+*Calls `.requests.http.request(method='DELETE', ...).send()` and returns the result*
 
-&nbsp; Parameters:
-- **`url`** str | bytes – URL to send the request to
-- **`auth`** tuple = None – Authentication in a username password pair
-- **`data`** dict = None – JSON data to send with the request(Added to url)
-- **`headers`** dict = None – Headers to add to the request(Overwrites defaults if the same are present)
-- **`cookies`** dict = None – Cookies to include in the headers
-- **`cert`** str = None – Path to certificate.pem file(Will use default if None)
-- **`timeout`** int = 10 – When to terminate the request
-- **`encoding`** str = ‘utf-8’ – Codec used to decode the response text
-- **`mask`** bool = False – Decide whether to use an anonymous user agent header
-- **`agent`** str = None – Overwrite for the agent header
-- **`verify`** bool = True – Whether to check the hostname and verify the request
-- **`redirects`** bool = True – Whether to allow redirects
+## <span style="font-family: Trebuchet MS;">Errors</span>
 
-&nbsp; Returns: **A request class** <br>
-&nbsp; Return type: **tooltils.requests.url_response** <br><br>
+*Package specific exceptions*
 
-&nbsp; **`delete(url)`** <br>
-&nbsp; Send a DELETE request
+**`TooltilsError`** <br>
+Base class for tooltils specific errors
 
-&nbsp; Parameters:
-- **`url`** str | bytes – URL to send the request to
-- **`auth`** tuple = None – Authentication in a username password pair
-- **`data`** dict = None – JSON data to send with the request(Added to url)
-- **`headers`** dict = None – Headers to add to the request(Overwrites defaults if the same are present)
-- **`cookies`** dict = None – Cookies to include in the headers
-- **`cert`** str = None – Path to certificate.pem file(Will use default if None)
-- **`timeout`** int = 10 – When to terminate the request
-- **`encoding`** str = ‘utf-8’ – Codec used to decode the response text
-- **`mask`** bool = False – Decide whether to use an anonymous user agent header
-- **`agent`** str = None – Overwrite for the agent header
-- **`verify`** bool = True – Whether to check the hostname and verify the request
-- **`redirects`** bool = True – Whether to allow redirects
+Parent class: `Exception` <br>
 
-&nbsp; Returns: **A request class** <br>
-&nbsp; Return type: **tooltils.requests.url_response** <br><br>
+Parameters:
+- **`message`** str = ‘’ – The text to print instead of the default message
 
-## &nbsp; <span style="font-family: Trebuchet MS;">Errors</span>
+Return type: **str** <br>
+Returns:
+- Default Message: **"A Tooltils error occured"**
+- Specified Message <br><br>
 
-&nbsp; *Package specific exceptions*
+**`TooltilsMainError`** <br>
+Base class for tooltils main module specific errors
 
-&nbsp; **`TooltilsError`** <br>
-&nbsp; Base class for tooltils specific errors <br><br>
+Parent class: `TooltilsError` <br>
 
-&nbsp; **`ShellCodeError`** <br>
-&nbsp; Shell command return non-zero exit code
+Parameters:
+- **`message`** str = ‘’ – The text to print instead of the default message
 
-&nbsp; Parameters:
+Return type: **str** <br>
+Returns:
+- Default Message: **"A Tooltils main module error occured"**
+- Specified Message <br><br>
+
+**`TooltilsRequestsError`** <br>
+Base class for tooltils.requests module specific errors
+
+Parent class: `TooltilsError` <br>
+
+Parameters:
+- **`message`** str = ‘’ – The text to print instead of the default message
+
+Return type: **str** <br>
+Returns:
+- Default Message: **"A tooltils.requests error occured"**
+- Specified Message <br><br>
+
+**`TooltilsSysError`** <br>
+Base class for tooltils.sys module specific errors
+
+Parent class: `TooltilsError` <br>
+
+Parameters:
+- **`message`** str = ‘’ – The text to print instead of the default message
+
+Return type: **str** <br>
+Returns:
+- Default Message: **"A tooltils.sys error occured"**
+- Specified Message <br><br>
+
+**`TooltilsInfoError`** <br>
+Base class for tooltils.info module specific errors
+
+Parent class: `TooltilsError` <br>
+
+Parameters:
+- **`message`** str = ‘’ – The text to print instead of the default message
+
+Return type: **str** <br>
+Returns:
+- Default Message: **"A tooltils.info error occured"**
+- Specified Message <br><br>
+
+**`SystemCallError`** <br>
+Base class for tooltils.sys.system() specific errors
+
+Parent class: `TooltilsSysError` <br>
+
+Parameters:
+- **`message`** str = ‘’ – The text to print instead of the default message
+
+Return type: **str** <br>
+Returns:
+- Default Message: **"A tooltils.sys.system() error occured"**
+- Specified Message <br><br>
+
+**`ShellCommandError`** <br>
+Shell command exited while in process
+
+Parent class: `SystemCallError` <br>
+
+Parameters:
+- **`message`** str = ‘’ – The text to print instead of the default message
+
+**`ShellCodeError`** <br>
+Shell command return non-zero exit code
+
+Parent class: `SystemCallError` <br>
+
+Parameters:
 - **`code`** int = -1 – The non-zero error code returned
 - **`message`** str = ‘’ – The message to print instead of the code message
 
-&nbsp; Return type: **str** <br>
-&nbsp; Returns:
+Return type: **str** <br>
+Returns:
 - Default Message: **"Shell command returned non-zero exit code"**
 - Message with code: **"Shell command returned non-zero exit code <i>[code]</i>"**
 - Specified Message <br><br>
 
-&nbsp; **`ShellTimeoutExpired`** <br>
-&nbsp; Shell command timed out
+**`ShellTimeoutExpired`** <br>
+Shell command timed out
 
-&nbsp; Parameters:
+Parent class: `SystemCallError` <br>
+
+Parameters:
 - **`message`** str = ‘’ – The text to print instead of the default message
 
-&nbsp; Return type: **str** <br>
-&nbsp; Returns:
+Return type: **str** <br>
+Returns:
 - Default Message: **"Shell command timed out"**
 - Specified Message <br><br>
 
-&nbsp; **`ShellCommandError`** <br>
-&nbsp; Shell command exited while in process
+**`ShellCommandError`** <br>
+Shell command exited while in process
 
-&nbsp; Parameters:
+Parent class: `SystemCallError` <br>
+
+Parameters:
 - **`message`** str = ‘’ – The text to print instead of the default message
 
-&nbsp; Return type: **str** <br>
-&nbsp; Returns:
+Return type: **str** <br>
+Returns:
 - Default Message: **"Shell command exited while in process"**
 - Specified Message <br><br>
 
-&nbsp; **`ShellCommandNotFound`** <br>
-&nbsp; Unable to locate shell command or program
+**`ShellCommandNotFound`** <br>
+Unable to locate shell command or program
 
-&nbsp; Parameters:
+Parent class: `SystemCallError` <br>
+
+Parameters:
 - **`message`** str = ‘’ – The text to print instead of the default message
 
-&nbsp; Return type: **str** <br>
-&nbsp; Returns:
+Return type: **str** <br>
+Returns:
 - Default Message: **"Unable to locate shell command or program"**
 - Specified Message <br><br>
 
-&nbsp; **`ConnectionError`** <br>
-&nbsp; Connection to URL failed
+**`ShellCommandPermissionError`** <br>
+Denied access to system command or program
 
-&nbsp; Parameters:
+Parent class: `SystemCallError` <br>
+
+Parameters:
 - **`message`** str = ‘’ – The text to print instead of the default message
 
-&nbsp; Return type: **str** <br>
-&nbsp; Returns:
+Return type: **str** <br>
+Returns:
+- Default Message: **"Denied access to system command or program"**
+- Specified Message <br><br>
+
+**`ConnectionError`** <br>
+Connection to URL failed
+
+Parent class: `RequestError` <br>
+
+Parameters:
+- **`message`** str = ‘’ – The text to print instead of the default message
+
+Return type: **str** <br>
+Returns:
 - Default Message: **"Connection to URL failed"**
 - Specified Message <br><br>
 
-&nbsp; **`ConnectionTimeoutExpired`** <br>
-&nbsp; Request read timeout expired
+**`ConnectionTimeoutExpired`** <br>
+Request read timeout expired
 
-&nbsp; Parameters:
+Parent class: `RequestError` <br>
+
+Parameters:
 - **`message`** str = ‘’ – The text to print instead of the default message
 
-&nbsp; Return type: **str** <br>
-&nbsp; Returns:
+Return type: **str** <br>
+Returns:
 - Default Message: **"Request read timeout expired"**
 - Specified Message <br><br>
 
-&nbsp; **`StatusCodeError`** <br>
-&nbsp; URL response returned non 200s status code
+**`StatusCodeError`** <br>
+The URL response returned an impassable status code
 
-&nbsp; Parameters:
+Parent class: `RequestError` <br>
+
+Parameters:
 - **`code`** int = 0 – The status code returned by the response
 - **`reason`** str = ‘’ – The reason paired with the status code
 
-&nbsp; Return type: **str** <br>
-&nbsp; Returns:
-- Default Message: **"URL response returned non 200s status code"**
+Return type: **str** <br>
+Returns:
+- Default Message: **"The URL response returned an impassable status code"**
 - Specified Message <br><br>
 
-&nbsp; **`UnicodeDecodeError`** <br>
-&nbsp; Unable to decode text input
+**`SSLCertificateFailed`** <br>
+The currently used SSL certificate could not be used to verify requests
 
-&nbsp; *Even though there is a class for this in python already, it requires more details so this simplified version is convenient*
+Parent class: `RequestError` <br>
 
-&nbsp; Parameters:
+Parameters:
 - **`message`** str = ‘’ – The text to print instead of the default message
 
-&nbsp; Return type: **str** <br>
-&nbsp; Returns:
-- Default Message: **"Unable to decode text input"**
+Return type: **str** <br>
+Returns:
+- Default Message: **"The currently used SSL certificate could not be used to verify requests"**
 - Specified Message <br><br>
 
-## &nbsp; <span style="font-family: Trebuchet MS;">Info</span>
+**`NoHttpConnection`** <br>
+No valid wifi connection could be found for the request
 
-&nbsp; *General installation information*
+Parent class: `RequestError` <br>
 
-&nbsp; Properties:
+Parameters:
+- **`message`** str = ‘’ – The text to print instead of the default message
+
+Return type: **str** <br>
+Returns:
+- Default Message: **"No valid wifi connection could be found for the request"**
+- Specified Message <br><br>
+
+## <span style="font-family: Trebuchet MS;">Info</span>
+
+*General installation information*
+
+Properties:
 - **`author`** str – The creator of tooltils
 - **`version`** str – The current installation version
 - **`released`** str – The release date of the current installation
 - **`lines`** lines – How many lines of code in this installation
 - **`license`** str – The content of the currently used license
+- **`description`** str – The short description of tooltils
+- **`long_description`** str – The long description of tooltils (README.md)
+- **`location`** str – The path of the current installation of tooltils
+
+Methods:
+
+**`clearCache`** <br>
+Clear the file cache of tooltils or a specific module within
+
+Parameters:
+- **`module`** str = None – The name of module to clear the cache for
+
+Returns: **Nothing** <br>
+Return type: **None** <br><br>
+
+**`clearConfig`** <br>
+Revert the config of tooltils or a specific module within
+
+Parameters:
+- **`module`** str = None – The name of module to revert the settings for
+
+Returns: **Nothing** <br>
+Return type: **None** <br><br>
+
+**`logger`** <br>
+Create a logging instance for tooltils modules only
+
+Parameters:
+- **`module`** str = 'ALL' – The name of module to initiliase logging for
+- **`level`** str | int | LoggingLevel = 'ALL' – The starting level of the logging range
+- **`level2`** str | int | LoggingLevel = 'ALL' – The ending level of the logging range
+
+Return properties:
+- **`module`** str – The name of module logging is initiliased for
+- **`level`** str | int | LoggingLevel – The starting level of the logging range
+- **`level2`** str | int | LoggingLevel – The ending level of the logging range
+- **`enabled`** bool – Whether the logging instance is enabled
+- **`closed`** bool – Whether the logging instance has been closed
+
+Return methods:
+- **`enable()`** – Enable the logger instance
+- **`disable()`** – Disable the logger instance
+- **`close()`** – Close the logger instance
+
+Raiseable exceptions:
+- **`TypeError`** – Input parameter types are incorrect
+- **`ValueError`** – Input parameter is invalid
+
+Returns: **Logger instance** <br>
+Return type: **tooltils.info.logger** <br><br>
+
+## <span style="font-family: Trebuchet MS;">Config</span>
+
+*My smart thought process converted to text*
+
+**Default Settings**
+
+The default structure for the config is as follows:
+
+```json
+"errors": {},
+"global": {},
+"info": {},
+"main": {
+    "easyAccessMethods": true
+},
+"requests": {
+    "verifiableCachingCheck": 50,
+    "connectedCachingCheck": 50,
+    "verifiableCaching": false,
+    "connectedCaching": false
+},
+"sys.info": {},
+"sys": {}
+```
+
+**Note: The text below was going to be for a feature to specify methods as config values but I am too dumb to lazy to implement it. Hopefully one day I am bothered.**
+
+<br>
+
+**Specifying methods**
+
+To set a setting value as a method, you first need to set the value to a string, then add the **`$function`** keyword, afterwards insert a space and the method. You may not use tooltils methods/properties as circular imports will not work. Built-in Python functions will work but not those from the standard library. But you may use methods or properties from the same module that you are editing the config for:
+
+```json
+"requests": {
+    "defaultVerificationMethod": "$function .verifiable()"
+},
+```
+
+The above example sets the verify parameter default in `requests` methods to the result of `.requests.verifiable()`, automatically preventing any kind of SSL error. Though this is not good practice as the certificate should be verified by default for security purposes. See as to why implementing a config to have the option of doing this is a good idea for people who seek this capability.
+
+**Note: As a limitation to prevent tooltils from being slowed or broken, two parameters in the global config have been added, `runConfigMethodAlways: false` and `checkMethodForSafety: true`. Only change these values if you really know what you are doing!**
