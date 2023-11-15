@@ -806,6 +806,14 @@ Parameters:
 Returns: **Nothing** <br>
 Return type: **None** <br><br>
 
+**`clearData`** <br>
+Clear the cache and config of tooltils
+
+No Parameters
+
+Returns: **Nothing** <br>
+Return type: **None** <br><br>
+
 **`logger`** <br>
 Create a logging instance for tooltils modules only
 

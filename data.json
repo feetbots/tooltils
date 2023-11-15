@@ -1,0 +1,30 @@
+{
+    "cache": {
+        "errors": {},
+        "global": {},
+        "info": {},
+        "main": {},
+        "requests": {
+            "verifiableTimesChecked": 0,
+            "verifiableNetworkList": {},
+            "connectedTimesChecked": 0,
+            "connectedNetworkList": {}
+        },
+        "sys.info": {},
+        "sys": {}
+    },
+    "config": {
+        "errors": {},
+        "global": {},
+        "info": {},
+        "main": {},
+        "requests": {
+            "verifiableCachingCheck": 50,
+            "connectedCachingCheck": 50,
+            "verifiableCaching": false,
+            "connectedCaching": false
+        },
+        "sys.info": {},
+        "sys": {}
+    }
+}

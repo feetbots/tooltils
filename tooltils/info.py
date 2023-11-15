@@ -4,9 +4,9 @@
 class _bm:
     from logging import basicConfig, DEBUG, INFO, WARN, ERROR, CRITICAL
     from os.path import exists, abspath
-    from os import listdir, mkdir
     from json import load, dumps
     from typing import Union
+    from os import listdir
 
     from ._logs import create, enable, disable, close
 
@@ -37,80 +37,64 @@ class _bm:
     
     with open('README.md') as _f:
         ld: str = _f.read()
-    
-    defaultCache: dict = {
-        "errors": {},
-        "global": {
-            # "configMethodValues": {}
-        },
-        "info": {},
-        "main": {},
-        "requests": {
-            "verifiableTimesChecked": 0,
-            "verifiableNetworkList": {},
-            "connectedTimesChecked": 0,
-            "connectedNetworkList": {}
-        },
-        "sys.info": {},
-        "sys": {}
-    }
 
-    defaultConfig: dict = {
-        "errors": {},
-        "global": {
-            # "config": {
-            #     "runConfigMethodAlways": False,
-            #     "checkMethodForSafety": True
-            # } 
+    defaultData: dict = {
+        "cache": {
+            "errors": {},
+            "global": {
+                # "configMethodValues": {}
+            },
+            "info": {},
+            "main": {},
+            "requests": {
+                "verifiableTimesChecked": 0,
+                "verifiableNetworkList": {},
+                "connectedTimesChecked": 0,
+                "connectedNetworkList": {}
+            },
+            "sys.info": {},
+            "sys": {}
         },
-        "info": {},
-        "main": {},
-        "requests": {
-            # "defaultVerificationMethod": True,
-            "verifiableCachingCheck": 50,
-            "connectedCachingCheck": 50,
-            "verifiableCaching": False,
-            "connectedCaching": False
-        },
-        "sys.info": {},
-        "sys": {}
+        "config": {
+            "errors": {},
+            "global": {
+                # "config": {
+                #     "runConfigMethodAlways": False,
+                #     "checkMethodForSafety": True
+                # } 
+            },
+            "info": {},
+            "main": {},
+            "requests": {
+                # "defaultVerificationMethod": True,
+                "verifiableCachingCheck": 50,
+                "connectedCachingCheck": 50,
+                "verifiableCaching": False,
+                "connectedCaching": False
+            },
+            "sys.info": {},
+            "sys": {}
+        }
     }
 
 
     # actualConfig: dict = defaultConfig
-    openCache  = None
-    openConfig = None
+    openData = None
 
 
-def _create(name: str):
-    with open('storage/' + name + '.json', 'a+') as _f:
-        if name == 'cache':
-            _f.write(_bm.dumps(_bm.defaultCache, indent=4))
-        else:
-            _f.write(_bm.dumps(_bm.defaultConfig, indent=4))
+if not _bm.exists('data.json'):
+    with open('data.json', 'a+') as _f:
+        _f.write(_bm.dumps(_bm.defaultData, indent=4))
 
-    return open('storage/' + name + '.json', 'r+')
+def _getData():
+    if _bm.openData is None:
+        _bm.openData = open('data.json', 'r+')
 
-if _bm.exists('storage'):
-    if not _bm.exists('storage/cache.json'):
-        _bm.openCache = _create('cache')
-    if not _bm.exists('storage/config.json'):
-        _bm.openConfig = _create('config')
-else:
-    _bm.mkdir('storage')
-
-    _bm.openCache  = _create('cache')
-    _bm.openConfig = _create('config')
-
-def _getCache():
-    if _bm.openCache is None:
-        _bm.openCache = open('storage/cache.json', 'r+')
-
-    return _bm.openCache
+    return _bm.openData
 
 def _loadCache(module: str='') -> dict:
-    _f = _getCache()
-    data: dict = _bm.load(_f)
+    _f = _getData()
+    data: dict = _bm.load(_f)['cache']
     _f.seek(0)
 
     if module == '':
@@ -119,13 +103,13 @@ def _loadCache(module: str='') -> dict:
         return data[module]
 
 def _editCache(module: str, option: dict, subclass: str='') -> None:
-    _f = _getCache()
+    _f = _getData()
     data = _bm.load(_f)
 
     if subclass:
-        data[module][subclass].update(option)
+        data['cache'][module][subclass].update(option)
     else:
-        data[module].update(option)
+        data['cache'][module].update(option)
 
     _f.seek(0)
     _f.truncate()
@@ -133,35 +117,29 @@ def _editCache(module: str, option: dict, subclass: str='') -> None:
     _f.seek(0)
 
 def _deleteCacheKey(module: str, key: str, subclass: str='') -> None:
-    _f = _getCache()
+    _f = _getData()
     data = _bm.load(_f)
 
     if subclass:
-        keys = data[module][subclass].keys()
+        keys = data['cache'][module][subclass].keys()
     else:
-        keys = data[module].keys()
+        keys = data['cache'][module].keys()
 
     for i in list(keys):
         if key == i:
             if subclass:
-                data[module][subclass].pop(i)
+                data['cache'][module][subclass].pop(i)
             else:
-                data[module].pop(i)
+                data['cache'][module].pop(i)
 
     _f.seek(0)
     _f.truncate()
     _f.write(_bm.dumps(data, indent=4))
     _f.seek(0)
 
-def _getConfig():
-    if _bm.openConfig is None:
-        _bm.openConfig = open('storage/config.json', 'r+')
-
-    return _bm.openConfig
-
 def _loadConfig(module: str='') -> dict:
-    _f = _getConfig()
-    data: dict = _bm.load(_f)
+    _f = _getData()
+    data: dict = _bm.load(_f)['config']
     _f.seek(0)
 
     if module == '':
@@ -170,13 +148,13 @@ def _loadConfig(module: str='') -> dict:
         return data[module]
 
 def _editConfig(module: str, option: dict, subclass: str='') -> None:
-    _f = _getConfig()
+    _f = _getData()
     data: dict = _bm.load(_f)
 
     if subclass:
-        data[module][subclass].update(option)
+        data['config'][module][subclass].update(option)
     else:
-        data[module].update(option)
+        data['config'][module].update(option)
 
     _f.seek(0)
     _f.truncate()
@@ -187,18 +165,21 @@ def clearCache(module: str=None) -> None:
     """Clear the file cache of tooltils or a specific module within"""
 
     module: str = str(module).lower()
-    _f          = _getCache()
+    _f          = _getData()
+    wdata: dict = _bm.load(_f)
 
     if module == 'none':
-        wdata: str = _bm.defaultCache
+        data: dict = _bm.defaultData['cache']
     else:
-        wdata: dict = _bm.load(_f)
+        data: dict = wdata['cache']
 
         try:
-            wdata.update(_bm.defaultCache[module])
+            data.update(_bm.defaultData['cache'][module])
         except KeyError:
             raise FileNotFoundError('Cache module not found')
         
+    wdata['cache'] = data
+
     _f.seek(0)
     _f.truncate(0)
     _f.write(_bm.dumps(wdata, indent=4))
@@ -208,22 +189,31 @@ def clearConfig(module: str=None) -> None:
     """Revert the config of tooltils or a specific module within"""
 
     module: str = str(module).lower()
-    _f          = _getConfig()
+    _f          = _getData()
+    wdata: dict = _bm.load(_f)
 
     if module == 'none':
-        wdata: str = _bm.defaultConfig
+        data: dict = _bm.defaultData['config']
     else:
-        wdata: dict = _bm.load(_f)
+        data: dict = wdata['config']
 
         try:
-            wdata.update(_bm.defaultConfig[module])
+            data.update(_bm.defaultData['config'][module])
         except KeyError:
             raise FileNotFoundError('Config module not found')
         
+    wdata['config'] = data
+
     _f.seek(0)
     _f.truncate(0)
     _f.write(_bm.dumps(wdata, indent=4))
     _f.seek(0)
+
+def clearData() -> None:
+    """Clear the cache and config of tooltils"""
+
+    clearCache()
+    clearConfig()
 
 class logger():
     """Create a logging instance for tooltils modules only"""

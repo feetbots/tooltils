@@ -27,7 +27,7 @@ The biggest update yet<br><br>
 - Readded the mini interpreter module from version 1.0.0-beta into the main module, it was a cool small project that I'm still willing to continue
 - Added `storage` folder containing `cache.json`, and `config.json`, two new features added to compliment new methods like `.requests.verifiable()`
 - Documentation for the config on how to specify built-in Python and local tooltils methods as values for the settings
-- `clearCache()` and `clearConfig()` methods in `.info` to also compliment the two new features respectively
+- `clearCache()`, `clearConfig()` and `clearData()` methods in `.info` to also compliment the two new features respectively
 - Extensively tested each method and property to make sure there are no bugs before releasing
 - Type check for `agent` property in `.requests` methods
 - `install_opener(None)` method in `.requests.request` class to make sure that non tooltils requests using urllib aren't interfered with

@@ -46,4 +46,4 @@ The full API is available to read in the project files at [**API.md**](API.md)
 
 ## Important Note
 
-The current implementation for the cache and config, opens the seperate files once if used, then the code will use those seperate TextIOWrappers to write and read etc. Unfortunately, there is no native method of closing these files once the program has ended, leaving this up to CPython's garbage collecter. This method is considered bad practice but should be better than constantly opening and closing each file.
+The current implementation for the cache and config, opens the data file once if used, then the code will use that TextIOWrapper to write and read etc. Unfortunately, there is no native method of closing this method once the program has ended, leaving this up to CPython's garbage collecter. This method is considered bad practice but should be better than constantly opening and closing each file.
