@@ -231,6 +231,9 @@ class request():
     def send(self) -> _bm.url_response:
         """Send the request"""
 
+        if self.sent:
+            raise _bm.ConnectionError('The request has already been sent')
+
         _data:    dict = self.data
         _encoding: str = self.encoding
         _openers: list = []

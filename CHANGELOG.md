@@ -1,6 +1,25 @@
 # Version History
 
-## 1.5.0 ( /11/2023)
+## 1.5.1 (16/11/2023)
+
+Small update but I somehow always forget something<br><br>
+
+**Additions:**
+- Checker that will raise an error if `.requests.request.send()` is called again after it has already been called
+
+<br>
+
+**Removals:**
+- `https` parameter from `.requests.ctx()` method
+
+<br>
+
+**Changes:**
+- Modified the way all directory dependent files are accessed within `.info` to avoid errors
+
+<br><br>
+
+## 1.5.0 (15/11/2023)
 
 The biggest update yet<br><br>
 

@@ -13,31 +13,6 @@ class _bm:
     class LoggingLevel:
         pass
 
-    lines:  int = 0
-    files: list = listdir('./') + ['tooltils/' + i for i in listdir('./tooltils')] + \
-                  ['tooltils/requests/' + i for i in listdir('./tooltils/requests')] + \
-                  ['tooltils/sys/' + i for i in listdir('./tooltils/sys')]
-
-    for i in ('API.md', 'CHANGELOG.md', 'LICENSE'):
-        files.remove(i)
-
-    for i in files:
-        if i == '.DS_Store' or i == '__pycache__':
-            files.remove(i)
-            continue
-
-        try:
-            with open(i) as _f:
-                lines += len(_f.readlines())
-        except (IsADirectoryError, UnicodeDecodeError):
-            pass
-    
-    with open('LICENSE') as _f:
-        lt: str = _f.read()
-    
-    with open('README.md') as _f:
-        ld: str = _f.read()
-
     defaultData: dict = {
         "cache": {
             "errors": {},
@@ -77,18 +52,26 @@ class _bm:
         }
     }
 
-
     # actualConfig: dict = defaultConfig
     openData = None
 
 
-if not _bm.exists('data.json'):
-    with open('data.json', 'a+') as _f:
+location: str = str('/'.join(__file__.split('/')[:-2]) + '/')
+"""The path of the current installation of tooltils"""
+
+if not _bm.exists(location + 'data.json'):
+    with open(location + 'data.json', 'a+') as _f:
         _f.write(_bm.dumps(_bm.defaultData, indent=4))
+
+with open(location + 'LICENSE') as _f:
+    _lt: str = _f.read()
+    
+with open(location + 'README.md') as _f:
+    _ld: str = _f.read()
 
 def _getData():
     if _bm.openData is None:
-        _bm.openData = open('data.json', 'r+')
+        _bm.openData = open(location + 'data.json', 'r+')
 
     return _bm.openData
 
@@ -347,17 +330,44 @@ class logger():
 
 author:      str = str('feetbots')
 """The creator of tooltils (is and always will be feetbots)"""
-version:     str = str('1.5.0')
+version:     str = str('1.5.1')
 """The current installation version"""
-released:    str = str(' /11/2023')
+released:    str = str('16/11/2023')
 """Release date of the current version"""
-lines:       int = int(_bm.lines)
-"""How many lines of code in this version"""
-license:     str = str(_bm.lt)
+license:     str = str(_lt)
 """The content of the currently used license"""
-location:    str = str('/' + '/'.join(_bm.abspath('info.py').split('/')[1:-1]) + '/')
-"""The path of the current installation of tooltils"""
 description: str = str('A lightweight python utility package built on the standard library')
 """The short description of tooltils"""
-long_description: str = str(_bm.ld)
+long_description: str = str(_ld)
 """The long description of tooltils (README.md)"""
+
+def _getFiles(dir: str) -> list:
+    fileList: list = []
+
+    for i in _bm.listdir(location + dir):
+        fileList.append(location + dir + '/' + i)
+        
+    return fileList
+
+lines: int = int(0)
+"""How many lines of code in this version"""
+_files: list = _getFiles('') + _getFiles('tooltils/requests') + \
+               _getFiles('tooltils/sys')
+
+for i in _files:
+    if i.endswith(('LICENSE', '.DS_Store', '__pycache__', '.git')):
+        _files.remove(i)
+
+# remove these seperately because they would not be removed from the endswith
+# statement for whatever reason
+_files.remove(location + '/API.md')
+_files.remove(location + '/CHANGELOG.md')
+
+for i in _files:
+    try:
+        with open(i) as _f:
+            lines += len(_f.readlines())
+    except (IsADirectoryError, UnicodeDecodeError):
+        pass
+
+del _getFiles, _files, _lt, _ld

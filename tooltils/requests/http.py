@@ -82,7 +82,7 @@ class _bm:
         
         return url
 
-    def ctx(verify: bool=True, https: bool=True, cert: str=None):
+    def ctx(verify: bool=True, cert: str=None):
         try:
             if type(cert) is not str and (
                 cert is not None and not cert is type(tuple)):
@@ -291,6 +291,9 @@ class request():
     
     def send(self) -> _bm.url_response:
         """Send the request"""
+
+        if self.sent:
+            raise _bm.ConnectionError('The request has already been sent')
 
         _headers: dict = self.headers
         _data:    dict = self.data
