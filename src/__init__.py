@@ -1,5 +1,5 @@
 """
-# tooltils | v1.5.0
+# tooltils | v1.5.2
 
 A lightweight python utility package built on the standard library
 
@@ -13,7 +13,7 @@ A lightweight python utility package built on the standard library
 >>> req.status_code
 '200 OK'
 >>> req.headers["User-Agent"]
-'Python-tooltils/1.5.0'
+'Python-tooltils/1.5.2'
 ```
 
 ## API
@@ -22,10 +22,10 @@ Read the full documentation within `API.md` included in the project directory
 """
 
 
-import tooltils.requests as requests
-import tooltils.errors as errors
-import tooltils.info as info
-import tooltils.sys as sys
+import src.requests as requests
+import src.errors as errors
+import src.info as info
+import src.sys as sys
 
 class _bm:
     from time import time, localtime, gmtime, perf_counter

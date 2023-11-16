@@ -1,4 +1,4 @@
-# tooltils | v1.5.1
+# tooltils | v1.5.2
 
 [![python](https://img.shields.io/pypi/pyversions/tooltils.svg)](https://pypi.org/project/tooltils/)
 [![downloads](https://static.pepy.tech/personalized-badge/tooltils?period=total&units=international_system&left_color=grey&right_color=red&left_text=downloads)](https://pepy.tech/project/tooltils)
@@ -15,7 +15,7 @@ A lightweight python utility package built on the standard library
 >>> req.status_code
 '200 OK'
 >>> req.headers["User-Agent"]
-'Python-tooltils/1.5.1'
+'Python-tooltils/1.5.2'
 ```
 
 ## Installation

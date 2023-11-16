@@ -1,5 +1,24 @@
 # Version History
 
+## 1.5.2 (16/11/2023)
+
+Weird bug <br><br>
+
+**Additions:**
+- None
+
+<br>
+
+**Removals:**
+- None
+
+<br>
+
+**Changes:**
+- Modified `pyproject.toml` in hopes of fixing obscure bug where the contents of `src/` would be output into the main project file when installed
+
+<br><br>
+
 ## 1.5.1 (16/11/2023)
 
 Small update but I somehow always forget something<br><br>

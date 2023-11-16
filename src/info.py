@@ -330,7 +330,7 @@ class logger():
 
 author:      str = str('feetbots')
 """The creator of tooltils (is and always will be feetbots)"""
-version:     str = str('1.5.1')
+version:     str = str('1.5.2')
 """The current installation version"""
 released:    str = str('16/11/2023')
 """Release date of the current version"""

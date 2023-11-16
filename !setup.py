@@ -1,6 +1,6 @@
 from setuptools import setup
 
-from .tooltils.info import version
+from .src.info import version
 
 
 with open('README.md') as _f:
@@ -16,5 +16,5 @@ setup(
     author_email='pheetbots@gmail.com',
     packages=['tooltils',],
     ext_modules=[],
-    package_dir={'': "tooltils"},
+    package_dir={'': "src"},
 )

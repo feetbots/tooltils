@@ -37,7 +37,7 @@ class _bm:
         else:
             return value
 
-import tooltils.requests.http as http
+import src.requests.http as http
 
 
 status_codes: dict[int, str] = _bm.StatusCodeError.status_codes
