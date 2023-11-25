@@ -1,6 +1,6 @@
 [project]
 name = "tooltils"
-version = "1.5.2"
+version = "1.5.3"
 authors = [
               {name="feetbots", email="pheetbots@gmail.com"},
           ]
@@ -19,7 +19,3 @@ classifiers = [
 [project.urls]
 "Homepage" = "https://github.com/feetbots/tooltils"
 "Issues" = "https://github.com/feetbots/tooltils/issues"
-
-[tool.setuptools.packages.find]
-where = ["src"]
-include = ["tooltils*"]

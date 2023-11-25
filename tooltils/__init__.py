@@ -1,5 +1,5 @@
 """
-# tooltils | v1.5.2
+# tooltils | v1.5.3
 
 A lightweight python utility package built on the standard library
 
@@ -13,7 +13,7 @@ A lightweight python utility package built on the standard library
 >>> req.status_code
 '200 OK'
 >>> req.headers["User-Agent"]
-'Python-tooltils/1.5.2'
+'Python-tooltils/1.5.3'
 ```
 
 ## API
@@ -22,10 +22,10 @@ Read the full documentation within `API.md` included in the project directory
 """
 
 
-import src.requests as requests
-import src.errors as errors
-import src.info as info
-import src.sys as sys
+import tooltils.requests as requests
+import tooltils.errors as errors
+import tooltils.info as info
+import tooltils.sys as sys
 
 class _bm:
     from time import time, localtime, gmtime, perf_counter
@@ -108,12 +108,11 @@ def style(text: str,
     else:
         code = ANSI_colours.get(colour, colour)
 
-    style:  str = ''
-    styles: dict = {bold: '1', italic: '3', crossed: '9', 
-                    underline: '4', double_underline: '21'}
-    for k, v in styles.items():
-        if k:
-            style += ';' + v
+    style: str = ''
+    for k, v in {'1': bold, '3': italic, '9': crossed, 
+                 '4': underline, '21': double_underline}.items():
+        if v:
+            style += ';' + k
 
     if fill:
         code += 10

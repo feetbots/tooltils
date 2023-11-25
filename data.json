@@ -1,7 +1,9 @@
 {
     "cache": {
         "errors": {},
-        "global": {},
+        "global": {
+            "configMethodValues": {}
+        },
         "info": {},
         "main": {},
         "requests": {
@@ -15,12 +17,19 @@
     },
     "config": {
         "errors": {},
-        "global": {},
+        "global": {
+            "config": {
+                "runConfigMethodAlways": false,
+                "configMethodCheck": 20
+            }
+        },
         "info": {},
         "main": {},
         "requests": {
-            "verifiableCachingCheck": 50,
-            "connectedCachingCheck": 50,
+            "defaultHttpVerificationMethod": true,
+            "defaultVerificationMethod": true,
+            "verifiableCachingCheck": 20,
+            "connectedCachingCheck": 20,
             "verifiableCaching": false,
             "connectedCaching": false
         },

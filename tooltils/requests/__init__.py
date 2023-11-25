@@ -16,9 +16,9 @@ class _bm:
 
     from ..errors import (ConnectionError, ConnectionTimeoutExpired, NoHttpConnection,
                           StatusCodeError, SSLCertificateFailed)
+    from ..info import _loadCache, _loadConfig, _editCache, _deleteCacheKey, version
     from ..sys import getCurrentWifiName
     from ..sys.info import platform
-    from ..info import _loadCache, _loadConfig, _editCache, _deleteCacheKey, version
     
     class FileDescriptorOrPath:
         pass
@@ -37,11 +37,12 @@ class _bm:
         else:
             return value
 
-import src.requests.http as http
+import tooltils.requests.http as http
 
 
 status_codes: dict[int, str] = _bm.StatusCodeError.status_codes
 """List of official valid HTTP response status codes (100-511)"""
+defaultVerificationMethod    = bool(_bm._loadConfig('requests')['defaultVerificationMethod'])
 
 def where() -> _bm.certifs:
     """Return default certificate file and path locations used by Python"""
@@ -355,7 +356,7 @@ class request():
                  encoding: str='utf-8',
                  mask: bool=False,
                  agent: str=None,
-                 verify: bool=True,
+                 verify: bool=defaultVerificationMethod,
                  redirects: bool=True):
         self._setVariables(url, method, auth, data, headers, cookies, 
                            cert, file_name, timeout, encoding, mask, 
@@ -398,7 +399,7 @@ def get(url: str,
         encoding: str='utf-8',
         mask: bool=False,
         agent: str=None,
-        verify: bool=True,
+        verify: bool=defaultVerificationMethod,
         redirects: bool=True
         ) -> _bm.url_response:
     """Send a GET request"""
@@ -418,7 +419,7 @@ def post(url: str,
          encoding: str='utf-8',
          mask: bool=False,
          agent: str=None,
-         verify: bool=True,
+         verify: bool=defaultVerificationMethod,
          redirects: bool=True
          ) -> _bm.url_response:
     """Send a POST request"""
@@ -439,7 +440,7 @@ def download(url: str,
              encoding: str='utf-8',
              mask: bool=False,
              agent: str=None,
-             verify: bool=True,
+             verify: bool=defaultVerificationMethod,
              redirects: bool=True
              ) -> _bm.url_response:
     """Download a file onto the disk"""
@@ -460,7 +461,7 @@ def head(url: str,
          encoding: str='utf-8',
          mask: bool=False,
          agent: str=None,
-         verify: bool=True,
+         verify: bool=defaultVerificationMethod,
          redirects: bool=True
         ) -> _bm.url_response:
     """Send a HEAD request"""
@@ -481,7 +482,7 @@ def put(url: str,
         encoding: str='utf-8',
         mask: bool=False,
         agent: str=None,
-        verify: bool=True,
+        verify: bool=defaultVerificationMethod,
         redirects: bool=True
         ) -> _bm.url_response:
     """Send a PUT request"""
@@ -502,7 +503,7 @@ def patch(url: str,
           encoding: str='utf-8',
           mask: bool=False,
           agent: str=None,
-          verify: bool=True,
+          verify: bool=defaultVerificationMethod,
           redirects: bool=True
           ) -> _bm.url_response:
     """Send a PATCH request"""
@@ -522,7 +523,7 @@ def delete(url: str,
            timeout: int=15, 
            encoding: str='utf-8',
            mask: bool=False,
-           verify: bool=True,
+           verify: bool=defaultVerificationMethod,
            agent: str=None,
            redirects: bool=True
            ) -> _bm.url_response:

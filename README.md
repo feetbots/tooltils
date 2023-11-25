@@ -1,4 +1,4 @@
-# tooltils | v1.5.2
+# tooltils | v1.5.3
 
 [![python](https://img.shields.io/pypi/pyversions/tooltils.svg)](https://pypi.org/project/tooltils/)
 [![downloads](https://static.pepy.tech/personalized-badge/tooltils?period=total&units=international_system&left_color=grey&right_color=red&left_text=downloads)](https://pepy.tech/project/tooltils)
@@ -15,7 +15,7 @@ A lightweight python utility package built on the standard library
 >>> req.status_code
 '200 OK'
 >>> req.headers["User-Agent"]
-'Python-tooltils/1.5.2'
+'Python-tooltils/1.5.3'
 ```
 
 ## Installation
@@ -31,7 +31,7 @@ OR build it directly from the source
 ```console
 git clone https://github.com/feetbots/tooltils.git
 cd tooltils
-python -m pip install !setup.py --user
+python -m pip install setup.py --user
 ```
 
 ## API
@@ -40,8 +40,8 @@ The full API is available to read in the project files at [**API.md**](API.md)
 
 ## Planned Features
 
-- Add a base-level implementation of the `requests` module using only the `socket` and `ssl` modules
-- Add a feature in the `info` module to specify methods or variables as config values
+- Add a different implementation of the `requests` module using some other library to include features like connection pooling
+- Add logging for all tooltils methods where necessary
 - Rewrite older messy code
 
 ## Important Note

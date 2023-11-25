@@ -5,7 +5,7 @@ A slightly different version, extending the functionality of the `urllib`
 implentation with features similar to the `http` module of Python.
 
 By default this module is slightly faster, but can see up to a 2x speed increase
-when the `https` parameter is passed as False. Though this is bad practice.
+when the `https` parameter is passed as False. Though this is bad practice for the average user.
 """
 
 
@@ -25,8 +25,7 @@ class _bm:
 
     from ..errors import (ConnectionError, ConnectionTimeoutExpired, NoHttpConnection,
                           StatusCodeError, SSLCertificateFailed)
-    from ..info import (version, _editCache, _deleteCacheKey, _loadCache,
-                        _loadConfig)
+    from ..info import _loadCache, _loadConfig, _editCache, _deleteCacheKey, version
     from ..sys import getCurrentWifiName
     from ..sys.info import platform
 
@@ -143,6 +142,8 @@ class _bm:
 
         return result
 
+
+defaultHttpVerificationMethod = bool(_bm._loadConfig('requests')['defaultHttpVerificationMethod'])
 
 class request():
     """Prepare and send a http[s] request"""

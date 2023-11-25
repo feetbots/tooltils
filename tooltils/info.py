@@ -8,7 +8,7 @@ class _bm:
     from typing import Union
     from os import listdir
 
-    from ._logs import create, enable, disable, close
+    from ._external import create, enable, disable, close, run
 
     class LoggingLevel:
         pass
@@ -17,7 +17,7 @@ class _bm:
         "cache": {
             "errors": {},
             "global": {
-                # "configMethodValues": {}
+                "configMethodValues": {}
             },
             "info": {},
             "main": {},
@@ -33,17 +33,18 @@ class _bm:
         "config": {
             "errors": {},
             "global": {
-                # "config": {
-                #     "runConfigMethodAlways": False,
-                #     "checkMethodForSafety": True
-                # } 
+                "config": {
+                     "runConfigMethodAlways": False,
+                     "configMethodCheck": 20
+                } 
             },
             "info": {},
             "main": {},
             "requests": {
-                # "defaultVerificationMethod": True,
-                "verifiableCachingCheck": 50,
-                "connectedCachingCheck": 50,
+                "defaultHttpVerificationMethod": True,
+                "defaultVerificationMethod": True,
+                "verifiableCachingCheck": 20,
+                "connectedCachingCheck": 20,
                 "verifiableCaching": False,
                 "connectedCaching": False
             },
@@ -52,26 +53,59 @@ class _bm:
         }
     }
 
-    # actualConfig: dict = defaultConfig
-    openData = None
+    openData           = None
+    actualConfig: dict = defaultData['config']
 
 
-location: str = str('/'.join(__file__.split('/')[:-2]) + '/')
+author:            str = str('feetbots')
+"""The current owner of tooltils"""
+author_email:      str = str('pheetbots@gmail.com')
+"""The email of the current owner of tooltils"""
+maintainer:        str = str('feetbots')
+"""The current sustainer of tooltils"""
+maintainer_email:  str = str('pheetbots@gmail.com')
+"""The email of the current sustainer of tooltils"""
+version:           str = str('1.5.3')
+"""The current installation version"""
+released:          str = str('25/11/2023')
+"""The release date of the current version"""
+description:       str = str('A lightweight python utility package built on the standard library')
+"""The short description of tooltils"""
+classifiers: list[str] = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
+"""The list of PyPi style tooltils classifiers"""
+homepage:          str = str('https://github.com/feetbots/tooltils')
+"""The current home website of tooltils"""
+homepage_issues:   str = str('https://github.com/feetbots/tooltils/issues')
+"""The current issues directory of the home website of tooltils"""
+location:          str = str('/'.join(__file__.split('/')[:-1]) + '/')
 """The path of the current installation of tooltils"""
 
 if not _bm.exists(location + 'data.json'):
     with open(location + 'data.json', 'a+') as _f:
         _f.write(_bm.dumps(_bm.defaultData, indent=4))
 
-with open(location + 'LICENSE') as _f:
-    _lt: str = _f.read()
-    
-with open(location + 'README.md') as _f:
-    _ld: str = _f.read()
+_location: str = '/'.join(location.split('/')[:-2]) + f'/tooltils-{version}.dist-info/'
+
+with open(_location + 'LICENSE') as _f:
+    _lt = _f.read()
+
+with open(_location + 'METADATA') as _f:
+    _ld = _f.read().split('LICENSE')[1]
+
+license:   tuple[str] = (str('MIT License'), str(_lt))
+"""The name and content of the currently used license in a tuple pair (name, content)"""
+long_description: str = str(_ld)
+"""The long description of tooltils"""
 
 def _getData():
     if _bm.openData is None:
-        _bm.openData = open(location + 'data.json', 'r+')
+        _configMethods()
 
     return _bm.openData
 
@@ -121,28 +155,24 @@ def _deleteCacheKey(module: str, key: str, subclass: str='') -> None:
     _f.seek(0)
 
 def _loadConfig(module: str='') -> dict:
-    _f = _getData()
-    data: dict = _bm.load(_f)['config']
-    _f.seek(0)
-
     if module == '':
-        return data
+        return _bm.actualConfig
     else:
-        return data[module]
+        return _bm.actualConfig[module]
 
-def _editConfig(module: str, option: dict, subclass: str='') -> None:
-    _f = _getData()
-    data: dict = _bm.load(_f)
-
-    if subclass:
-        data['config'][module][subclass].update(option)
-    else:
-        data['config'][module].update(option)
-
-    _f.seek(0)
-    _f.truncate()
-    _f.write(_bm.dumps(data, indent=4))
-    _f.seek(0)
+#def _editConfig(module: str, option: dict, subclass: str='') -> None:
+#    _f = _getData()
+#    data: dict = _bm.load(_f)
+#
+#    if subclass:
+#        data['config'][module][subclass].update(option)
+#    else:
+#        data['config'][module].update(option)
+#
+#    _f.seek(0)
+#    _f.truncate()
+#    _f.write(_bm.dumps(data, indent=4))
+#    _f.seek(0)
 
 def clearCache(module: str=None) -> None:
     """Clear the file cache of tooltils or a specific module within"""
@@ -195,8 +225,14 @@ def clearConfig(module: str=None) -> None:
 def clearData() -> None:
     """Clear the cache and config of tooltils"""
 
-    clearCache()
-    clearConfig()
+    _f         = _getData()
+    data: dict = _bm.load(_f)
+    data.update(_bm.defaultData)
+
+    _f.seek(0)
+    _f.truncate(0)
+    _f.write(_bm.dumps(data, indent=4))
+    _f.seek(0)
 
 class logger():
     """Create a logging instance for tooltils modules only"""
@@ -281,7 +317,6 @@ class logger():
                  level: _bm.Union[str, int, _bm.LoggingLevel]='ALL',
                  level2: _bm.Union[str, int, _bm.LoggingLevel]='ALL'
                  ) -> None:
-        if type(module) is str: module = module.upper()
         if type(level) is str: level = level.upper()
         if type(level2) is str: level2 = level2.upper()
         
@@ -290,12 +325,13 @@ class logger():
         elif module not in ('', 'ALL', 'MAIN', 'REQUESTS', 'SYS'):
             raise ValueError('Unknown module \'{}\''.format(module))
         else:
-            self._module: str = module
+            self._module: str = module.upper()
 
             if module == '' or module == 'ALL' or module == 'MAIN':
                 self._module: str = 'tooltils'
             else:
                 self._module: str = 'tooltils.' + module.lower()
+
         for i in (('level', level), ('level2', level2)):
             if not isinstance(i[1], (str, int, _bm.DEBUG, _bm.INFO, _bm.WARN,
                                      _bm.ERROR, _bm.CRITICAL)):
@@ -328,46 +364,69 @@ class logger():
 
         return f'<Logger instance: [{state}] -> [{module}]>'
 
-author:      str = str('feetbots')
-"""The creator of tooltils (is and always will be feetbots)"""
-version:     str = str('1.5.2')
-"""The current installation version"""
-released:    str = str('16/11/2023')
-"""Release date of the current version"""
-license:     str = str(_lt)
-"""The content of the currently used license"""
-description: str = str('A lightweight python utility package built on the standard library')
-"""The short description of tooltils"""
-long_description: str = str(_ld)
-"""The long description of tooltils (README.md)"""
-
 def _getFiles(dir: str) -> list:
     fileList: list = []
 
     for i in _bm.listdir(location + dir):
-        fileList.append(location + dir + '/' + i)
+        fileList.append(location + ('' if not dir else dir + '/') + i)
         
     return fileList
 
-lines: int = int(0)
-"""How many lines of code in this version"""
-_files: list = _getFiles('') + _getFiles('tooltils/requests') + \
-               _getFiles('tooltils/sys')
+def _getLines():
+    lines:  int = 0
+    files: list = _getFiles('') + _getFiles('requests') + _getFiles('sys')
 
-for i in _files:
-    if i.endswith(('LICENSE', '.DS_Store', '__pycache__', '.git')):
-        _files.remove(i)
+    for i in ('README.md', 'API.md', 'CHANGELOG.md', 'test.py', 'LICENSE', '.DS_Store',
+            '__pycache__', '.git'):
+        try:
+            files.remove(location + i)
+        except ValueError:
+            continue
 
-# remove these seperately because they would not be removed from the endswith
-# statement for whatever reason
-_files.remove(location + '/API.md')
-_files.remove(location + '/CHANGELOG.md')
+    for i in files:
+        try:
+            with open(i) as _f:
+                lines += len(_f.readlines())
+        except (IsADirectoryError, UnicodeDecodeError):
+            pass
+    
+    return lines
 
-for i in _files:
-    try:
-        with open(i) as _f:
-            lines += len(_f.readlines())
-    except (IsADirectoryError, UnicodeDecodeError):
-        pass
 
-del _getFiles, _files, _lt, _ld
+lines: int = int(_getLines())
+"""The amount of lines of code in this tooltils installation"""
+
+del _getFiles, _getLines, _f, _lt, _ld
+
+def _configMethods():
+    _f           = open(location + 'data.json', 'r+')
+    _bm.openData = _f
+    data: dict   = _bm.load(_f)
+    _f.            seek(0)
+    funcs: dict  = data['cache']['global']['configMethodValues']
+
+    for k, v in data['config'].items():
+        for k2, v2 in v.items():
+            if type(v2) is str and '$f' in v2:
+                try:
+                    statement: str = v2.split(' ')[1].split('(')
+                    funcName:  str = statement[0]
+                    args:      str = '[' + statement[1][:-1] + ']'
+
+                    if funcName in tuple(funcs.keys()) and funcs[funcName][1] < data[
+                        'config']['global']['config']['configMethodCheck']:
+                        funcs[funcName] = (funcs[funcName][0], funcs[funcName][1] + 1)
+                        _editCache('global', {"configMethodValues": funcs})
+                    else:
+                        value = _bm.run(funcName, args)
+
+                        funcs.update({funcName: (value, 1)})
+                        _editCache('global', {"configMethodValues": funcs})
+                except:
+                    value = None
+            else:
+                value = v2
+
+            _bm.actualConfig[k][k2] = value
+
+    return _f

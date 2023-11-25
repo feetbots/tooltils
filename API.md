@@ -372,7 +372,7 @@ Parameters:
 - **`encoding`** str = ‘utf-8’ – Codec used to decode the response text
 - **`mask`** bool = False – Decide whether to use an anonymous user agent header
 - **`agent`** str = None – Overwrite for the agent header
-- **`verify`** bool = True – Whether to check the hostname and verify the request
+- **`verify`** bool = `config.defaultVerificationMethod` – Whether to check the hostname and verify the request
 - **`redirects`** bool = True – Whether to allow redirects
 
 Return properties:
@@ -470,7 +470,7 @@ Parameters:
 - **`encoding`** str = ‘utf-8’ – Codec used to decode the response text
 - **`mask`** bool = False – Decide whether to use an anonymous user agent header
 - **`agent`** str = None – Overwrite for the agent header
-- **`verify`** bool = True – Whether to use SSL in the request
+- **`verify`** bool = `config.defaultHttpVerificationMethod` – Whether to use SSL in the request
 - **`redirects`** bool = True – Whether to allow redirects
 - **`https`** bool = True – Whether https should be used in the request
 - **`port`** int – The port to send the request from
@@ -777,14 +777,20 @@ Returns:
 *General installation information*
 
 Properties:
-- **`author`** str – The creator of tooltils
+- **`author`** str – The current owner of tooltils
+- **`author_email`** str – The email of the current owner of tooltils
+- **`maintainer`** str – The current sustainer of tooltils
+- **`maintainer_email`** str – The email of the current sustainer of tooltils
 - **`version`** str – The current installation version
 - **`released`** str – The release date of the current installation
-- **`lines`** lines – How many lines of code in this installation
-- **`license`** str – The content of the currently used license
+- **`license`** tuple[str] – The name and content of the currently used license in a tuple pair (name, content)
 - **`description`** str – The short description of tooltils
-- **`long_description`** str – The long description of tooltils (README.md)
+- **`long_description`** str – The long description of tooltils
 - **`location`** str – The path of the current installation of tooltils
+- **`lines`** int – The amount of lines of code in this tooltils installation
+- **`classifiers`** list[str] – The list of PyPi style tooltils classifiers
+- **`homepage`** str – The current home website of tooltils
+- **`homepage_issues`** str – The current issues directory of the home website of tooltils
 
 Methods:
 
@@ -843,7 +849,7 @@ Return type: **tooltils.info.logger** <br><br>
 
 ## <span style="font-family: Trebuchet MS;">Config</span>
 
-*My smart thought process converted to text*
+*Config configuration config*
 
 **Default Settings**
 
@@ -851,14 +857,19 @@ The default structure for the config is as follows:
 
 ```json
 "errors": {},
-"global": {},
-"info": {},
-"main": {
-    "easyAccessMethods": true
+"global": {
+    "config": {
+         "runConfigMethodAlways": false,
+         "configMethodCheck": 20
+    } 
 },
+"info": {},
+"main": {},
 "requests": {
-    "verifiableCachingCheck": 50,
-    "connectedCachingCheck": 50,
+    "defaultHttpVerificationMethod": true,
+    "defaultVerificationMethod": true,
+    "verifiableCachingCheck": 20,
+    "connectedCachingCheck": 20,
     "verifiableCaching": false,
     "connectedCaching": false
 },
@@ -866,20 +877,25 @@ The default structure for the config is as follows:
 "sys": {}
 ```
 
-**Note: The text below was going to be for a feature to specify methods as config values but I am too dumb to lazy to implement it. Hopefully one day I am bothered.**
-
 <br>
 
 **Specifying methods**
 
-To set a setting value as a method, you first need to set the value to a string, then add the **`$function`** keyword, afterwards insert a space and the method. You may not use tooltils methods/properties as circular imports will not work. Built-in Python functions will work but not those from the standard library. But you may use methods or properties from the same module that you are editing the config for:
+To set a setting value as a method, you first need to set the value to a string, then add the **"`$f`"** keyword, afterwards insert a space and the method. If an error was raised or the function did not execute properly the config value will become None. Keyword arguments are not supported as of yet. If you wish to use the keyword without insitigating a method, you can backslash each character (**"`\$\f`"**). To use a tooltils method follow the below example with each module, the same goes with a builtin function (**"`$f subprocess.call(...)`"**). You may use any tooltils method available. Built-in Python functions will work but not those from the standard library:
 
 ```json
 "requests": {
-    "defaultVerificationMethod": "$function .verifiable()"
+    "defaultVerificationMethod": "$f tooltils.requests.verifiable()"
 },
 ```
 
-The above example sets the verify parameter default in `requests` methods to the result of `.requests.verifiable()`, automatically preventing any kind of SSL error. Though this is not good practice as the certificate should be verified by default for security purposes. See as to why implementing a config to have the option of doing this is a good idea for people who seek this capability.
+The above example sets the verify parameter default in `requests` methods to the result of `tooltils.requests.verifiable()`, automatically preventing any kind of SSL error. Though this is not good practice as the certificate should be verified by default for security purposes. See as to why implementing a config to have the option of doing this is a good idea for people who seek this capability.
 
-**Note: As a limitation to prevent tooltils from being slowed or broken, two parameters in the global config have been added, `runConfigMethodAlways: false` and `checkMethodForSafety: true`. Only change these values if you really know what you are doing!**
+```jsonc
+"requests": {
+    "defaultHttpVerificationMethod": "$f any()", // builtin function any (false)
+    "defaultVerificationMethod": "$f tooltils.sys.getCurrentWifiName()" // tooltils function (... or None)
+}
+```
+
+**Note: As a limitation to prevent tooltils from being slowed or broken, a parameter in the global config has been added, `runConfigMethodAlways: false`. Only change this value if you really know what you are doing!**

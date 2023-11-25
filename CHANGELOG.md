@@ -1,5 +1,39 @@
 # Version History
 
+## 1.5.3 (25/11/2023)
+
+PyPi is disorganised
+
+**Additions:**
+- `author_email`, `maintainer`, `maintainer_email`, `classifiers`, `homepage` and `issues` variables to `.info` reflecting the data of `setup.py` and `pyproject.toml`
+- `tooltils/` base source code directory to the line counter in `.info`
+- Ability to specify local `methods` as config values (very basic implementation, also note keyword arguments are not supported yet, but you may use any tooltils method)
+- New `config` options for `.requests`
+- New roadmap item in `README.md`
+- New global `config` option, `configMethodCheck` for caching with the feature of specifying config values as methods
+
+<br>
+
+**Removals:**
+- Unnecessary data tables in `pyproject.toml`
+- `README.md` is now excluded from the line counter in `.info`
+
+<br>
+
+**Changes:**
+- Rename `!setup.py` to `setup.py`
+- Finally fix `setup.py` and `pyproject.toml` to fix the installation bug since 1.5.0 (see [rude stackoverflow people](https://stackoverflow.com/questions/77520583/pypi-package-installing-source-code-into-site-packages-folder-directly))
+- Modify `.style()` method optimisation to fix bug
+- Update `.info` variable docstrings
+- Change `license` variable in `.info` to a dict with the structure (name, content)
+- Convert `clearData()` method in `.info` to actually have separate code instead of just using `clearCache()` and `clearConfig()`
+- Change copyright symbol in `LICENSE` back to **"(c)"** as the license may have been void when it was changed
+- Tooltils is now tested on test.pypi.org before each release to prevent future bugs like what happened in 1.5.0
+- Modified the `config` section in `API.md` slightly
+- Reworded `requests` module roadmap item in `README.md`
+- Update all cache config values to check every 20 times instead of 50
+- Fix all directory related errors
+
 ## 1.5.2 (16/11/2023)
 
 Weird bug <br><br>
@@ -171,7 +205,7 @@ The biggest update yet<br><br>
 - Rename `output` variable from `.sys.system()` `shell_response` return to `text`
 - The way some system programs are called from various methods, they should call the program directly instead of running a shell command
 - Made sure the correct return type is present on every method in `API.md`
-- Converted `clean` parameter from `.sys.system()` class to instead be a seperate property
+- Converted `clean` parameter from `.sys.system()` class to instead be a separate property
 - Made text property in `.sys.system()` become a string instead of a list
 
 <br>
@@ -252,7 +286,7 @@ Some needed features lacking in 1.4.3 (also bugfixes)<br><br>
 - Reworded `.sys.info.bitsize` docstring
 - Adapted the *`.date().fv()`* helper function to return multiple values
 - Fixed an issue in `.sys.system()` (and child commands) where if the output was not checked, an error would be raised when creating the output property
-- Changed `.style()` `style` parameter to `colour` as font styles were added as seperate parameters
+- Changed `.style()` `style` parameter to `colour` as font styles were added as separate parameters
 - Made `.style()` `colour` parameter become a non required parameter so you don't need to add a colour to use font styles
 - Added official keyword to the `.requests.status_codes` dictionary to indicate supported codes everywhere
 - Reworded the main file docstring to have correct grammar

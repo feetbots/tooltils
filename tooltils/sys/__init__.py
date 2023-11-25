@@ -13,7 +13,7 @@ class _bm:
     class shell_response:
         pass
 
-import src.sys.info as info
+import tooltils.sys.info as info
 
 
 def exit(details: str='', code: int=0) -> _bm.NoReturn:
