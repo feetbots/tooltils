@@ -1,5 +1,5 @@
 """
-# tooltils | v1.5.3
+# tooltils | v1.6.0
 
 A lightweight python utility package built on the standard library
 
@@ -7,13 +7,13 @@ A lightweight python utility package built on the standard library
 >>> import tooltils
 >>> req = tooltils.get('httpbin.org/get')
 >>> req
-'<GET httpbin.org [200]>
+'<GET httpbin.org [200]>'
 >>> req.url
 'https://httpbin.org/get'
 >>> req.status_code
 '200 OK'
 >>> req.headers["User-Agent"]
-'Python-tooltils/1.5.3'
+'Python-tooltils/1.6.0'
 ```
 
 ## API
@@ -31,9 +31,13 @@ class _bm:
     from time import time, localtime, gmtime, perf_counter
     from datetime import datetime, timezone, timedelta
     from os.path import abspath, getsize, exists
+    from shutil import copyfileobj, rmtree
+    from tarfile import open as topen
+    from gzip import open as gopen
+    from logging import getLogger
     from typing import Any, Union
     from io import TextIOWrapper
-    from os import mkdir
+    from os import mkdir, remove
     
     class EPOCH_seconds:
         pass
@@ -49,6 +53,7 @@ class _bm:
         'September', 'October', 
         'November', 'December'
     ]
+    logger            = getLogger('tooltils')
 
 
 ANSI_colours: dict[str, int] = {
@@ -87,10 +92,10 @@ def length(file: _bm.FileDescriptorOrPath) -> float:
     return round((_bm.getsize(file) - 44) * 1000 / rate / 1000, 2)
 
 def style(text: str, 
-          colour: str='', 
-          fill: bool=False,
+          colour: str='',
           bold: bool=False,
           italic: bool=False,
+          fill: bool=False,
           crossed: bool=False,
           underline: bool=False,
           double_underline: bool=False,
@@ -119,19 +124,21 @@ def style(text: str,
     if flush:
         sys.call('', shell=True)
 
+        _bm.logger.debug('A shell flush was called to the terminal')
+
     return '\u001b[{0}{1}{2}\u001b[0m'.format(code, style + 'm', text)
 
-def halve(object: _bm.Union[str, list]) -> list:
-    """Return the halves of a string or list"""
+def halve(array: _bm.Union[str, list, tuple, set, dict]) -> list:
+    """Return the halves of a string or array"""
 
-    if not isinstance(object, (str, list)):
-        raise TypeError('Object must be a valid \'str\' or \'list\' instance')
+    if not isinstance(array, (str, list, tuple, set, dict)):
+        raise TypeError('Array must be a valid \'str\' or array instance')
 
-    i: int = len(object)
+    i: int = len(array)
     if i % 2 == 0:
-        return [object[:i // 2], object[i // 2:]]
+        return [array[:i // 2], array[i // 2:]]
     else:
-        return [object[:(i // 2 + 1)], object[(i // 2 + 1):]]
+        return [array[:(i // 2 + 1)], array[(i // 2 + 1):]]
 
 def cipher(text: str, shift: int) -> str:
     """A simple caeser cipher"""
@@ -220,10 +227,10 @@ def date(epoch: _bm.EPOCH_seconds=...,
                'PM' if sdate.tm_hour >= 12 else 'AM', sdate.tm_mday, end, 
                _bm.months[sdate.tm_mon - 1], sdate.tm_year)
     else:
-        raise TypeError('Format ({}) not found'.format(format))
+        raise ValueError('Format ({}) not found'.format(format))
 
-def epoch(date: str) -> _bm.Union[int, float]:
-    """Get epoch from a formatted date (`strftime` etc.)"""
+def epoch(date: str) -> int:
+    """Get epoch from a formatted string date"""
 
     if type(date) is not str:
         raise TypeError('Date must be a valid \'str\' instance')
@@ -250,13 +257,13 @@ def epoch(date: str) -> _bm.Union[int, float]:
             splitDate: list = [year + '/' + str(int(_bm.months.index(month)) + 1)
                                + '/' + days, hours + ':' + minutes + ':00']
         except IndexError:
-            raise TypeError('Invalid date argument')
+            raise ValueError('Invalid date argument')
 
     try:
         sdate = _bm.datetime(*[int(i) for i in splitDate[0].split(
                              '/') + splitDate[1].split(':')])
     except IndexError:
-        raise TypeError('Invalid date argument')
+        raise ValueError('Invalid date argument')
 
     days: int = _bm.datetime(sdate.year, sdate.month, 
                              sdate.day, sdate.hour,
@@ -270,7 +277,7 @@ def epoch(date: str) -> _bm.Union[int, float]:
     return epoch
 
 def squeeze(array: _bm.Union[list, tuple, set, dict],
-            item: _bm.Union[_bm.Any, None]=None
+            item: _bm.Any=None
             ) -> _bm.Union[list, tuple, set, dict]:
     """Remove empty or the specified item(s) from an array"""
     
@@ -373,9 +380,12 @@ def timeTest(method, method2, params: dict={}, params2: dict={},
         start = _bm.perf_counter()
         method(**params)
         one = _bm.perf_counter() - start
+        _bm.logger.debug(f'tooltils.timeTest() method one reported time {round(one, 2)}s on test {i}')
+
         start2 = _bm.perf_counter()
         method2(**params2)
         two = _bm.perf_counter() - start2
+        _bm.logger.debug(f'tooltils.timeTest() method two reported time {round(two, 2)}s on test {i}')
 
         avg1.append(one)
         avg2.append(two)
@@ -395,8 +405,67 @@ def varName(**vars: dict) -> _bm.Union[str, list[str]]:
     else:
         return names
 
-class interpereter():
-    """Custom top-level Python interpereter to add niche features from other languages"""
+def tgzOpen(file: _bm.FileDescriptorOrPath, 
+            output: _bm.FileDescriptorOrPath=None,
+            ) -> str:
+    """Open a gzipped tar file"""
+
+    if type(file) is not str:
+        raise TypeError('File must be a valid \'str\' instance')
+    elif not file.endswith('.tar.gz') and not file.endswith('.tgz'):
+        raise ValueError('File is not a valid gzipped tar instance')
+    elif not _bm.exists(file):
+        raise FileNotFoundError('Could not locate the specified gzipped tar file')
+    else:
+        file: str = _bm.abspath(file)
+    if file.endswith('.tar.gz'):
+        tfile: str = '.'.join(file.split('.')[:-1])
+    elif file.endswith('.tgz'):
+        tfile: str = '.'.join(file.split('.')[:-1]) + '.tar'
+    if output is None:
+        output: str = '.'.join(tfile.split('.')[:-1])
+    elif type(output) is not str:
+        raise TypeError('Output must be a valid \'str\' instance')
+    else:
+        output: str = _bm.abspath(output)
+    if _bm.exists(output) or _bm.exists(tfile):
+        raise FileExistsError('Output file/folder already file exists')
+
+    with _bm.gopen(file, 'rb') as _f, open(tfile, 'wb') as _f2:
+        _bm.copyfileobj(_f, _f2)
+    
+    _bm.logger.debug(f'Uncompressed gzip file {file} to {tfile} in tooltils.tgzOpen()')
+
+    with _bm.topen(tfile) as _f:
+        _f.extractall(output)
+    
+    _bm.logger.debug(f'Extracted tarfile {tfile} to {output} in tooltils.tgzOpen()')
+
+    _bm.remove(tfile)
+    _bm.logger.debug(f'Delete tarfile {tfile} in tooltils.tgzOpen()')
+
+    return output
+
+def lengthSort(array: _bm.Union[list, tuple, set, dict],
+               fromLowest: bool=True,
+               sortByKey: bool=False
+               ) -> _bm.Union[list, tuple, set, dict]:
+    """Sort an array by it's length"""
+
+    if not isinstance(array, (list, tuple, set, dict)):
+        raise TypeError('Array must be a valid \'list\', \'tuple\', \'set\' or \'dict\' instance')
+    elif len(array) == 0:
+        raise ValueError('Array cannot be empty')
+    
+    if isinstance(array, (list, tuple, set)):
+        return sorted(array, key=lambda l: len(l), reverse=not fromLowest)
+    elif type(array) is dict:
+        return dict(sorted(array.items(), key=lambda l: len(l[1 if sortByKey else 0]),
+                           reverse=fromLowest)) # sorted() isn't flipped here for some reason,
+                                                # that's why fromLowest is being passed as is
+
+class interpreter():
+    """Custom top-level Python interpreter to add niche features from other languages"""
 
     def _getIndent(self, line: str) -> str:
         return ''.join([' ' for i in range(len(line) - len(line.lstrip()))])
@@ -418,19 +487,19 @@ class interpereter():
     def read(self) -> str:
         """Read the output file and return the content as a string"""
 
-        if ''.join(self._interpereted)[-1:] == '\n':
-            return ''.join(self._interpereted)[:-1]
+        if ''.join(self._interpreted)[-1:] == '\n':
+            return ''.join(self._interpreted)[:-1]
         else:
-            return ''.join(self._interpereted)
+            return ''.join(self._interpreted)
     
     def readlines(self) -> list:
         """Read the output file and return the content as a list containing strings split at every newline"""
 
-        return self._interpereted
+        return self._interpreted
 
     def __init__(self, 
                  file: str,
-                 output: str='%(name)s.interpereted.py',
+                 output: str='%(name)s.interpreted.py',
                  override: bool=False):
         if type(file) is not str:
             raise TypeError('File must be a valid \'str\' instance')
@@ -445,9 +514,9 @@ class interpereter():
         else:
             file: str = file
 
-        self.output:         str = output % {"name": file}
-        self.override:      bool = bool(override)
-        self._interpereted: list = []
+        self.output:        str = output % {"name": file}
+        self.override:     bool = bool(override)
+        self._interpreted: list = []
 
         if not self.override and _bm.exists(self.output):
             raise FileExistsError('Output file already present')
@@ -458,20 +527,24 @@ class interpereter():
         except IsADirectoryError:
             raise FileNotFoundError('There was a problem locating the file')
         
-        for line in _content:
+        for i, line in enumerate(_content):
             if line.lstrip()[:2] == '//':
-                self._interpereted.append(self._convertComment(line))
+                self._interpreted.append(self._convertComment(line))
+
+                _bm.logger.debug(f'Found comment on line {i} on tooltils.interpreter() for file \'{self.file}\'')
             elif line.lstrip()[0] != '#' and line.lstrip()[:2] != '//' and \
                  len(line.split('=')) != 1 and len(line.split('=')[1].split('?')) != 1:
-                self._interpereted.append(self._convertTernary(line))
+                self._interpreted.append(self._convertTernary(line))
+
+                _bm.logger.debug(f'Found ternary condition on line {i} on tooltils.interpreter() for file \'{self.file}\'')
             else:
-                self._interpereted.append(line)
+                self._interpreted.append(line)
 
         with open(self.output, 'a+') as _f:
             _f.truncate(0)
-            _f.writelines(self._interpereted)
+            _f.writelines(self._interpreted)
         
         self.full_output: str = _bm.abspath(self.output)
 
     def __str__(self):
-        return '<Interpereter instance [{}]>'.format(self.file)
+        return '<Interpreter instance [{}]>'.format(self.file)

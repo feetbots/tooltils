@@ -1,6 +1,10 @@
 """Package specific exceptions"""
 
 
+class _bm:
+    from typing import Union
+
+
 class TooltilsError(Exception):
     """Base class for tooltils specific errors"""
 
@@ -93,8 +97,9 @@ class ShellCodeError(SystemCallError):
 class ShellTimeoutExpired(SystemCallError):
     """Shell command timed out"""
     
-    def __init__(self, message: str=''):
+    def __init__(self, message: str='', timeout: int=-1):
         self.message: str = message
+        self.timeout: int = timeout
     
     def __str__(self):
         if self.message:
@@ -165,8 +170,9 @@ class ConnectionError(RequestError):
 class ConnectionTimeoutExpired(RequestError):
     """Request read timeout expired"""
 
-    def __init__(self, message: str=''):
+    def __init__(self, message: str='', timeout: int=-1):
         self.message: str = message
+        self.timeout: int = timeout
     
     def __str__(self):
         if self.message:
@@ -273,10 +279,10 @@ class SSLCertificateFailed(RequestError):
     def __str__(self):
         if self.message:
             return self.message
+        else:
+            return 'The currently used SSL certificate could not be used to verify requests'
 
-        return 'The currently used SSL certificate could not be used to verify requests'
-
-class NoHttpConnection(RequestError):
+class InvalidWifiConnection(RequestError):
     """No valid wifi connection could be found for the request"""
 
     def __init__(self, message: str=''):
@@ -285,5 +291,32 @@ class NoHttpConnection(RequestError):
     def __str__(self):
         if self.message:
             return self.message
+        else:
+            return 'No valid wifi connection could be found for the request'
 
-        return 'No valid wifi connection could be found for the request'
+class RequestRedirectError(RequestError):
+    """Request redirected too many times or entered a redirect loop"""
+
+    def __init__(self, message: str='', limit: int=-1):
+        self.message: str = message
+        self.limit:   int = limit
+    
+    def __str__(self):
+        if self.message:
+            return self.message
+        else:
+            return 'Request redirected too many times or entered a redirect loop'
+
+class RequestCodecError(RequestError):
+    """Unable to decode request body"""
+
+    def __init__(self, message: str='', 
+                 encoding: _bm.Union[str, tuple]=('utf-8', 'ISO-8859-1')):
+        self.message:                    str = message
+        self.encoding: _bm.Union[str, tuple] = encoding
+    
+    def __str__(self):
+        if self.message:
+            return self.message
+        else:
+            return 'Unable to decode request body'

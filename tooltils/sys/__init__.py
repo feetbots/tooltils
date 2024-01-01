@@ -4,6 +4,7 @@
 class _bm:
     from subprocess import run, CalledProcessError, TimeoutExpired, DEVNULL
     from typing import NoReturn, Union
+    from logging import getLogger
     from sys import exit
     
     from ..errors import (ShellCodeError, ShellTimeoutExpired,
@@ -12,32 +13,40 @@ class _bm:
     
     class shell_response:
         pass
+    
+    logger = getLogger('tooltils.sys')
 
 import tooltils.sys.info as info
 
 
-def exit(details: str='', code: int=0) -> _bm.NoReturn:
-    """Exit the current thread with details"""
+def exit(details: str=None, code: int=1) -> _bm.NoReturn:
+    """Print some text and exit the current thread"""
 
+    if details is None:
+        details: str = ''
+    elif type(details) is not str:
+        raise TypeError('Details must be a valid \'str\' instance')
     if type(code) is not int:
-        raise TypeError('Exit code must be a valid integer instance')
-    if type(details) is not str:
-        raise TypeError('Details must be a valid string instance')
+        raise TypeError('Code must be a valid \'int\' instance')
 
     if details == '':
         print('', end='')
     else:
         print(details)
+    
+    _bm.logger.warn(f'Exiting the current thread with exit code {code}')
 
     _bm.exit(code)
 
 def clear() -> None:
-    """OS independent terminal clearing"""
+    """Clear the terminal history"""
 
-    if info.platform == 'Windows':
-        _bm.run(['cls'])
-    elif info.platform == 'MacOS' or info.platform == 'Linux':
-        _bm.run(['clear'])
+    if info.platform.lower() == 'windows':
+        _bm.run('cls')
+    else:
+        _bm.run('clear')
+
+    _bm.logger.debug('Terminal history was cleared')
 
 class system():
     """Call a system program and return some information"""
@@ -81,6 +90,8 @@ class system():
         
         if error:
             raise error
+
+        _bm.logger.debug(f'Called system command/program with shell: {bool(shell)}, print: {bool(print)}')
         
         self.cmds: _bm.Union[list, str] = cmds
         self.shell:                bool = bool(shell)

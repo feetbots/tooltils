@@ -4,9 +4,12 @@ class _bm:
     from subprocess import CalledProcessError, TimeoutExpired, run
     from sys import executable, maxsize, platform, version
     from socket import gethostname
+    from logging import getLogger
 
     def check(cmd: str, shell: bool=False):
         return _bm.run(cmd, shell=shell, capture_output=True).stdout.decode().splitlines()
+    
+    logger = getLogger('tooltils.sys.info')
 
 macOS_releases: dict[str, str] = {
     "10.0":  "Cheetah",
@@ -32,54 +35,40 @@ macOS_releases: dict[str, str] = {
 }
 """List of all current MacOS versions"""
 
-python_version:         str = _bm.version.split(' ')[0]
-"""Current Python interpereter version"""
-python_version_tuple: tuple = tuple(python_version.split('.'))
-"""Current Python interpereter version seperated into major, minor, patch"""
+python_version:         str = _bm.version.split('(')[0].strip()
+"""Current Python interpreter version"""
 name:                   str = _bm.gethostname()
 """The network name of computer"""
-bitsize                     = 32 if not (_bm.maxsize > 2 ** 32) else 64
-"""Whether the current Python interpreter computer is 32 or 64-bit"""
+bitsize                     = 64 if (_bm.maxsize > 2 ** 32) else 32
+"""The bit limit of the current Python interpreter"""
 interpreter:            str = _bm.executable
-"""Location of current Python interpereter"""
+"""Location of current Python interpreter"""
 
 st = _bm.platform.startswith
 if st('linux'):
-    tplatform = 'Linux'
-    tdplatform = 'Linux'
+    tplatform = tdplatform = 'Linux'
 elif st('win'):
-    tplatform = 'Windows'
-    tdplatform = 'Windows'
+    tplatform = tdplatform = 'Windows'
 elif st('cygwin'):
-    tplatform = 'Windows'
-    tdplatform = 'Cygwin'
+    tplatform, tdplatform = 'Windows', 'Cygwin'
 elif st('msys'):
-    tplatform = 'Windows'
-    tdplatform = 'MSYS2'
+    tplatform, tdplatform = 'Windows', 'MSYS2'
 elif st('darwin'):
-    tplatform = 'MacOS'
-    tdplatform = 'Darwin'
+    tplatform, tdplatform = 'MacOS', 'Darwin'
 elif st('os2'):
-    tplatform = 'OS2'
-    tdplatform = 'OS2'
+    tplatform = tdplatform = 'OS2'
 elif st('risc'):
-    tplatform = 'Linux'
-    tdplatform = 'RiscOS'
+    tplatform, tdplatform = 'Linux', 'RiscOS'
 elif st('athe'):
-    tplatform = 'Linux'
-    tdplatform = 'AtheOS'
+    tplatform, tdplatform = 'Linux', 'AtheOS'
 elif st('freebsd'):
-    tplatform = 'BSD'
-    tdplatform = 'FreeBSD'
+    tplatform, tdplatform = 'BSD', 'FreeBSD'
 elif st('openbsd'):
-    tplatform = 'BSD'
-    tdplatform = 'OpenBSD'
+    tplatform, tdplatform = 'BSD', 'OpenBSD'
 elif st('aix'):
-    tplatform = 'AIX'
-    tdplatform = 'AIX'
+    tplatform = tdplatform = 'AIX'
 else:
-    tplatform = None
-    tdplatform = None
+    tplatform = tdplatform = None
 
 platform:          str = tplatform
 """Name of current operating system"""
@@ -128,7 +117,7 @@ elif platform.lower() == 'windows':
     tboot_drive:   str = tsysinfo[19]
     tram:          str = tsysinfo[23]
 
-    for i in ['tname', 'tversion', 'tmanufacturer', 'tmodel', 'tboot_drive', 'tram']:
+    for i in ['tversion', 'tmanufacturer', 'tmodel', 'tboot_drive', 'tram']:
         locals()[i] = locals()[i].split(': ')[1].strip()
 
     tpver:  str = tversion.split(' ')[0]
@@ -146,6 +135,8 @@ elif platform.lower() == 'linux':
     tmanufacturer:  str = _bm.check(['cat', '/sys/devices/virtual/dmi/id/sys_vendor'])[0]
     tserial_number: str = ''
     tboot_drive:    str = _bm.check('df /boot | grep -Eo \'/dev/[^ ]+\'', True)[0]
+
+    _bm.logger.warn('serial_number variable could not be obtained successfully in tooltils.sys.info')
 
 else:
     tcpu:   str = ''
@@ -177,13 +168,12 @@ serial_number:           str = str(tserial_number)
 boot_drive:              str = str(tboot_drive)
 """The location of the boot drive currently being used on your computer"""
 
-try:
-    del _bm, st, tcpu, tarch, tpver, \
-        tplatform, tdplatform, tmodel, \
-        tcores, tram, tserial_number, \
-        tboot_drive, tmanufacturer
-
-    if platform.lower() in ('windows', 'macos'):
-        del tsysinfo, wmic
-except NameError:
-    pass
+for i in ('_bm', 'st', 'tcpu', 'tarch', 'tpver',
+          'tplatform', 'tdplatform', 'tmodel',
+          'tcores', 'tram', 'tserial_number',
+          'tboot_drive', 'tmanufacturer', 
+          'tsysinfo', 'wmic'):
+    try:
+        del globals()[i]
+    except KeyError:
+        continue

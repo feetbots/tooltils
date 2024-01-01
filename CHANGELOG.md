@@ -1,11 +1,116 @@
 # Version History
 
-## 1.5.3 (25/11/2023)
+## 1.6.0 (1/1/2024)
 
-PyPi is disorganised
+New year new tooltils <br><br>
+
+**Major Changes:**
+- The normal `.requests` module has been deprecated and renamed to `.requests.urllib` in favour of the `.requests.http` module taking it's place as the main requesting interface
+- Requesting has some new advanced features
+- Logging has been implemented for every method where necessary
+- The json file containing data for tooltils is now located within the user's directory under **".tooltils/config-{version}.json"**, this also means config will be saved across different version installs
+- The api is even prettier and more usuable now
+- Various optimisations
+
+<br><br>
 
 **Additions:**
-- `author_email`, `maintainer`, `maintainer_email`, `classifiers`, `homepage` and `issues` variables to `.info` reflecting the data of `setup.py` and `pyproject.toml`
+- Various failsafes for code under certain conditions
+- `Raisable exceptions:` tab for all methods where necessary in `API.md`
+- `tests/` directory containing files that provide semi-thorough testing for all methods, classes and variables in tooltils
+- Other array types to `.halve()` method in the main module
+- Logging for all methods where necessary, you can access the output through the custom method `.info.logger()`
+- `override` parameter for `.requests.request()` when the method is **"DOWNLOAD"**
+- New planned features in `README.md`
+- Parameter testing for the `file_name` argument in `.requests.request()`
+- Method `deleteData()` to accompany the change in how tooltils config is stored
+- Method `tgzOpen(file)` to unzip and decompress .tar.gz files simply
+- Variable `releases` in `.info` containing all current versions of tooltils
+- `any` typehint to `.requests.request()` sub-method `.read()`
+- Advanced settings through the use of the `adv` parameter for `.requests.request()`, adding feauters like a request redirect limit
+- New method `advancedContext()` in `.requests` to be passed in the `advContext` parameter in `.requests.request()` providing featues like a request redirect limit
+- Requests are now limited to 20 redirects before the new exception `.errors.RequestRedirectError`, you can change this in the config with the value `requests.redirectLimit`
+- Input to certain parameters in the code speeding up the process in which it takes `.requests.verifiable()` to check if a request can be verified
+- Include standard `.requests` methods in `.requests.urllib`
+- Include `defaultVerificationMethod` as a variable in `API.md` for `.requests`
+- New exception class in `.errors`, `RequestCodecError` for when none of the specified codecs can be used to translate the text output by the server in `.requests.request()`
+- Certain exception classes now have return properties of information that may be necessary to the user
+- New parameter, `write_binary` in `.requests.request()` and `.requests.download()` used to indicate whether the downloaded file should be written as binary or plain text
+- `port` parameter to `.requests.request()` in 1.5.0 but forgot to mention
+- New method `lengthSort(array)` to sort an array by it's length 
+<br>
+
+**Removals:**
+- `python_version_tuple` variable from `.sys.info`
+- `.change()` method from `.requests.http.request()` as it wasn't a reusable connection meaning there is no point to be able to change the data
+- The github repository code is no longer bundled with the `data.json` file
+- The urllib version of the `.requests` module is now deprecated, becoming `.requests.urllib`, the `.requests.http` module takes it place as it is easier to develop and has a better user experience, this also means the urllib version will no longer receive updates unless they are bugs
+- The config value `requests.defaultHttpVerificationMethod` has been removed in favour of having one value for both modules
+- `html` return property from `.requests.request()`
+
+<br>
+
+**Changes:**
+- Various optimisations
+- Modified the way the python version is obtained in `.sys.info`
+- Reworded `bitsize` variable docstring in `.sys.info`
+- Modified some methods so that the correct error is raised on an exception
+- Update important note in `README.md` to include what happens to the data file after uninstall
+- Modify the way package data is stored to avoid PermissionError when the Python installation is located in an applications folder
+- To account for compatibility, package data is now installed into the system's current user directory as `.tooltils/data-{version}.json`
+- Fixed typo of code example in main module `__init__.py` file docstring
+- I completely forgot Windows has a different way of operating with directories, bruh
+- `license` and `long_description` now have to be provided as is in `.info` because they are inacessible without permission errors from `site-packages`
+- If no platform is detected from the set list, it will use the sys.platform variable directly in `.sys.info` `platform` and `detailed_platform` variables
+- Updated list of variables set for Windows `.sys.info` implementation
+- Updated how the `ram` variable is obtained in the Windows implementation of `.sys.info`
+- Reorganised and fixed various `API.md` features
+- Reworded main module `epoch()` method docstring
+- Reworded `.sys.clear()` method docstring
+- Reworded `.sys.info.bitsize` docstring
+- Slightly changed how `.sys.clear()` method works
+- Fixed all typo errors of the word **"interpreter"**
+- `.info.logger()` sub-methods are now handled within the class instead of the external handler
+- Removed duplicate sub-method definitions in `.info.logger()`
+- Sub-methods in `.info.logger()` now set the `disabled` and `closed` variables when called
+- Modified `.sys.exit()` method slightly
+- `.requests.request()` sub-methods `.read()` and `.readlines()` now get the response body from the `.text` variable instead of reading the request again as you cannot read the request data twice
+- Fixed name lookup bug in `.info.logger()` module parameter
+- Logging output format date for `.info.logger()` now uses **"%H"** instead of **"%I"** so the output hour is now in 24 hour format
+- Logging output module name now utilises the specific module a log is coming from when the logger was initiated for all of tooltils
+- The same headers are now added to the request in `.requests.request()` as `.requests.http.request()` when created
+- **"Content-Type"** is now only added to the request in `.requests.request()` when the method is either **"POST"** or **"PUT"**
+- Catch new `urllib.error.URLError` when wifi is disconnected for `.requests.urllib.request()` method
+- The config value `requests.defaultHttpVerificationMethod` has been changed to `requests.defaultVerificationMethod`
+- Reworded `.requests.request()` method docstring
+- `requests` now uses the config value `defaultVerificationMethod` for the parameter `verify` in all requesting methods
+- `API.md` config section now doesn't no longer includes text indicating you are able to use standard library functions
+- Modules names are now lowercase in `API.md`
+- Rename `.errors.NoHttpConnection` exception class to `InvalidWifiConnection`
+- `url` is now defined before the file name is figured out in `.requests.request()` to avoid name errors
+- Cookies and authorisation are now only added to the headers just before the request is made in `.requests.request()`
+- Split `headers` response variable into `sent_headers` and `resp_headers` when a request is made with `.requests.request()`
+- Rename main module `.interpereter()` class to `.interpreter`
+- `encoding` parameter in `.requests.request()` will now consist of both **"utf-8"** and **"ISO-8859-1"** as websites like google use the iso latin format
+- Return properties `text`, `raw` and `html` are now set if the request method is **"DOWNLOAD"** in `.requests.request()`
+- The parameter `encoding` in `.requests.request()` can now be set as a tuple to try multiple encodings at once
+- If the request method is **"DOWNLOAD"** in `.requests.request()`, the `.__str__()` method will now return the filename instead of the url
+- `.requests.request(method='DOWNLOAD')` now works because I forgot to change the method checker to use the new keyword
+- `.requests.put()` method no longer has the get version of the docstring
+- When a filename is not present through the parameter or in the url in `.requests.request(method='DOWNLOAD')`, an exception will now be raised
+- `agent` parameter in `.requests.request()` is now type checked and takes priority in being set over the `mask` parameter
+- Data is now no longer added to the url when supplied in `.requests.request()`
+- Reorganised sensical parameters for request methods in `.requests`
+- Logging initilisation is now handled within `info.py` instead of the `_external.py` file
+
+<br><br>
+
+## 1.5.3 (25/11/2023)
+
+PyPi is disorganised <br><br>
+
+**Additions:**
+- `author_email`, `maintainer`, `maintainer_email`, `classifiers`, `homepage` and `homepage_issues` variables to `.info` reflecting the data of `setup.py` and `pyproject.toml`
 - `tooltils/` base source code directory to the line counter in `.info`
 - Ability to specify local `methods` as config values (very basic implementation, also note keyword arguments are not supported yet, but you may use any tooltils method)
 - New `config` options for `.requests`
@@ -33,6 +138,8 @@ PyPi is disorganised
 - Reworded `requests` module roadmap item in `README.md`
 - Update all cache config values to check every 20 times instead of 50
 - Fix all directory related errors
+
+<br><br>
 
 ## 1.5.2 (16/11/2023)
 
@@ -76,7 +183,7 @@ Small update but I somehow always forget something<br><br>
 
 The biggest update yet<br><br>
 
-**Main Changes:**
+**Major Changes:**
 - Added other system implementations of `.sys` modules (Windows and Linux)
 - Fixed a shelf of `.requests` module bugs
 - Implemented cache and config for global use
