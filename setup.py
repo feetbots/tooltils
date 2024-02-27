@@ -15,12 +15,6 @@ setup(
     packages=find_packages(exclude=['*tests*', '*.tests', '*.tests.*', 'tests.*', 'tests']),
     ext_modules=[],
     requires=[],
-    classifiers=[
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.12",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent"
-    ],
-    test_suite='tests'
+    test_suite='tests',
+    include_package_data=True
 )

@@ -1,68 +1,73 @@
 """General installation information"""
 
 
+version: str = str('1.7.0')
+"""The current installation version"""
+
 class _bm:
     from logging import (getLogger, Formatter, StreamHandler, DEBUG, 
                          INFO, WARN, ERROR, CRITICAL)
     from os import listdir, remove, mkdir
     from os.path import exists, abspath
     from time import localtime, mktime
+    from typing import Union, List
     from datetime import datetime
     from json import load, dumps
     from shutil import rmtree
     from sys import platform
-    from typing import Union
 
     from ._external import run
 
     class LoggingLevel:
         pass
 
-    defaultData: dict = {
-        "cache": {
-            "errors": {},
-            "global": {
-                "configMethodValues": {}
-            },
-            "info": {},
-            "main": {},
-            "requests": {
-                "verifiableTimesChecked": 0,
-                "verifiableNetworkList": {},
-                "connectedTimesChecked": 0,
-                "connectedNetworkList": {}
-            },
-            "sys.info": {},
-            "sys": {}
+    defaultCache:  dict = {
+        "errors": {},
+        "global": {
+            "configMethodValues": {}
         },
-        "config": {
-            "errors": {},
-            "global": {
-                "config": {
-                     "runConfigMethodAlways": False,
-                     "configMethodCheck": 20
-                } 
-            },
-            "info": {},
-            "main": {},
-            "requests": {
-                "defaultVerificationMethod": True,
-                "verifiableCachingCheck": 20,
-                "connectedCachingCheck": 20,
-                "verifiableCaching": False,
-                "connectedCaching": False,
-                "redirectLimit": 20
-            },
-            "sys.info": {},
-            "sys": {}
-        }
+        "info": {
+            "licenseContent": None,
+            "readmeContent": None
+        },
+        "main": {},
+        "requests": {
+            "verifiableTimesChecked": 0,
+            "verifiableNetworkList": {},
+            "connectedTimesChecked": 0,
+            "connectedNetworkList": {}
+        },
+        "sys.info": {},
+        "sys": {}
+    }
+    defaultConfig: dict = {
+        "errors": {},
+        "global": {
+            "disableConfigMethodValues": False,
+            "configMethodCheck": 20
+        },
+        "info": {
+            "disableOnlineContentFetch": False,
+        },
+        "main": {},
+        "requests": {
+            "defaultVerificationMethod": True,
+            "verifiableCachingCheck": 20,
+            "connectedCachingCheck": 20,
+            "verifiableCaching": True,
+            "connectedCaching": False,
+            "redirectLimit": 20
+        },
+        "sys.info": {},
+        "sys": {}
     }
 
-    openData           = None
-    actualConfig: dict = defaultData['config']
+    openCache          = None
+    openConfig         = None
+    actualConfig: dict = defaultConfig
     split:         str = '\\' if platform.startswith('win') else '/'
-    cdir:          str = split.join(__file__.split(split)[:3]) + split + '.tooltils' + split
-    logger             = getLogger('tooltils.info')
+    baseCdir:      str = split.join(__file__.split(split)[:3]) + split + '.tooltils' + split
+    cdir:          str = baseCdir + 'v' + version + split
 
     class levelFilter(object):
         def __init__(self, level):
@@ -77,125 +82,117 @@ class _bm:
                    _bm.mktime(_bm.localtime(record.created))).strftime(datefmt)
 
 
-author:            str = str('feetbots')
+def _makeFunc(module: str, func: str) -> str:
+    if '.' not in module:
+        return func
+    else:
+        return '.'.join(func.split('.')[1:])
+
+def _logger(module: str):
+    logger = _bm.getLogger('tooltils' + module)
+
+    logger._debug    = lambda msg, func: logger.debug(msg, extra={"caller": _makeFunc(module, func)})
+    logger._info     = lambda msg, func: logger.info(msg, extra={"caller": _makeFunc(module, func)})
+    logger._warning  = lambda msg, func: logger.warning(msg, extra={"caller": _makeFunc(module, func)})
+    logger._error    = lambda msg, func: logger.error(msg, extra={"caller": _makeFunc(module, func)})
+    logger._critical = lambda msg, func: logger.critical(msg, extra={"caller": _makeFunc(module, func)})
+
+    return logger
+
+
+_bm.logger = _logger('.info')
+
+author:                str = str('feetbots')
 """The current owner of tooltils"""
-author_email:      str = str('pheetbots@gmail.com')
+author_email:          str = str('pheetbots@gmail.com')
 """The email of the current owner of tooltils"""
-maintainer:        str = str('feetbots')
+maintainer:            str = str('feetbots')
 """The current sustainer of tooltils"""
-maintainer_email:  str = str('pheetbots@gmail.com')
+maintainer_email:      str = str('pheetbots@gmail.com')
 """The email of the current sustainer of tooltils"""
-version:           str = str('1.6.0')
-"""The current installation version"""
-released:          str = str('1/1/2024')
+released:              str = str('28/2/2024')
 """The release date of the current version"""
-description:       str = str('A lightweight python utility package built on the standard library')
+release_description:   str = str('Going cold')
+"""The description of the current release version"""
+description:           str = str('A lightweight python utility package built on the standard library')
 """The short description of tooltils"""
-classifiers: list[str] = [
+homepage:              str = str('https://github.com/feetbots/tooltils')
+"""The current home website of tooltils"""
+homepage_issues:       str = str('https://github.com/feetbots/tooltils/issues')
+"""The current issues directory of the home website of tooltils"""
+location:              str = str(_bm.split.join(__file__.split(_bm.split)[:-1]) + _bm.split)
+"""The path of the current installation of tooltils"""
+classifiers: _bm.List[str] = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent"
 ]
 """The list of PyPi style tooltils classifiers"""
-homepage:          str = str('https://github.com/feetbots/tooltils')
-"""The current home website of tooltils"""
-homepage_issues:   str = str('https://github.com/feetbots/tooltils/issues')
-"""The current issues directory of the home website of tooltils"""
-location:          str = str(_bm.split.join(__file__.split(_bm.split)[:-1]) + _bm.split)
-"""The path of the current installation of tooltils"""
-releases:    list[str] = ['1.0.0-beta', '1.1.0', '1.2.0', '1.3.0', '1.4.0', '1.4.1', '1.4.2',
-                          '1.4.3', '1.4.4', '1.4.4-1', '1.5.0', '1.5.1', '1.5.2', '1.5.3',
-                          '1.6.0']
+releases:    _bm.List[str] = ['1.0.0-beta', '1.1.0', '1.2.0', '1.3.0', '1.4.0', '1.4.1', '1.4.2',
+                              '1.4.3', '1.4.4', '1.4.4-1', '1.5.0', '1.5.1', '1.5.2', '1.5.3',
+                              '1.6.0', '1.7.0']
 """All current versions of tooltils"""
 
-license:   tuple[str] = (str('MIT License'), str("""
-MIT License
+def _getCache():
+    if not _bm.openCache:
+        _bm.openCache = open(_bm.cdir + 'cache.json', 'r+')
 
-Copyright (c) 2024 feetbots
+    return _bm.openCache
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+def _getConfig():
+    if _bm.openConfig:
+        return _bm.openConfig
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+    _f  = _bm.openConfig = open(_bm.cdir + 'config.json', 'r+')
+    _f2 = _getCache()
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-"""))
-"""The name and content of the currently used license in a tuple pair (name, content)"""
-long_description: str = str("""
-# tooltils | v1.6.0
+    # locate and config method values and convert them
 
-[![python](https://img.shields.io/pypi/pyversions/tooltils.svg)](https://pypi.org/project/tooltils/)
-[![downloads](https://static.pepy.tech/personalized-badge/tooltils?period=total&units=international_system&left_color=grey&right_color=red&left_text=downloads)](https://pepy.tech/project/tooltils)
+    config: dict = _bm.load(_f)
+    cache:  dict = _bm.load(_f2)
+    funcs:  dict = cache['global']['configMethodValues']
 
-A lightweight python utility package built on the standard library
+    _f.seek(0)
+    _f2.seek(0)
 
-```py
->>> import tooltils
->>> req = tooltils.requests.get('httpbin.org/get/')
->>> req
-'<GET httpbin.org [200]>'
->>> req.url
-'https://httpbin.org/get'
->>> req.status_code
-'200 OK'
->>> req.headers["User-Agent"]
-'Python-tooltils/1.6.0'
-```
+    if config['global']['disableConfigMethodValues']:
+        return _f
+ 
+    for k, v in config.items():
+        for k2, v2 in v.items():
+            if type(v2) is str and '$f ' in v2:
+                try:
+                    statement: str = v2.split(' ')[1].split('(')
+                    funcName:  str = statement[0]
+                    args:      str = '[' + statement[1][:-1] + ']'
 
-## Installation
+                    if funcName in funcs.keys() and funcs[funcName][1] < config[
+                       'global']['configMethodCheck']:
+                        funcs[funcName] = (funcs[funcName][0], funcs[funcName][1] + 1)
+                        _editCache('global', {"configMethodValues": funcs})
+                    else:
+                        value = _bm.run(funcName, args)
 
-Get the latest version from PyPi
+                        funcs.update({funcName: (value, 1)})
+                        _editCache('global', {"configMethodValues": funcs})
+                except Exception:
+                    value = None
+            else:
+                value = v2
 
-```console
-python -m pip install tooltils
-```
-
-OR build it directly from the source
-
-```console
-git clone https://github.com/feetbots/tooltils.git
-cd tooltils
-python -m pip install setup.py --user
-```
-
-## API
-
-The full API is available to read in the project files at [**API.md**](API.md)
-
-## Planned Features
-
-- Add a different implementation of the `requests` module using some other library to include features like connection pooling
-- (maybe) start including third party modules to add desireable features
-- Stop using run of the mill implementations for everything
-
-## Important Note
-
-The current implementation for the cache and config, opens the data file once if used, then the code will use that specific TextIOWrapper class to write and read etc. Unfortunately, there is no native method of closing this file class once the program execution has ended, leaving this up to CPython's garbage collecter. This technique is bad practice but should be better than constantly opening and closing each file (performance reasons).
-""")
-"""The long description of tooltils"""
-
-def _getData():
-    if _bm.openData is None:
-        _configMethods()
-
-    return _bm.openData
+            _bm.actualConfig[k][k2] = value
+    
+    return _f
 
 def _loadCache(module: str='') -> dict:
-    _f = _getData()
-    data: dict = _bm.load(_f)['cache']
+    _f = _getCache()
+    data: dict = _bm.load(_f)
     _f.seek(0)
 
     if module == '':
@@ -204,13 +201,13 @@ def _loadCache(module: str='') -> dict:
         return data[module]
 
 def _editCache(module: str, option: dict, subclass: str='') -> None:
-    _f = _getData()
+    _f = _getCache()
     data = _bm.load(_f)
 
     if subclass:
-        data['cache'][module][subclass].update(option)
+        data[module][subclass].update(option)
     else:
-        data['cache'][module].update(option)
+        data[module].update(option)
 
     _f.seek(0)
     _f.truncate()
@@ -218,20 +215,20 @@ def _editCache(module: str, option: dict, subclass: str='') -> None:
     _f.seek(0)
 
 def _deleteCacheKey(module: str, key: str, subclass: str='') -> None:
-    _f = _getData()
+    _f = _getCache()
     data = _bm.load(_f)
 
     if subclass:
-        keys = data['cache'][module][subclass].keys()
+        keys = data[module][subclass].keys()
     else:
-        keys = data['cache'][module].keys()
+        keys = data[module].keys()
 
     for i in list(keys):
         if key == i:
             if subclass:
-                data['cache'][module][subclass].pop(i)
+                data[module][subclass].pop(i)
             else:
-                data['cache'][module].pop(i)
+                data[module].pop(i)
 
     _f.seek(0)
     _f.truncate()
@@ -239,101 +236,85 @@ def _deleteCacheKey(module: str, key: str, subclass: str='') -> None:
     _f.seek(0)
 
 def _loadConfig(module: str='') -> dict:
+    # make sure _getConfig() is called otherwise _bm.actualConfig will not be set
+
+    _getConfig()
+
     if module == '':
         return _bm.actualConfig
     else:
         return _bm.actualConfig[module]
 
-#def _editConfig(module: str, option: dict, subclass: str='') -> None:
-#    _f = _getData()
-#    data: dict = _bm.load(_f)
-#
-#    if subclass:
-#        data['config'][module][subclass].update(option)
-#    else:
-#        data['config'][module].update(option)
-#
-#    _f.seek(0)
-#    _f.truncate()
-#    _f.write(_bm.dumps(data, indent=4))
-#    _f.seek(0)
-
 def clearCache(module: str=None) -> None:
     """Clear the file cache of tooltils or a specific module within"""
 
     module: str = str(module).lower()
-    _f          = _getData()
-    wdata: dict = _bm.load(_f)
+    _f          = _getCache()
+    data:  dict = _bm.load(_f)
 
     if module == 'none':
-        data: dict = _bm.defaultData['cache']
+        data: dict = _bm.defaultCache
     else:
-        data: dict = wdata['cache']
-
         try:
-            data.update(_bm.defaultData['cache'][module])
+            data.update(_bm.defaultCache[module])
         except KeyError:
             raise FileNotFoundError('Cache module not found')
-        
-    wdata['cache'] = data
-
-    _f.seek(0)
-    _f.truncate(0)
-    _f.write(_bm.dumps(wdata, indent=4))
-    _f.seek(0)
-
-    _bm.logger.debug('User cache was cleared')
-
-def clearConfig(module: str=None) -> None:
-    """Revert the config of tooltils or a specific module within"""
-
-    module: str = str(module).lower()
-    _f          = _getData()
-    wdata: dict = _bm.load(_f)
-
-    if module == 'none':
-        data: dict = _bm.defaultData['config']
-    else:
-        data: dict = wdata['config']
-
-        try:
-            data.update(_bm.defaultData['config'][module])
-        except KeyError:
-            raise FileNotFoundError('Config module not found')
-        
-    wdata['config'] = data
-
-    _f.seek(0)
-    _f.truncate(0)
-    _f.write(_bm.dumps(wdata, indent=4))
-    _f.seek(0)
-
-    _bm.logger.debug('User config was reset')
-
-def clearData() -> None:
-    """Clear the cache and config of tooltils"""
-
-    _f         = _getData()
-    data: dict = _bm.load(_f)
-    data.update(_bm.defaultData)
 
     _f.seek(0)
     _f.truncate(0)
     _f.write(_bm.dumps(data, indent=4))
     _f.seek(0)
 
-    _bm.logger.debug('User cache and config was cleared and reset')
+    _bm.logger._debug('User cache was cleared', 'info.clearCache')
+
+def clearConfig(module: str=None) -> None:
+    """Revert the config of tooltils or a specific module within"""
+
+    module: str = str(module).lower()
+    _f          = _getConfig()
+    data:  dict = _bm.load(_f)
+
+    if module == 'none':
+        data: dict = _bm.defaultConfig
+    else:
+        try:
+            data.update(_bm.defaultConfig[module])
+        except KeyError:
+            raise FileNotFoundError('Config module not found')
+
+    _f.seek(0)
+    _f.truncate(0)
+    _f.write(_bm.dumps(data, indent=4))
+    _f.seek(0)
+
+    _bm.logger._debug('User config was reset', 'info.clearConfig')
+
+def clearData() -> None:
+    """Clear the cache and config of tooltils"""
+
+    _f  = _getCache()
+    _f2 = _getConfig()
+
+    _f.truncate(0)
+    _f.write(_bm.dumps(_bm.defaultCache, indent=4))
+    _f.seek(0)
+
+    _f2.truncate(0)
+    _f2.write(_bm.dumps(_bm.defaultConfig, indent=4))
+    _f2.seek(0)
+
+    _bm.logger._debug('User cache and config was cleared and reset', 'info.clearData')
 
 def deleteData(version: str=None) -> None:
-    """Delete the data file for a specific tooltils version or all present"""
+    """Delete the stored data for a specific tooltils version or all present"""
 
     if version is None:
-        if not _bm.exists(_bm.cdir):
+        if not _bm.exists(_bm.baseCdir):
             raise FileNotFoundError('The tooltils storage directory does not exist')
         else:
-            _bm.rmtree(_bm.cdir)
+            _bm.rmtree(_bm.baseCdir, True)
 
-            _bm.logger.debug('User storage directory was deleted')
+            _bm.logger._debug('User storage directory was deleted', 'info.deleteData')
     else:
         if type(version) is not str:
             raise TypeError('Version must be a valid \'str\' instance')
@@ -343,11 +324,11 @@ def deleteData(version: str=None) -> None:
             raise ValueError('Version not found in valid releases')
 
         try:
-            _bm.remove(_bm.cdir + 'data-v' + version + '.json')
+            _bm.rmtree(_bm.cdir)
 
-            _bm.logger.debug(f'User storage data file version v{version} was deleted')
+            _bm.logger._debug(f'User storage data version v{version} was deleted', 'info.deleteData')
         except FileNotFoundError:
-            raise FileNotFoundError('Version data file not found in tooltils directory')
+            raise FileNotFoundError('Version data not found in tooltils directory')
 
 class logger():
     """Create a logging instance for tooltils modules only"""
@@ -461,7 +442,7 @@ class logger():
         
         if type(module) is not str:
             raise TypeError('Module must be a valid \'str\' instance')
-        elif module.upper() not in ('', 'ALL', 'MAIN', 'REQUESTS', 'SYS'):
+        elif module.upper() not in ('', 'ALL', 'MAIN', 'REQUESTS', 'OS'):
             raise ValueError('Unknown module \'{}\''.format(module))
         else:
             self._module: str = module.upper()
@@ -490,9 +471,10 @@ class logger():
                         self._level2 = level2
         
         self.logger = _bm.getLogger(self._module)
-        handler     = _bm.StreamHandler()
-        handler.      setFormatter(_bm.lFormatter(
-                      '[%(asctime)s] [%(name)s/%(levelname)s]: %(message)s', '%H:%M:%S'))
+
+        handler = _bm.StreamHandler()
+        handler.  setFormatter(_bm.lFormatter(
+                               '[%(asctime)s] [%(name)s.%(caller)s()/%(levelname)s]: %(message)s', '%H:%M:%S'))
 
         self.logger.setLevel(self._level)
         self.logger.addFilter(_bm.levelFilter(self._level2))
@@ -507,7 +489,12 @@ class logger():
             elif self._level2 == k:
                 r2 = v
         
-        _bm.logger.debug(f'Initiated logger for <{self._module}> with range {r1} -> {r2}')
+        if '.' not in self._module:
+            caller = 'info.logger'
+        else:
+            caller = 'logger'
+
+        self.logger.debug(f'Initiated logger for <{self._module}> with range {r1} -> {r2}', extra={"caller": caller})
 
     def __str__(self) -> str:
         module: str = 'ALL' if not self.module else self.module.upper()
@@ -515,86 +502,131 @@ class logger():
 
         return f'<Logger instance: [{state}] -> [{module}]>'
 
-def _getFiles(dir: str) -> list:
-    fileList: list = []
 
-    for i in _bm.listdir(location + dir):
-        fileList.append(location + ('' if not dir else dir + _bm.split) + i)
+# necessary startup code
+
+_cache = _config = True
+
+if not _bm.exists(_bm.baseCdir):
+    _bm.mkdir(_bm.baseCdir)
+    _bm.mkdir(_bm.baseCdir + 'temp')
+if not _bm.exists(_bm.cdir):
+    _bm.mkdir(_bm.cdir)
+
+if _bm.exists(_bm.cdir + 'cache.json'):
+    _cache: bool = False
+if _bm.exists(_bm.cdir + 'config.json'):
+    _config: bool = False
+
+if _cache:
+    with open(_bm.cdir + 'cache.json', 'a+') as _f:
+        _f.write(_bm.dumps(_bm.defaultCache, indent=4))
+
+if _config:
+    with open(_bm.cdir + 'config.json', 'a+') as _f:
+        _f.write(_bm.dumps(_bm.defaultConfig, indent=4))
+
+_data = _loadConfig()
+
+for i in (('global', 'configMethodCheck'), ('requests', 'verifiableCachingCheck'), 
+          ('requests', 'connectedCachingCheck'), ('requests', 'redirectLimit')):
+    if type(_data[i[0]][i[1]]) is not int:
+        raise RuntimeError(f'Config value {i[0]}.{i[1]} is not an instance of type \'int\', ' +
+                           'please change it or reset the config')
+
+# try to get license and long_description
+
+_check:              bool = not _loadConfig('info')['disableOnlineContentFetch']
+license, long_description = None, None
+
+if _check and not _loadCache('info')['licenseContent']: # check if it is already cached
+    from ssl import create_default_context, CERT_NONE
+    from http.client import HTTPSConnection
+    from zipfile import ZipFile
+
+    try:
+        # make testing easier
+        verOverride = '1.6.0' if len(version.split('.')) > 2 else version
+
+        ctx = create_default_context()
+
+        ctx.check_hostname = False
+        ctx.verify_mode    = CERT_NONE
+        ctx.set_ciphers('RSA')
+
+        _req = HTTPSConnection('codeload.github.com', context=ctx)
+        _req.request('GET', '/feetbots/tooltils/zip/refs/tags/{}'.format(
+                     'v' + verOverride), body=None,
+                     headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:10.0) " + 
+                              "Gecko/20100101 Firefox/10.0"})
+
+        with open(_bm.baseCdir + f'temp{_bm.split}files.zip', 'wb+') as _f:
+            _f.write(_req.getresponse().read())
         
-    return fileList
+        with ZipFile(_bm.baseCdir + f'temp{_bm.split}files.zip') as _f:
+            _f.extractall(_bm.baseCdir + f'temp{_bm.split}files')
+        
+        with open(_bm.baseCdir + f'temp{_bm.split}files{_bm.split}tooltils-{verOverride}{_bm.split}LICENSE') as _f, \
+             open(_bm.baseCdir + f'temp{_bm.split}files{_bm.split}tooltils-{verOverride}{_bm.split}README.md') as _f2:
+            license, long_description = _f.read(), _f2.read()
+
+        _editCache('info', {"licenseContent": license, 
+                            "readmeContent": long_description})
+    except Exception:
+        pass
+    finally:
+        try:
+            _bm.remove(_bm.baseCdir + f'temp{_bm.split}files.zip')
+            _bm.rmtree(_bm.baseCdir + f'temp{_bm.split}files', True)
+        except Exception:
+            pass
+
+        _req.close()
+else:
+    license          = _loadCache('info')['licenseContent']
+    long_description = _loadCache('info')['readmeContent']
 
 def _getLines():
-    lines:  int = 0
-    files: list = _getFiles('') + _getFiles('requests') + _getFiles('sys')
+    def getFiles(dir: str) -> list:
+        fileList: list = []
 
-    for i in ('README.md', 'API.md', 'CHANGELOG.md', 'test.py', 'LICENSE', '.DS_Store',
-            '__pycache__', '.git'):
-        try:
-            files.remove(location + i)
-        except ValueError:
-            continue
+        for i in _bm.listdir(location + dir):
+            fileList.append(location + ('' if not dir else dir + _bm.split) + i)
+        
+        return fileList
+
+    lines:  int = 0
+    files: list = getFiles('') + getFiles('requests') + getFiles('os')
+
+    for i in files:
+        for x in ('README.md', 'API.md', 'CHANGELOG.md', 'LICENSE', '.DS_Store',
+                  '__pycache__', '.git'):
+            if x in i:
+                files.remove(i)
 
     for i in files:
         try:
             with open(i) as _f:
                 lines += len(_f.readlines())
         except (IsADirectoryError, UnicodeDecodeError, PermissionError):
-            pass
-    
-    _bm.logger.debug(f'Reported {lines} lines across {len(files)} items')
-    
+            continue
+
     return lines
 
-lines: int = int(_getLines())
+license:          str = str(license) if type(license) is str else None
+"""The content of the currently used license"""
+long_description: str = str(long_description) if type(
+                            long_description) is str else None
+"""The long description of tooltils"""
+lines:            int = int(_getLines())
 """The amount of lines of code in this tooltils installation"""
 
-def _configMethods():
-    _f           = open(location + 'data.json', 'r+')
-    _bm.openData = _f
-    data: dict   = _bm.load(_f)
-    _f.            seek(0)
-    funcs: dict  = data['cache']['global']['configMethodValues']
+for i in ['_getLines', '_cache', '_config', '_check', 'create_default_context', 
+          'CERT_NONE', 'ctx', 'HTTPSConnection', 'ZipFile', '_req', '_data', 
+          '_f', '_f2']:
+    try:
+        del locals()[i]
+    except KeyError:
+        continue
 
-    for k, v in data['config'].items():
-        for k2, v2 in v.items():
-            if type(v2) is str and '$f' in v2:
-                try:
-                    statement: str = v2.split(' ')[1].split('(')
-                    funcName:  str = statement[0]
-                    args:      str = '[' + statement[1][:-1] + ']'
-
-                    if funcName in tuple(funcs.keys()) and funcs[funcName][1] < data[
-                       'config']['global']['config']['configMethodCheck']:
-                        funcs[funcName] = (funcs[funcName][0], funcs[funcName][1] + 1)
-                        _editCache('global', {"configMethodValues": funcs})
-                    else:
-                        value = _bm.run(funcName, args)
-
-                        funcs.update({funcName: (value, 1)})
-                        _editCache('global', {"configMethodValues": funcs})
-                except:
-                    value = None
-            else:
-                value = v2
-
-            _bm.actualConfig[k][k2] = value
-
-    return _f
-
-if not _bm.exists(_bm.cdir):
-    _bm.mkdir(_bm.cdir)
-    _bm.logger.debug('User storage directory does not exist, creating one now...')
-
-    _create: bool = True
-elif not _bm.exists(_bm.cdir + 'data-v' + version + '.json'):
-    _create: bool = True
-else:
-    _create: bool = False
-
-if _create:
-    _bm.logger.debug('Current tooltils version data file does not exist, creating one now...')
-
-    with open(_bm.cdir + 'data-v' + version + '.json', 'a+') as _f:
-        _f.write(_bm.dumps(_bm.defaultData, indent=4))
-
-del _getFiles, _getLines, _create
+del i

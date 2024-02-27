@@ -2,13 +2,13 @@
 
 
 class _bm:
-    from typing import Union
+    from typing import Union, Dict
 
 
 class TooltilsError(Exception):
     """Base class for tooltils specific errors"""
 
-    def __init__(self, message:str=''):
+    def __init__(self, message: str=''):
         self.message: str = message
     
     def __str__(self):
@@ -20,7 +20,7 @@ class TooltilsError(Exception):
 class TooltilsMainError(TooltilsError):
     """Base class for tooltils main module specific errors"""
 
-    def __init__(self, message:str=''):
+    def __init__(self, message: str=''):
         self.message: str = message
     
     def __str__(self):
@@ -29,34 +29,10 @@ class TooltilsMainError(TooltilsError):
         else:
             return 'A tooltils main module error occured'
 
-class TooltilsRequestsError(TooltilsError):
-    """Base class for tooltils.requests specific errors"""
-
-    def __init__(self, message:str=''):
-        self.message: str = message
-    
-    def __str__(self):
-        if self.message:
-            return self.message
-        else:
-            return 'A tooltils.requests error occured'
-
-class TooltilsSysError(TooltilsError):
-    """Base class for tooltils.sys specific errors"""
-
-    def __init__(self, message:str=''):
-        self.message: str = message
-    
-    def __str__(self):
-        if self.message:
-            return self.message
-        else:
-            return 'A tooltils.sys error occured'
-
 class TooltilsInfoError(TooltilsError):
     """Base class for tooltils.info specific errors"""
 
-    def __init__(self, message:str=''):
+    def __init__(self, message: str=''):
         self.message: str = message
     
     def __str__(self):
@@ -65,50 +41,104 @@ class TooltilsInfoError(TooltilsError):
         else:
             return 'A tooltils.info error occured'
 
-class SystemCallError(TooltilsSysError):
-    """Base class for tooltils.sys.system() specific errors"""
+class TooltilsOSError(TooltilsError):
+    """Base class for tooltils.os specific errors"""
 
-    def __init__(self, message:str=''):
+    def __init__(self, message: str=''):
         self.message: str = message
     
     def __str__(self):
         if self.message:
             return self.message
         else:
-            return 'A tooltils.sys.system() error occured'
+            return 'A tooltils.os error occured'
 
-class ShellCodeError(SystemCallError):
-    """Shell command returned non-zero exit code"""
+class SubprocessError(TooltilsOSError):
+    """Base class for tooltils.os.system() specific errors"""
 
-    def __init__(self, 
-                 code: int=-1, 
-                 message: str=''):
-        self.code:    int = code
+    def __init__(self, message: str=''):
         self.message: str = message
+    
+    def __str__(self):
+        if self.message:
+            return self.message
+        else:
+            return 'A tooltils.os.system() error occured'
+
+class SubprocessExecutionError(SubprocessError):
+    """Child process execution failed"""
+
+    def __init__(self, message: str=''):
+        self.message: str = message
+    
+    def __str__(self):
+        if self.message:
+            return self.message
+        else:
+            return 'Child process execution failed'
+
+class SubprocessCodeError(SubprocessError):
+    """Child process execution returned non-zero exit code"""
+
+    def __init__(self, message: str='', code: int=0):
+        self.message: str = message
+        self.code:    int = code
     
     def __str__(self):
         if self.message:
             return self.message
         elif self.code:
-            return f'Shell command returned non-zero exit code {self.code}'
+            return f'Child process execution returned non-zero exit code {self.code}'
         else:
-            return 'Shell command returned non-zero exit code'
+            return 'Child process execution returned non-zero exit code'
 
-class ShellTimeoutExpired(SystemCallError):
-    """Shell command timed out"""
+class SubprocessTimeoutExpired(SubprocessError):
+    """Child process execution timed out"""
     
-    def __init__(self, message: str='', timeout: int=-1):
+    def __init__(self, message: str='', timeout: int=0):
         self.message: str = message
         self.timeout: int = timeout
     
     def __str__(self):
         if self.message:
             return self.message
+        elif self.timeout:
+            return f'Child process execution timed out at {self.timeout} seconds'
         else:
-            return 'Shell command timed out'
+            return 'Child process execution timed out'
 
-class ShellCommandError(SystemCallError):
-    """Shell command exited while in process"""
+class SubprocessLookupNotFound(SubprocessError):
+    """Unable to locate program or shell command"""
+
+    def __init__(self, message: str='', name: str=''):
+        self.message: str = message
+        self.name:    str = name
+    
+    def __str__(self):
+        if self.message:
+            return self.message
+        elif self.name:
+            return f'Unable to locate program or shell command \'{self.name}\''
+        else:
+            return 'Unable to locate program or shell command'
+
+class SubprocessPermissionError(SubprocessError):
+    """Denied access to program or shell command"""
+
+    def __init__(self, message: str='', name: str=''):
+        self.message: str = message
+        self.name:    str = name
+    
+    def __str__(self):
+        if self.message:
+            return self.message
+        elif self.name:
+            return f'Denied access to program or shell command \'{self.name}\''
+        else:
+            return 'Denied access to program or shell command'
+
+class TooltilsOSInfoError(TooltilsOSError):
+    """Base class for tooltils.os.info specific errors"""
 
     def __init__(self, message: str=''):
         self.message: str = message
@@ -117,22 +147,10 @@ class ShellCommandError(SystemCallError):
         if self.message:
             return self.message
         else:
-            return 'Shell command exited while in process'
+            return 'A tooltils.os.info error occured'
 
-class ShellCommandNotFound(SystemCallError):
-    """Unable to locate shell command or program"""
-
-    def __init__(self, message: str=''):
-        self.message: str = message
-    
-    def __str__(self):
-        if self.message:
-            return self.message
-        else:
-            return 'Unable to locate shell command or program'
-
-class ShellCommandPermissionError(SystemCallError):
-    """Denied access to system command or program"""
+class TooltilsRequestsError(TooltilsError):
+    """Base class for tooltils.requests specific errors"""
 
     def __init__(self, message: str=''):
         self.message: str = message
@@ -141,7 +159,7 @@ class ShellCommandPermissionError(SystemCallError):
         if self.message:
             return self.message
         else:
-            return 'Denied access to system command or program'
+            return 'A tooltils.requests error occured'
 
 class RequestError(TooltilsRequestsError):
     """Base class for tooltils.requests.request() specific errors"""
@@ -155,35 +173,70 @@ class RequestError(TooltilsRequestsError):
         else:
             return 'A tooltils.requests.request() error occured'
 
-class ConnectionError(RequestError):
-    """Connection to URL failed"""
+class ActiveRequestError(RequestError):
+    """The request to the URL failed"""
 
-    def __init__(self, message: str=''):
+    def __init__(self, message: str='', url: str=''):
         self.message: str = message
+        self.url:     str = url
+
+    def __str__(self):
+        if self.message:
+            return self.message
+        elif self.url:
+            return f'Request to \'{self.url}\' failed'
+        else:
+            return 'The request to the URL failed'
+
+class InvalidRequestURL(RequestError):
+    """URL cannot be used to make a valid request"""
+
+    def __init__(self, message: str='', url: str=''):
+        self.message: str = message
+        self.url:     str = url
     
     def __str__(self):
         if self.message:
             return self.message
+        elif self.url:
+            return f'URL \'{self.url}\' cannot be used to make a valid request'
+        else:
+            return 'URL cannot be used to make a valid request'
+
+class ConnectionError(RequestError):
+    """Connection to URL failed"""
+
+    def __init__(self, message: str='', url: str=''):
+        self.message: str = message
+        self.url:     str = url
+    
+    def __str__(self):
+        if self.message:
+            return self.message
+        elif self.url:
+            return f'Connection to \'{self.url}\' failed'
         else:
             return 'Connection to URL failed'
 
 class ConnectionTimeoutExpired(RequestError):
-    """Request read timeout expired"""
+    """Request connection timeout expired"""
 
-    def __init__(self, message: str='', timeout: int=-1):
+    def __init__(self, message: str='', timeout: int=0):
         self.message: str = message
         self.timeout: int = timeout
     
     def __str__(self):
         if self.message:
             return self.message
+        elif self.timeout:
+            return f'Request connection timeout expired at {self.timeout} seconds'
         else:
-            return 'Request read timeout expired'
+            return 'Request connection timeout expired'
 
 class StatusCodeError(RequestError):
     """Status code of URL response is not 200"""
 
-    status_codes: dict[int, str] = {
+    status_codes: _bm.Dict[int, str] = {
         100: 'Continue',
         101: 'Switching Protocols',
         102: 'Processing',
@@ -246,29 +299,29 @@ class StatusCodeError(RequestError):
         510: 'Not Extended',
         511: 'Network Authorisation Required',
     }
-    """List of valid HTTP response status codes (100-511)"""
+    """List of official HTTP response status codes"""
     
-    def __init__(self, 
-                 code: int=0, 
-                 reason: str=''):
+    def __init__(self, code: int=0, reason: str=''):
         self.code:   int = code
         self.reason: str = reason
 
     def __str__(self):
-        if self.reason:
+        if self.code and self.reason:
+            return f'{self.code} {self.reason}'
+        elif self.code:
             try:
-                code = {v: k for (k, v) in self.status_codes.items(
-                        )}[self.reason]
-
-                return '{} {}'.format(code, self.reason)
+                return f'{self.code} {self.status_codes[self.code]}'
             except KeyError:
                 pass
-        elif self.code:
-            return '{} {}'.format(self.code, self.status_codes[self.code])
-        elif self.code and self.reason:
-            return '{} {}'.format(self.code, self.reason)
-        else:
-            return 'The URL response returned an impassable status code'
+        elif self.reason:
+            try:
+                code: int = {v: k for k, v in self.status_codes.items()}[self.reason]
+
+                return f'{code} {self.reason}'
+            except KeyError:
+                pass
+        
+        return 'The URL request response returned an impassable HTTP status code'
 
 class SSLCertificateFailed(RequestError):
     """The currently used SSL certificate could not be used to verify requests"""
@@ -297,20 +350,23 @@ class InvalidWifiConnection(RequestError):
 class RequestRedirectError(RequestError):
     """Request redirected too many times or entered a redirect loop"""
 
-    def __init__(self, message: str='', limit: int=-1):
+    def __init__(self, message: str='', limit: int=0):
         self.message: str = message
         self.limit:   int = limit
     
     def __str__(self):
         if self.message:
             return self.message
+        elif self.limit:
+            return f'Request redirected too many times at {self.limit} redirects'
         else:
             return 'Request redirected too many times or entered a redirect loop'
 
 class RequestCodecError(RequestError):
     """Unable to decode request body"""
 
-    def __init__(self, message: str='', 
+    def __init__(self, 
+                 message: str='', 
                  encoding: _bm.Union[str, tuple]=('utf-8', 'ISO-8859-1')):
         self.message:                    str = message
         self.encoding: _bm.Union[str, tuple] = encoding
@@ -318,5 +374,8 @@ class RequestCodecError(RequestError):
     def __str__(self):
         if self.message:
             return self.message
+        elif self.encoding:
+            return 'Unable to decode request body from codec(s): {}'.format(
+                   '\'' + self.encoding + '\'' if type(self.encoding) is str else self.encoding)
         else:
             return 'Unable to decode request body'

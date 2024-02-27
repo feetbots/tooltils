@@ -1,41 +1,40 @@
 """
-# tooltils | v1.6.0
+# tooltils | v1.7.0
 
 A lightweight python utility package built on the standard library
 
 ```py
 >>> import tooltils
->>> req = tooltils.get('httpbin.org/get')
->>> req
-'<GET httpbin.org [200]>'
->>> req.url
-'https://httpbin.org/get'
->>> req.status_code
+>>> data = tooltils.requests.get('httpbin.org/get')
+>>> data.status_code
 '200 OK'
->>> req.headers["User-Agent"]
-'Python-tooltils/1.6.0'
+>>> data.end_data.url
+'https:/httpbin.org/get'
+>>> data.end_data.sent_headers
+{'User-Agent': 'Python-tooltils/1.7.0', 'Accept-Encoding': 'gzip, deflate', ...}
+>>> data.headers
+{'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate', 'Host': 'httpbin.org', ...}
 ```
 
 ## API
 
-Read the full documentation within `API.md` included in the project directory
+Read the full documentation within `API.md` included in the github project directory
 """
 
 
 import tooltils.requests as requests
 import tooltils.errors as errors
 import tooltils.info as info
-import tooltils.sys as sys
+import tooltils.os as os
 
 class _bm:
     from time import time, localtime, gmtime, perf_counter
     from datetime import datetime, timezone, timedelta
     from os.path import abspath, getsize, exists
+    from typing import Any, Union, Dict, List
     from shutil import copyfileobj, rmtree
     from tarfile import open as topen
     from gzip import open as gopen
-    from logging import getLogger
-    from typing import Any, Union
     from io import TextIOWrapper
     from os import mkdir, remove
     
@@ -45,7 +44,7 @@ class _bm:
     class FileDescriptorOrPath:
         pass
 
-    months: list[str] = [
+    months:  list = [
         'January', 'February', 
         'March', 'April', 
         'May', 'June', 
@@ -53,10 +52,16 @@ class _bm:
         'September', 'October', 
         'November', 'December'
     ]
-    logger            = getLogger('tooltils')
+    sMonths: list = [
+        'Jan', 'Feb', 'Mar', 'Apr', 
+        'May', 'Jun', 'Jul', 'Aug', 
+        'Sep', 'Oct', 'Nov', 'Dec'
+    ]
+
+    logger = info._logger('')
 
 
-ANSI_colours: dict[str, int] = {
+ANSI_colours: _bm.Dict[str, int] = {
     "white":  97,
     "cyan":   36,
     "pink":   35,
@@ -66,7 +71,7 @@ ANSI_colours: dict[str, int] = {
     "red":    31,
     "gray":   30,
 }
-"""List of the main colours as ANSI integer codes"""
+"""List of major colours as ANSI integer codes"""
 
 def length(file: _bm.FileDescriptorOrPath) -> float:
     """Get the length of a wave file in seconds"""
@@ -111,7 +116,7 @@ def style(text: str,
     if not colour:
         code = 0
     else:
-        code = ANSI_colours.get(colour, colour)
+        code = ANSI_colours.get(colour.lower(), colour)
 
     style: str = ''
     for k, v in {'1': bold, '3': italic, '9': crossed, 
@@ -122,11 +127,11 @@ def style(text: str,
     if fill:
         code += 10
     if flush:
-        sys.call('', shell=True)
+        os.call('', shell=True)
 
-        _bm.logger.debug('A shell flush was called to the terminal')
+        _bm.logger._debug('A shell flush was called to the terminal', 'style')
 
-    return '\u001b[{0}{1}{2}\u001b[0m'.format(code, style + 'm', text)
+    return '\u001b[{}{}m{}\u001b[0m'.format(code, style, text)
 
 def halve(array: _bm.Union[str, list, tuple, set, dict]) -> list:
     """Return the halves of a string or array"""
@@ -145,18 +150,20 @@ def cipher(text: str, shift: int) -> str:
 
     if type(text) is not str:
         raise TypeError('Text must be a valid \'str\' instance')
-    elif len(text) > 1:
+    elif len(text) < 1:
         raise ValueError('Invalid text')
     if type(shift) is not int:
         raise TypeError('Shift must be a valid \'int\' instance')
     elif shift == 0:
         raise ValueError('Shift must not be 0')
+    
+    result: str = ''
 
     for i in text:
         start: int = 65 if i.isupper() else 97
-        text += chr((ord(i) + shift - (start)) % 26 + (start))
+        result    += chr((ord(i) + shift - start) % 26 + start)
 
-    return halve(text)[1]
+    return result
 
 def mstrip(text: str,
            values: dict
@@ -226,6 +233,12 @@ def date(epoch: _bm.EPOCH_seconds=...,
         return '{}:{} {} on the {}{} of {}, {}'.format(hour, *fv(sdate.tm_min), 
                'PM' if sdate.tm_hour >= 12 else 'AM', sdate.tm_mday, end, 
                _bm.months[sdate.tm_mon - 1], sdate.tm_year)
+
+    elif format == 'programmer':
+        return '{} {} {}, {}:{}:{}'.format(_bm.sMonths[sdate.tm_mon - 1], sdate.tm_mday,
+                                          sdate.tm_year, *fv(sdate.tm_hour, sdate.tm_min, 
+                                          sdate.tm_sec))
+
     else:
         raise ValueError('Format ({}) not found'.format(format))
 
@@ -309,7 +322,7 @@ def squeeze(array: _bm.Union[list, tuple, set, dict],
 
         return op(array)
 
-def reverseDictSearch(array: dict, value: _bm.Any) -> _bm.Any:
+def reverseDictSearch(array: dict, value: _bm.Any) -> tuple:
     """Find the unknown key(s) of a value in a dictionary"""
 
     if type(array) is not dict:
@@ -329,7 +342,7 @@ def reverseDictSearch(array: dict, value: _bm.Any) -> _bm.Any:
         if results == []:
             raise IndexError('There was no key matching the specified value')
         else:
-            return results
+            return tuple(results)
 
 def getArrayValues(array: _bm.Union[list, tuple, dict]) -> tuple:
     """Recursively obtain all of the values of any keys or items within an array"""
@@ -360,42 +373,35 @@ def getArrayValues(array: _bm.Union[list, tuple, dict]) -> tuple:
 
     return tuple(values)
 
-def timeTest(method, method2, params: dict={}, params2: dict={}, 
-             accuracy: int=10) -> tuple[float]:
-    """Run two different methods x amount of times, sum then divide to estimate accurate run-time"""
+def timeTest(method, 
+             params: dict={},
+             accuracy: int=10
+             ) -> float:
+    """Run a method with optional kwargs {accuracy} amount of times, sum then divide by {accuracy} for precise run time"""
 
-    avg1: list = []
-    avg2: list = []
+    avg: list = []
 
     if type(accuracy) is not int:
         raise TypeError('Accuracy must be a valid \'int\' instance')
     elif accuracy < 1:
         raise ValueError('Accuracy must be 1 or bigger')
-    if not hasattr(method, '__call__') or not hasattr(method2, '__call__'):
-        raise TypeError('Methods must be a callable instance')
-    if type(params) is not dict or type(params2) is not dict:
-        raise TypeError('Params and params2 must be a valid \'dict\' instance')
+
+    if not hasattr(method, '__call__'):
+        raise TypeError('Method must be a callable instance')
+
+    if type(params) is not dict:
+        raise TypeError('Params must be a valid \'dict\' instance')
 
     for i in range(accuracy):
         start = _bm.perf_counter()
         method(**params)
         one = _bm.perf_counter() - start
-        _bm.logger.debug(f'tooltils.timeTest() method one reported time {round(one, 2)}s on test {i}')
 
-        start2 = _bm.perf_counter()
-        method2(**params2)
-        two = _bm.perf_counter() - start2
-        _bm.logger.debug(f'tooltils.timeTest() method two reported time {round(two, 2)}s on test {i}')
+        avg.append(one)
 
-        avg1.append(one)
-        avg2.append(two)
+    return sum(avg) / accuracy
 
-    one: float = sum(avg1) / accuracy
-    two: float = sum(avg2) / accuracy
-
-    return (one, two)
-
-def varName(**vars: dict) -> _bm.Union[str, list[str]]:
+def varName(**vars: dict) -> _bm.Union[str, _bm.List[str]]:
     """Get the namespace name of one or more variables"""
 
     names: list = [x for x in vars]
@@ -418,6 +424,7 @@ def tgzOpen(file: _bm.FileDescriptorOrPath,
         raise FileNotFoundError('Could not locate the specified gzipped tar file')
     else:
         file: str = _bm.abspath(file)
+
     if file.endswith('.tar.gz'):
         tfile: str = '.'.join(file.split('.')[:-1])
     elif file.endswith('.tgz'):
@@ -434,15 +441,16 @@ def tgzOpen(file: _bm.FileDescriptorOrPath,
     with _bm.gopen(file, 'rb') as _f, open(tfile, 'wb') as _f2:
         _bm.copyfileobj(_f, _f2)
     
-    _bm.logger.debug(f'Uncompressed gzip file {file} to {tfile} in tooltils.tgzOpen()')
+    _bm.logger._debug(f'Uncompressed gzip file {file} to {tfile}', 'tgzOpen')
 
     with _bm.topen(tfile) as _f:
         _f.extractall(output)
     
-    _bm.logger.debug(f'Extracted tarfile {tfile} to {output} in tooltils.tgzOpen()')
+    _bm.logger._debug(f'Extracted tarfile {tfile} to {output}', 'tgzOpen')
 
     _bm.remove(tfile)
-    _bm.logger.debug(f'Delete tarfile {tfile} in tooltils.tgzOpen()')
+
+    _bm.logger._debug(f'Deleted tarfile {tfile}', 'tgzOpen')
 
     return output
 
@@ -465,7 +473,67 @@ def lengthSort(array: _bm.Union[list, tuple, set, dict],
                                                 # that's why fromLowest is being passed as is
 
 class interpreter():
-    """Custom top-level Python interpreter to add niche features from other languages"""
+    """Custom top-level Python interpreter to add useful typing features"""
+
+    def __init__(self, 
+                 file: str,
+                 output: str='%(name)s.interpreted.py',
+                 override: bool=False,
+                 ternary: bool=True,
+                 comments: bool=True):
+        if type(file) is not str:
+            raise TypeError('File must be a valid \'str\' instance')
+        if not _bm.exists(file):
+            raise FileNotFoundError('Could not locate Python file')
+        if type(output) is not str:
+            raise TypeError('Output must be a valid \'str\' instance')
+
+        self.file: str = file
+
+        if '.' in file:
+            file: str = '.'.join(file.split('.')[0:-1])
+        else:
+            file: str = file
+
+        self.output:        str = output % {"name": file}
+        self.override:     bool = bool(override)
+        self.ternary:      bool = bool(ternary)
+        self.comments:     bool = bool(comments)
+        self._interpreted: list = []
+
+        if not self.override and _bm.exists(self.output):
+            raise FileExistsError('Output file already present')
+
+        try:
+            with open(self.file) as _f:
+                _content = _f.readlines()
+        except IsADirectoryError:
+            raise FileNotFoundError('There was a problem locating the file')
+
+        for i, line in enumerate(_content):
+            if line.strip() == '\n' or line.strip() == '':
+                self._interpreted.append(line)
+            elif self.comments and line.lstrip()[:2] == '//':
+                self._interpreted.append(self._convertComment(line))
+
+                _bm.logger.debug(f'Found comment on line {i} on tooltils.interpreter() for file \'{self.file}\'')
+            elif self.ternary and line.lstrip()[0] != '#' and len(line.split('=')) != 1 and \
+                 len(line.split('=')[1].split('?')) != 1:
+                self._interpreted.append(self._convertTernary(line))
+
+                _bm.logger.debug(f'Found ternary condition on line {i} on tooltils.interpreter() for file \'{self.file}\'')
+            else:
+                self._interpreted.append(line)
+
+        with open(self.output, 'a+') as _f:
+            _f.truncate(0)
+            _f.writelines(self._interpreted)
+        
+        self.file:   str = _bm.abspath(self.file)
+        self.output: str = _bm.abspath(self.output)
+
+    def __str__(self):
+        return '<Interpreter instance [{}]>'.format(self.file.split(info._bm.split)[-1])
 
     def _getIndent(self, line: str) -> str:
         return ''.join([' ' for i in range(len(line) - len(line.lstrip()))])
@@ -477,7 +545,8 @@ class interpreter():
             condition: str = statement[1].split('?')[0][1:-1]
             values:   list = statement[1].split('?')[1].split(':')
 
-            return f'{statement[0][:-1]} = {values[0].strip()} if {condition} else {values[1].strip().replace('\n', '')}\n'
+            return '{} = {} if {} else {}\n'.format(statement[0][:-1], values[0].strip(), condition, 
+                                                    values[1].strip().replace('\n', ''))
         except Exception as error:
             raise error
 
@@ -496,55 +565,3 @@ class interpreter():
         """Read the output file and return the content as a list containing strings split at every newline"""
 
         return self._interpreted
-
-    def __init__(self, 
-                 file: str,
-                 output: str='%(name)s.interpreted.py',
-                 override: bool=False):
-        if type(file) is not str:
-            raise TypeError('File must be a valid \'str\' instance')
-        if not _bm.exists(file):
-            raise FileNotFoundError('Could not locate Python file')
-        if type(output) is not str:
-            raise TypeError('Output must be a valid \'str\' instance')
-
-        self.file: str = file
-        if '.' in file:
-            file: str = '.'.join(file.split('.')[0:-1])
-        else:
-            file: str = file
-
-        self.output:        str = output % {"name": file}
-        self.override:     bool = bool(override)
-        self._interpreted: list = []
-
-        if not self.override and _bm.exists(self.output):
-            raise FileExistsError('Output file already present')
-
-        try:
-            with open(self.file) as _f:
-                _content = _f.readlines()
-        except IsADirectoryError:
-            raise FileNotFoundError('There was a problem locating the file')
-        
-        for i, line in enumerate(_content):
-            if line.lstrip()[:2] == '//':
-                self._interpreted.append(self._convertComment(line))
-
-                _bm.logger.debug(f'Found comment on line {i} on tooltils.interpreter() for file \'{self.file}\'')
-            elif line.lstrip()[0] != '#' and line.lstrip()[:2] != '//' and \
-                 len(line.split('=')) != 1 and len(line.split('=')[1].split('?')) != 1:
-                self._interpreted.append(self._convertTernary(line))
-
-                _bm.logger.debug(f'Found ternary condition on line {i} on tooltils.interpreter() for file \'{self.file}\'')
-            else:
-                self._interpreted.append(line)
-
-        with open(self.output, 'a+') as _f:
-            _f.truncate(0)
-            _f.writelines(self._interpreted)
-        
-        self.full_output: str = _bm.abspath(self.output)
-
-    def __str__(self):
-        return '<Interpreter instance [{}]>'.format(self.file)

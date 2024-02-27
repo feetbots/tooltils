@@ -1,5 +1,228 @@
 # Version History
 
+## 1.7.0 (28/2/2024)
+
+Going cold <br>
+
+This will probably be the last tooltils update for a while unless there is some bug I didn't catch. I am working on a project which is similar to Spotify, but free and without ads
+
+<br><br>
+
+**Major Changes:**
+- Requests now supports re-usable connections! Utilise it through the `openConnection()` class
+- Requests has some small bugfixes and new features like proxies and advanced url checking
+- Gave the README and CHANGELOG a small facelift
+- The `license` and `long_description` variables in the info module are now fetched from the github repository on first startup, cached then never requested for again
+- The sys module has been renamed to OS because that makes more sense
+- Fixed and added new advanced implementations for the OS module methods
+- Changed backend storage configuration of tooltils data in the `.tooltils` folder within the user's home directory
+- The API now has examples for every method and looks a bit nicer
+- Fixed major incompatibility issues with Python 3.7
+- Logging in the info module `logger()` class now includes the full function stack trace when logging a message
+- Minor optimisations
+
+<br><br>
+
+**General**:
+- Main files like `LICENSE`, `README.md` and `API.md` will now use grammatical abbreviations like API and README instead of the file name for clarity in the changelog
+- Reworded grammar on previous release notes in the changelog
+- Added examples for every function and class in the API (a full thorough example going over every parameter and method will come in a future update)
+- Added **"Supported"** tab for os dependent functions that may not work on some systems in the API
+- Removed the ability to escape the **"$f"** keyword for custom config values as it would just be hard to implement
+- Removed the important note in the README about the management of the data file as the object gets destroyed regardless when the code execution ends
+- Modified tooltils version tooltip in the README to be coloured teal and have slightly different text
+- Changelog items are now sorted into modules and other categories and instead of additions, removals and changes
+- The config data is now stored in a seperate file to differentiate material
+- Moved version resources into seperate folders within the `.tooltils` location to house other items
+- Tweaked README content wording
+- The headers variable call in the README code example is now not limited to just the user agent
+- Improved API readability
+- If a function can return None, it will be included within the code return types for linting and the API
+- Removed planned features section from the README because the items that were going to be there were common sense
+- Replaced copyright year in LICENSE to range from 2023-2024
+- Added best features section to the README to replace the planned features section
+- Moved global config value `configMethodCheck` to be directly in the global category so the function value converter will detect those values if necessary
+- Replaced `runConfigMethodAlways` with `disableConfigMethodValues` as it wasn't used in the code
+- Reorganised requests module `request()` class parameter list to match that of the actual method in the code
+- Added necessary tabs like **"Raisable exceptions"** to every method that didn't have it in the API
+- Updated old API information for all methods/modules necessary
+- Reorganised API modules
+- Exception `RuntimeError` will be raised if any config value is the incorrect type
+- Added raisable exception `gzip.BadGzipFile` for Python 3.8+ and `OSError` for Python 3.7 in the `tgzOpen()` method within the main module in the API
+- Replaced all non Python type hints for file name input parameters with str in all modules
+- The default config value for `requests.verifiableCaching` is now True
+- Made type hints more concise
+- Slightly changed README code example
+
+<br>
+
+**Backend**:
+- Refactored the design of the code that needs to be run on the import of tooltils
+- Updated core methods in the info module to use the new location for the data file for tooltils introduced in 1.6.0
+- Removed `tests/info.py` file
+- Added Python versions 3.8 to 3.11 into the `classifiers` table in `pyproject.toml`
+- Slightly reformatted code for all changed items in this update to be more readable
+- Removed unused type hint classes in all modules
+- Compatibility with Python 3.7 was broken because of an oversight I made for a long time, type hints with sub-types had not yet been integrated into the builtin Python types leading to runtime errors in all modules that use this kind of type hint. The fix for this was to use the python standard module `typing` and the subscriptable types within that library
+- I accidentally included quotes and backslashes in f-string expressions which is only a Python 3.12 feature. Converted appearance of these expressions to use the str.format() function instead
+- The exception class `gzip.BadGzipFile` did not exist until Python 3.8, meaning the logic for importing the correct error and decompressing a gzipped request response body had to be changed a little bit
+- Fixed minor Python interpreter feature that converts an object surrounded by parentheses to the object itself
+- Removed `classifiers` argument specification in `setup.py`
+- The type of supposed integer config values is now checked on startup to be correct, if not raise `RuntimeError`
+- Changed how the `tests/build.py` file works slightly
+- Added underscores to the start of variables that aren't designed to be accessed directly by the user in the os.info module
+
+<br>
+
+**Main Module**:
+- Updated old code example in the file docstring
+- Updated the `ANSI_colours` variable docstring
+- `style()` method now converts the colour argument to lowercase for cross compatibility
+- Fixed invalid text bug with the `cipher()` method
+- Changed the `reverseDictSearch()` method return type
+- Reworded `interpreter()` class docstring
+- New arguments for `interpreter()` class to individually control each language feature
+- `timeTest()` function now only accepts one method as input
+- Removed logging for `timeTest()` function
+- Added a checker to skip the line if it is a blank line in the `interpreter()` method
+- Return properties `file` and `output` now use the absolute paths of the files instead of the relative path
+- Removed the `full_output` return property in the `interpreter()` method
+- Slightly changed how the `cipher()` method works
+- Added a new formatter option to the `date()` method, you may now pass **"programmer"** to get an output that looks something like this **"February 27 2024, 23:08:49"**
+
+<br>
+
+**errors**:
+- Reworded `StatusCodeError.status_codes` variable docstring
+- Renamed all `SystemCallError` child exceptions and the exception itself to be derivatives of **"SubprocessError"** to better describe the action taking place
+- Reworded all `SubprocessError` exceptions' docstrings
+- The default `code` parameter for `SubprocessCodeError` exception is now 0 and has different logic to determine what the error message should be
+- Changed default `timeout` parameter for `SubprocessTimeoutError` and added logic to print a different message if the timeout is set
+- `SubprocessLookupNotFound` and `SubprocessPermissionError` exceptions now accept the `name` parameter for specifying the shell command or program that could not be found
+- Added `message` parameter as a return property to all necessary exceptions that don't already have it listed
+- Reorganised exceptions to be sorted in module order
+- Added `TooltilsOSInfoError` exception for the os.info module
+- Added new return messages for `RequestRedirectError` and `RequestCodecError` exception classes
+- The default `limit` parameter for `RequestRedirectError` is now 0, the default `timeout` parameter for `ConnectionTimeoutExpired`
+- Added `url` parameter to `ConnectionError`
+- Changed how `StatusCodeError` chooses the exception message to be returned, also removing the specified message item in the API for the class
+- Reworded `ConnectionTimeoutExpired` exception class docstring
+- Added a new exception `InvalidRequestURL` for url specific related errors, takes place over `ValueError` in most cases for requests
+- New exception `ActiveRequestError` for general errors within a request for an opened connection in requests
+
+<br>
+
+**info**:
+- The variables `license` and `long_description` content are now fetched from the github repository during import. The obtained values will be cached and used infinitely because the content of those files will not be changed, though you may edit the `disableOnlineContentFetch` config value to disable this feature.
+- Improved line counter accuracy for `lines` variable
+- Removed all logging statements for code that runs on import as there is no way to create a logging object and display those messages before the package has initialised
+- Added Python versions 3.8 to 3.11 into the `classifiers` variable
+- Modified `deleteData()` method docstring
+- Changed how `deleteData()` and `clearData()` methods work slightly
+- Added a new variable `release_description`, contains the text of the current version's description text as specified in the github version commit name or changelog version description
+- Deleted the variable `i` from the for loop block within the startup code before it has finished
+- Logging now includes the full function name when logging a message (e.g. tooltils.requests.request().send()/DEBUG etc.)
+
+**os** `(previously sys)`:
+- Renamed the `sys` module to `os` as it better describes the application of the methods contained inside this module
+- Added `strict` parameter for `pID()` method to determine how harsh the name comparison should be when determing found processes
+- The Windows implementation of the `pID()` method now uses the win32 api with `ctypes` directly and is a lot more reliable than the previous basic implementation
+- The MacOS and Linux implementatin of the `pID()` method now uses the `pgrep` command with arguments so that version is also a lot more reliable than the previous implementation
+- The `pID()` method now returns a tuple of found ids
+- Reworded docstrings on shell/program interaction methods
+- Changed logging call in `exit()` method to the status INFO instead of WARN
+- `clear()` method now uses the shell for the Windows version as it wouldn't be able to locate the cls program normally for some reason
+- Reworded the module docstring
+- All subprocess execution methods now also take a `tuple` as a valid argument type for the `cmds` parameter
+- `exit()` method default parameter `details` now has the value '' instead of None
+- `system()` method adds more detailed information to exceptions on errors with the child process execution
+- Added more detail to the raised exception when an unknown error is caught in the `system()` method
+- Modified `system()` logging call
+- The logging call in `system()` now happens before a caught exception is raised
+- The `ValueError` exception is now raised if an empty string is passed to `cmds` in the `system()` method because otherwise the code will fail
+- The `timeout` parameter for `system()`, `check()` and `call()` now accept a float and no longer have a limit
+- Removed the `print` parameter from `check()` as to capture the output, the command or program must be able to output something
+- Updated the Windows implementation of the `getCurrentWifiName()` method to use the netsh command, providing a much more reliable way of obtaining the wifi network name
+- The Linux implementation of the `getCurrentWifiName()` method will now return None if the iwgetid command did not return anything, meaning the current connection is either ethernet or there isn't one
+- Improved the reliability of the MacOS implementation of the `getCurrentWifiName()` method
+
+<br>
+
+**os.info**:
+- The `platform` variable is now set to `sys.platform` if an unknown system was detected
+
+<br>
+
+**requests**:
+- Reworded `status_codes` variable docstring
+- Moved code for `connected()`, `ctx()` and `prep_url()` methods to the new `_helpers.py` file since both versions of the requests module utilise these functions
+- Fixed `connected()` method
+- Requests now supports re-usable connections! Utilise it through the `.requests.openConnection()` class
+- Moved `verifiable()` source code into the main requests __init__ file
+- `where()` method now guesses the certificates from the normal and openssl variables from the `ssl.get_default_verify_paths()` instance
+- `where()` method returns a tuple with the format (path, file)
+- Changed default type hint for `port` argument for requesting methods
+- Added `proxy` argument to all requesting methods
+- `ctx()` method now detects the openssl cert file and uses that instead of the normal cert file from the `ssl.get_default_verify_paths()` function
+- The default certificate is now assumed from the `ssl.create_default_context()` function instead of from `ssl.get_default_verify_paths()` in the `ctx()` method when creating the SSLContext instance
+- Changed `advancedContext()` function to a class
+- Modified `advancedContext()` method docstring
+- Error checking for control characters in the url after a request exception wasn't looking up the error and that could've caused some issues, the correct condition has been added
+- Added return property `redirected` to the `request()` method to indicate whether the request has been redirected by the url, this wil be False if `redirects` is also False
+- All requests `reason` parameter will now utilise the status reason provided by the URL response as well as the status code
+- Request methods now accept a float for the `timeout` parameter
+- Catch `TimeoutError` in request methods and raise `tooltils.errors.ConnectionTimeoutExpired`
+- If a unknown error is received by the http.client response object in a request, raise `tooltils.errors.ConnectionError`
+- Updated to the most recent firefox user agent headers if `mask` is True in requests
+- Reworded `request()` class docstring
+- Added `redirect_loops=False` parameter to requesting methods for whether redirect looping should be allowed for this request
+- The `prep_url()` method will now try to determine if the url can be used or if it has a scheme and host etc. An invalid url will now raise the `tooltils.errors.InvalidRequestURL` exception
+- All url related errors in requests will also now raise the `tooltils.errors.InvalidRequestURL` exception
+- The `connected()` method will now get the host ip address of httpbin.org each time
+- Added a solver to change the url scheme depending on whether it is using http or https in the URI and depending on whatever is passed in the `https` argument for requesting
+- A request defined by `request()` is now connected during the call to create the request class, and closed after `.send()` is called
+- Moved **"Sending request to server"** logging call to happen normally instead of only when extraLogs is True
+- The logging call for getting the request response now happens directly after instead of before setting the variables like code and reason in requesting
+- The `headers` return variable for requesting is now directly converted to a dictionary instead of looped through and added progressively from the `.getheaders()` method within the HTTPResponse
+- A file is now always written using `shutil.copyfileobj()` regardless of if it is binary or not in requesting
+- New allowed http methods and functions `options` and `trace`, the `trace` method does not include the `data` or `cookies` argument or allow it according to [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html#name-trace), other methods have been updated to also follow RFC 9110
+- Added logging for `connected()` and `verifiable()` methods because they can update the cache
+- The default `redirectLimit` parameter is now assumed from the `redirectLimit` variable for request methods when it is not specified
+- Renamed return property `verified` to `verify` for the `request()` method
+- Improved backend code readability and performance
+- The `cert` return property will now be set to None if `verify` or `https` are passed as False in requesting methods
+- `cert` is now actually set to the user defined parameter in requesting methods
+- The logging call and return method `.__str__()` for the request classes, now determine the https tag based on whether the request is using https instead of whether it has been verified
+- If a request returns malformed data, the new exception `ActiveRequestError` is raised
+- The `agent` return property is now no longer set to the masked version when `mask=True`
+- Requesting now sends a lowercase version of the **"Connection"** header
+- Made the `advancedContext` class `SSLContext` parameter None because if you use the class but don't specify a custom SSLContext, it will override the default one
+- Replaced `url_response` type hint from requesting methods with `tooltilsResponse`
+- Fixed how some properties are type checked in requesting methods
+- Added some new extra log calls with the `advancedContext.extraLogs` parameter in request methods
+- Modified grammar of existing log calls in request methods
+- New return property for request methods, `rID`, starting from 0 on the first connection made and increases each time a new connection is created, it is program execution specific
+- Made exceptions more specific in requesting methods
+- Added catching for more per-request exceptions with the request methods `.send()` function
+- Fixed an obscure bug where the request data couldn't be read if the connection was closed before trying to read it
+- Fixed a bug where if the request body was gzipped, instead of decoding that text to get it as plain text, the code would try the ungzipped version of the text and decode that instead, leading to malformed data
+- `raw` return type for request methods is now `bytes`
+- The `raw` and `text` return properties for request methods are now set when the method is DOWNLOAD
+- Added `tooltilsResponse()` class, this is only intended to be used by the requesting methods since there is data that comes from the request reference, but exists so you are able to know the return properties from code highlighters like Pylance. I have also added reading functions to the response like `.read()`, `.readlines()` and `.seek()` for cross compatibility
+- The new `tooltilsResponse` class is now returned from the `.send()` request methods and the http method functions, you may also use the `tooltilsResponse` class with the Python context manager protocol (with statement)
+- Added `end_url` and `end_agent` properties to the requesting methods return class to find out what the url was redirected to if it was redirected, and to find out the final User-Agent header
+- Modified module docstring
+- The new `openConnection` class also supports the Python context manager protocol
+- The `request` class now also supports the Python context manager protocol
+
+<br>
+
+**requests.urllib**:
+- This version of the requests module is now no longer deprecated but won't be receiving feature updates unless there is an issue or a backend conflict with the normal requests module
+- Removed requesting utility functions from this module like `ctx()` and `prep_url()`
+
+<br><br>
+
 ## 1.6.0 (1/1/2024)
 
 New year new tooltils <br><br>
@@ -100,8 +323,8 @@ New year new tooltils <br><br>
 - When a filename is not present through the parameter or in the url in `.requests.request(method='DOWNLOAD')`, an exception will now be raised
 - `agent` parameter in `.requests.request()` is now type checked and takes priority in being set over the `mask` parameter
 - Data is now no longer added to the url when supplied in `.requests.request()`
-- Reorganised sensical parameters for request methods in `.requests`
-- Logging initilisation is now handled within `info.py` instead of the `_external.py` file
+- Re-organised sensical parameters for request methods in `.requests`
+- Logging initialisation is now handled within `info.py` instead of the `_external.py` file
 
 <br><br>
 

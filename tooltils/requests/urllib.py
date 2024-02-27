@@ -1,5 +1,5 @@
 """
-Internet requesting access methods - `urllib.request` version (deprecated)
+Internet requesting access methods - `urllib.request` version
 
 This is the old version of the requesting module, using the basis of `urllib.request` as the source,
 though it is not as featured or advanced as the `http.client` module, so that is being favoured
@@ -8,25 +8,29 @@ over this implementation.
 
 
 class _bm:
-    from ssl import (SSLContext, SSLError, SSLCertVerificationError,
-                     create_default_context, get_default_verify_paths, CERT_NONE)
-    from socket import gaierror #, socket, AF_INET, SOCK_STREAM 
+    from ssl import SSLCertVerificationError, get_default_verify_paths
     from json import JSONDecodeError, loads, dumps
     from urllib.error import URLError, HTTPError
     from http.client import RemoteDisconnected
-    from gzip import decompress, BadGzipFile
     from os.path import abspath, exists
-    from urllib.parse import urlencode
     from shutil import copyfileobj
-    from logging import getLogger
+    from typing import Any, Dict
+    from gzip import decompress
+    from socket import gaierror
     import urllib.request as u
-    from typing import Any
 
     from ..errors import (ConnectionError, ConnectionTimeoutExpired, InvalidWifiConnection,
                           StatusCodeError, SSLCertificateFailed)
-    from ..info import _loadCache, _loadConfig, _editCache, _deleteCacheKey, version
-    from ..sys import getCurrentWifiName
-    from ..sys.info import platform
+    from ..info import _loadConfig, version, _logger
+    from ._helpers import ctx, prep_url, connected
+    from ..os.info import platform, python_version
+
+    if python_version.split('.')[1] == '7':
+        GzipError = OSError
+    else:
+        from gzip import BadGzipFile
+
+        GzipError = BadGzipFile
     
     class FileDescriptorOrPath:
         pass
@@ -34,174 +38,20 @@ class _bm:
     class url_response:
         pass
 
-    class certifs:
-        pass
-
     def propertyTest(value, types: tuple, name: str):
         if value is None:
             return types[0]()
         elif not isinstance(value, types):
-            raise TypeError(name + ' must be a valid \'' + value.__name__ + '\' instance')
+            raise TypeError(name + ' must be a valid \'' + types[0].__name__ + '\' instance')
         else:
             return value
     
-    logger = getLogger('tooltils.requests.urllib')
+_bm.logger = _bm._logger('.requests.urllib')
 
 
-status_codes: dict[int, str] = _bm.StatusCodeError.status_codes
-"""List of official valid HTTP response status codes (100-511)"""
-defaultVerificationMethod    = bool(_bm._loadConfig('requests')['defaultVerificationMethod'])
-
-def where() -> _bm.certifs:
-    """Return default certificate file and path locations used by Python"""
-
-    data = _bm.get_default_verify_paths()
-
-    class certifs:
-        cafile: str = data.cafile
-        """The .pem name of the default certificate file"""
-        capath: str = data.capath
-        """The location of the default certificate file path"""
-
-    return certifs
-
-def connected() -> bool:
-    """Get the connectivity status of the currently connected wifi network"""
-    
-    caching: bool = bool(_bm._loadConfig('requests')["connectedCaching"])
-    wifiName: str = _bm.getCurrentWifiName()
-    result:  bool = True
-
-    if wifiName is None:
-        return False
-
-    if caching:
-        configData: dict = _bm._loadConfig('requests')
-        cacheData:  dict = _bm._loadCache('requests')
-
-        if cacheData["connectedTimesChecked"] >= configData["connectedCachingCheck"]:
-            _bm._editCache('requests', {"connectedTimesChecked": 0})
-            _bm._deleteCacheKey('requests', wifiName, 'connectedNetworkList')
-        else:
-            if wifiName in list(cacheData["connectedNetworkList"].keys()):
-                _bm._editCache('requests', 
-                {"connectedTimesChecked": cacheData["connectedTimesChecked"] + 1})
-
-                return cacheData["connectedNetworkList"][wifiName]
-
-    try:
-        # have fallback method incase create_connection() doesn't work
-        # conn = _bm.socket(_bm.AF_INET, _bm.SOCK_STREAM)
-        # conn.settimeout(3)
-        # conn.connect(('3.227.133.255', 80))
-        # conn.close()
-        _bm.create_connection(('3.227.133.255', 80), 3).close()
-    except (TimeoutError, OSError):
-        result: bool = False
-
-    if caching:
-        _bm._editCache('requests', {wifiName: result}, 'connectedNetworkList')
-        _bm._editCache('requests', {"connectedTimesChecked": 1})
-
-    return result
-
-def ctx(verify: bool=True, cert: str=None):
-    """Create a custom SSLContext instance"""
-
-    try:
-        if type(cert) is not str and (
-           cert is not None and not cert is type(tuple)):
-            raise TypeError('Certificate must be a valid file path')
-        elif cert is None:
-            cert: str = _bm.get_default_verify_paths().cafile
-
-        if not verify:
-            cert = None
-
-        ctx = _bm.create_default_context(cafile=cert)
-        ctx.set_alpn_protocols(['https/1.1'])
-    except (FileNotFoundError, IsADirectoryError, _bm.SSLError):
-        raise FileNotFoundError('Not a valid certificate file path')
-        
-    if not verify:         
-        ctx.check_hostname = False
-        ctx.verify_mode    = _bm.CERT_NONE
-        ctx.                 set_ciphers('RSA')
-        
-    return ctx
-
-def prep_url(url: str, 
-             data: dict=None,
-             https: bool=True,
-             order: bool=False
-             ) -> str:
-    """Configure a URL making it viable for requests"""
-
-    if data is None:
-        data = {}
-    elif type(data) is not dict:
-        raise TypeError('Data must be a valid dictionary instance')
-
-    try:
-        if url[-1] == '/':
-            url = url[:-1]
-
-        st = url.strip().startswith
-    except AttributeError:
-        raise TypeError('URL must be a valid \'str\' instance')
-    except IndexError:
-        raise ValueError('URL must contain a valid http link')
-
-    if data != {}:
-        url += '?' + _bm.urlencode(data, doseq=order, safe='/')
-    if url[0] == '/':
-        raise ValueError('URL must be a http type instance, not a file path')
-    elif url.startswith('file:///'):
-        raise ValueError('URL must be a http type instance, not a file path')
-    elif not st('https://') and not st('http://'):
-        if https:
-            url = 'https://' + url
-        else:
-            url = 'http://' + url
-        
-    return url
-
-def verifiable() -> bool:
-    """Determine whether requests can be verified with a valid ssl 
-    certificate on the current connection"""
-
-    caching: bool = bool(_bm._loadConfig('requests')["verifiableCaching"])
-    wifiName: str = _bm.getCurrentWifiName()
-
-    if wifiName is None:
-        return False
-    
-    if caching:
-        configData: dict = _bm._loadConfig('requests')
-        cacheData:  dict = _bm._loadCache('requests')
-
-        if cacheData["verifiableTimesChecked"] >= configData["verifiableCachingCheck"]:
-            _bm._editCache('requests', {"verifiableTimesChecked": 0})
-            _bm._deleteCacheKey('requests', wifiName, 'verifiableNetworkList')
-        else:
-            if wifiName in list(cacheData["verifiableNetworkList"].keys()):
-                _bm._editCache('requests', 
-                {"verifiableTimesChecked": cacheData["verifiableTimesChecked"] + 1})
-
-                return cacheData["verifiableNetworkList"][wifiName]
-
-    try:
-        head('httpbin.org/get', mask=True, redirects=False)
-
-        result: bool = True
-    except (_bm.ConnectionError, _bm.SSLCertificateFailed):
-        result: bool = False
-
-    if caching:
-        _bm._editCache('requests', {wifiName: result}, 'verifiableNetworkList')
-        _bm._editCache('requests', {"verifiableTimesChecked": 1})
-
-    return result
+status_codes: _bm.Dict[int, str] = _bm.StatusCodeError.status_codes
+"""List of official HTTP response status codes"""
+defaultVerificationMethod: bool  = bool(_bm._loadConfig('requests')['defaultVerificationMethod'])
 
 class NoRedirects(_bm.u.HTTPRedirectHandler):
     """An opener to prevent redirects in urllib requests"""
@@ -223,11 +73,11 @@ class request():
         self.verified:  bool = bool(verify)
         self.mask:      bool = bool(mask)
         self.sent:      bool = False
-        self.cookies:   dict = _bm.propertyTest(cookies, (dict), 'Cookies')
-        self.data:      dict = _bm.propertyTest(data, (dict), 'Data')
-        self.headers: dict[str, str] = _bm.propertyTest(headers, (dict), 'Headers')
+        self.cookies:   dict = _bm.propertyTest(cookies, (dict,), 'Cookies')
+        self.data:      dict = _bm.propertyTest(data, (dict,), 'Data')
+        self.headers: dict[str, str] = _bm.propertyTest(headers, (dict,), 'Headers')
 
-        self.url:    str = prep_url(url, self.data)
+        self.url:    str = _bm.prep_url(url, self.data)
         self._url:   str = self.url.replace('https://', '').replace('http://', '').split('/')
         self.port:   int = 443
         self.https: bool = True
@@ -338,9 +188,9 @@ class request():
         error          = None
 
         if self.data:
-            _bm.logger.debug(f'Sending data with length {len(self.data)}')
+            _bm.logger._debug(f'Sending data with length {len(self.data)}', 'requests.urllib.request().send')
     
-        _bm.logger.debug(f'Sending headers: {self.headers}')
+        _bm.logger._debug(f'Sending headers: {self.headers}', 'requests.urllib.request().send')
         
         if self.method == 'POST' or self.method == 'PUT':
             _data: dict = _bm.dumps(_data).encode()
@@ -358,7 +208,7 @@ class request():
 
         try:
             rdata = _bm.u.urlopen(self._req, _data, timeout=self.timeout,
-                                  context=ctx(self.verified, self.cert))
+                                  context=_bm.ctx(self.verified, self.cert))
         except _bm.RemoteDisconnected:
             error = _bm.ConnectionError('The server ended the connection without a response')
         except _bm.SSLCertVerificationError:
@@ -370,23 +220,23 @@ class request():
                 error = _bm.StatusCodeError(err.code)
         except _bm.URLError as err:
             if '[Errno 8]' in str(err) or '[Errno 11001]' in str(err):
-                if connected():
+                if _bm.connected():
                     error = _bm.StatusCodeError(404)
                 else:
                     error = _bm.InvalidWifiConnection()
 
-                _bm.logger.debug('tooltils.requests.connected() was called by tooltils.requests.request and may update the cache') 
+                _bm.logger.debug('tooltils.requests.connected() was called and may update the cache', 'requests.urllib.request().send') 
             elif 'ssl' in str(err):
                 error = _bm.SSLCertificateFailed()
             else:
                 error = err
         except _bm.gaierror:
-            if connected():
+            if _bm.connected():
                 error = _bm.StatusCodeError(404)
             else:
                 error = _bm.InvalidWifiConnection()
             
-            _bm.logger.debug('tooltils.requests.connected() was called by tooltils.requests.request and may update the cache')
+            _bm.logger.debug('tooltils.requests.connected() was called and may update the cache', 'requests.urllib.request().send')
         except TimeoutError:
             error = _bm.ConnectionTimeoutExpired('The request connection operation timed out')
         except ValueError:
@@ -396,8 +246,9 @@ class request():
         self.sent: bool = True
 
         if error:
-            _bm.logger.debug('Request to <{}:{}> failed due to: {}'.format(self.url.split('/')[2], 
-                                                                           self.port, type(error).__name__))
+            _bm.logger._debug('Request to <{}:{}> failed due to: {}'.format(self.url.split('/')[2], 
+                                                                            self.port, type(error).__name__),
+                              'requests.urllib.request().send')
 
             raise error
 
@@ -416,7 +267,7 @@ class request():
 
                 try:
                     text = _bm.decompress(text)
-                except _bm.BadGzipFile:
+                except _bm.GzipError:
                     pass
 
                 self.text = text.decode(_encoding)
@@ -452,8 +303,8 @@ class request():
             self.json = None
             self.path = None
         
-        _bm.logger.debug(f'Server replied with [{self.status_code}]')
-        _bm.logger.debug('Connection to server has been discarded')
+        _bm.logger._debug(f'Server replied with [{self.status_code}]', 'requests.urllib.request().send')
+        _bm.logger._debug('Connection to server has been discarded', 'requests.urllib.request().send')
         
         return self
 
@@ -479,8 +330,9 @@ class request():
         
         self._prepare()
 
-        _bm.logger.debug('Setting up http{}/1.1 {} request to <{}:{}>'.format(
-                         's' if self.verified else '', self.method, self.url.split('/')[2], self.port))
+        _bm.logger._debug('Setting up http{}/1.1 {} request to <{}:{}>'.format(
+                          's' if self.verified else '', self.method, self.url.split('/')[2], self.port),
+                          'requests.urllib.request().__init__')
         
     def __str__(self):
         if self.sent:
