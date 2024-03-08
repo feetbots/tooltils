@@ -25,5 +25,6 @@ def run(funcName: str, args: str):
             for k, v in globals()['__builtins__'].items():
                 if k == funcName:
                     return v(*args)
-    except:
+    except Exception:
         return None
+

@@ -1,5 +1,5 @@
 """
-# tooltils | v1.7.0
+# tooltils | v1.7.1
 
 A lightweight python utility package built on the standard library
 
@@ -11,7 +11,7 @@ A lightweight python utility package built on the standard library
 >>> data.end_data.url
 'https:/httpbin.org/get'
 >>> data.end_data.sent_headers
-{'User-Agent': 'Python-tooltils/1.7.0', 'Accept-Encoding': 'gzip, deflate', ...}
+{'User-Agent': 'Python-tooltils/1.7.1', 'Accept-Encoding': 'gzip, deflate', ...}
 >>> data.headers
 {'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate', 'Host': 'httpbin.org', ...}
 ```
@@ -57,6 +57,9 @@ class _bm:
         'May', 'Jun', 'Jul', 'Aug', 
         'Sep', 'Oct', 'Nov', 'Dec'
     ]
+
+    def fv(*values) -> tuple:
+        return [str(i) if i > 9 else f'0{i}' for i in values]
 
     logger = info._logger('')
 
@@ -165,9 +168,7 @@ def cipher(text: str, shift: int) -> str:
 
     return result
 
-def mstrip(text: str,
-           values: dict
-           ) -> str:
+def mstrip(text: str, values: dict) -> str:
     """Change some text from a dictionary pair of values"""
 
     if type(text) is not str:
@@ -182,30 +183,38 @@ def mstrip(text: str,
 
 def date(epoch: _bm.EPOCH_seconds=..., 
          timezone: str='local', 
-         format: str='standard'
+         format: int=0
          ) -> str:
-    """Convert epoch to a readable date"""
+    """
+    Convert the current date timestamp to a readable format
+    
+    #### Format:
+    - `0:` "2024/03/08 17:29:46"
+    - `1:` "5:30 PM on the 8th of March, 2024"
+    - `2:` "Mar 8 2024, 17:30:23"
+    """
 
     if not isinstance(epoch, (int, float)) and epoch != ...:
         raise TypeError('Epoch must be a valid \'int\' or \'float\' instance')
     if type(timezone) is not str:
         raise TypeError('Timezone must be a valid \'str\' instance')
-    if type(format) is not str:
-        raise TypeError('Format must be a valid \'str\' instance')
+    if type(format) is not int:
+        raise TypeError('Format must be a valid \'int\' instance')
 
     try:
-        if epoch == ...:
+        if epoch == ...: 
             epoch = _bm.time()
+        
+        timezone = timezone.lower()
 
-        tz = timezone
-        if tz.lower() == 'local':
+        if timezone == 'local':
             sdate = _bm.localtime(epoch)
-        elif tz.lower() == 'gm' or '00:00' in tz.lower():
+        elif timezone == 'gm' or '00:00' in timezone:
             sdate = _bm.gmtime(epoch)
-        elif tz.startswith('+') or tz.startswith('-'):
+        elif timezone.startswith('+') or timezone.startswith('-'):
             timezone = _bm.timezone(_bm.timedelta(
-                       hours=int(tz[:3]), 
-                       minutes=int(tz[4:])))
+                       hours=int(timezone[:3]), 
+                       minutes=int(timezone[4:])))
             sdate    = _bm.datetime.fromtimestamp(epoch, 
                        tz=timezone).timetuple()
         else:
@@ -215,35 +224,32 @@ def date(epoch: _bm.EPOCH_seconds=...,
     except OverflowError:
         raise OverflowError('Epoch timestamp too large')
 
-    def fv(*values) -> tuple:
-        return [str(i) if i > 9 else f'0{i}' for i in values]
-
-    if format == 'standard':
+    if format == 0:
         return '{}/{}/{} {}:{}:{}'.format(sdate.tm_year,
-               *fv(sdate.tm_mon, sdate.tm_mday, sdate.tm_hour,
+               *_bm.fv(sdate.tm_mon, sdate.tm_mday, sdate.tm_hour,
                sdate.tm_min, sdate.tm_sec))
 
-    elif format == 'fancy':
+    elif format == 1:
         hour: int = sdate.tm_hour % 12 if sdate.tm_hour % 12 != 0 else 12
         end: list = ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'
                      ][int(str(sdate.tm_mday)[-1])]
         if sdate.tm_mday in [11, 12, 13]:
             end: str = 'th'
 
-        return '{}:{} {} on the {}{} of {}, {}'.format(hour, *fv(sdate.tm_min), 
+        return '{}:{} {} on the {}{} of {}, {}'.format(hour, *_bm.fv(sdate.tm_min), 
                'PM' if sdate.tm_hour >= 12 else 'AM', sdate.tm_mday, end, 
                _bm.months[sdate.tm_mon - 1], sdate.tm_year)
 
-    elif format == 'programmer':
+    elif format == 2:
         return '{} {} {}, {}:{}:{}'.format(_bm.sMonths[sdate.tm_mon - 1], sdate.tm_mday,
-                                          sdate.tm_year, *fv(sdate.tm_hour, sdate.tm_min, 
+                                          sdate.tm_year, *_bm.fv(sdate.tm_hour, sdate.tm_min, 
                                           sdate.tm_sec))
 
     else:
         raise ValueError('Format ({}) not found'.format(format))
 
 def epoch(date: str) -> int:
-    """Get epoch from a formatted string date"""
+    """Get the epoch timestamp from a formatted date"""
 
     if type(date) is not str:
         raise TypeError('Date must be a valid \'str\' instance')
@@ -252,7 +258,7 @@ def epoch(date: str) -> int:
         splitDate: list = str(date).split(' ')
     elif '-' in date:
         splitDate: list = str(date).replace('-', '/').split(' ')
-    else:
+    elif ',' in date:
         try:
             # Remove '1st' to avoid stripping Augu[st]
             sdate: list = mstrip(date, 
@@ -269,19 +275,29 @@ def epoch(date: str) -> int:
 
             splitDate: list = [year + '/' + str(int(_bm.months.index(month)) + 1)
                                + '/' + days, hours + ':' + minutes + ':00']
-        except IndexError:
-            raise ValueError('Invalid date argument')
+        except (IndexError, ValueError):
+            try:
+                month, days, year, hours, minutes, seconds = mstrip(
+                    date, {":": " ", ",": ""}).split(' ')
+
+                splitDate: list = [year + '/' + str(int(_bm.sMonths.index(month)) + 1)
+                                   + '/' + days, hours + ':' + minutes + ':' + seconds]
+            except (IndexError, ValueError):
+                raise ValueError('Invalid date')
+    else:
+        raise ValueError('Unknown date format')
 
     try:
         sdate = _bm.datetime(*[int(i) for i in splitDate[0].split(
                              '/') + splitDate[1].split(':')])
     except IndexError:
-        raise ValueError('Invalid date argument')
+        raise ValueError('Invalid date')
 
     days: int = _bm.datetime(sdate.year, sdate.month, 
                              sdate.day, sdate.hour,
                              sdate.minute, sdate.second).toordinal(
                              ) - _bm.datetime(1970, 1, 1).toordinal() - 1
+
     # Add 13 hours because of obscure glitch
     hours = days * 24 + sdate.hour + 13
     minutes = hours * 60 + sdate.minute

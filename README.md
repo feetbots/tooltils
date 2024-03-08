@@ -1,4 +1,4 @@
-# tooltils | v1.7.0
+# tooltils | v1.7.1
 
 [![python](https://img.shields.io/badge/python-3.7+-teal)](https://pypi.org/project/tooltils/)
 [![downloads](https://static.pepy.tech/personalized-badge/tooltils?period=total&units=international_system&left_color=grey&right_color=red&left_text=downloads)](https://pepy.tech/project/tooltils)
@@ -13,7 +13,7 @@ A lightweight python utility package built on the standard library
 >>> data.end_data.url
 'https:/httpbin.org/get'
 >>> data.end_data.sent_headers
-{'User-Agent': 'Python-tooltils/1.7.0', 'Accept-Encoding': 'gzip, deflate', ...}
+{'User-Agent': 'Python-tooltils/1.7.1', 'Accept-Encoding': 'gzip, deflate', ...}
 >>> data.headers
 {'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate', 'Host': 'httpbin.org', ...}
 ```

@@ -1,5 +1,82 @@
 # Version History
 
+## 1.7.1 (8/3/2024)
+
+Murphy's Law
+
+<br><br>
+
+**Major Changes:**
+- Added backend optimisation for import performance, it was around 2 seconds to import tooltils each time after this update, but it now only takes on average around under 0.1 seconds. Though the first time you import, there will still be the time it takes to obtain the license and readme from the github, so there will only be around 1.5 seconds of import time for the first time ever importing tooltils
+
+<br><br>
+
+**General**:
+- The config value `global.disableConfigMethodValues` is now True by default
+- Added fields in the cache and config for the os module and removed the unused sys fields
+- The config and cache for tooltils are now stored in the format **"~/.tooltils/{pyv}/{tsv}/"**, pyv being the current Python interpreter version and tsv being the current tooltils version
+- The reliability of obtaining the user's home directory is better for managing the cache and config files
+
+<br>
+
+**Backend**:
+- Made testing capabilities easier
+- Added a type hint to the `bitsize` variable of the os.info module
+- Improved code readability where changed
+
+<br>
+
+**Main Module**:
+- The `date()` method `format` parameter now accepts an integer for the format which replaces as 0=**"standard"**, 1=**"fancy"**, 2=**"programmer"**
+- Modified the `date()` method docstring and added examples for each of the formats inside the docstring
+- Improved error messages for the `epoch()` method
+- The `epoch()` method now accepts the programmer format from the `date()` method added in version 1.7.0
+
+<br>
+
+**errors**:
+- None
+
+<br>
+
+**info**:
+- Fixed a PermissionError bug that prevented the tooltils data files from being deleted because they were in use by the program
+- Fixed a bug where the `license` and `long_description` variables would have the content of tooltils version 1.6.0 instead of 1.7.0
+- Removed broken definitions of functions `enable`, `disable` and `close` of the `logger()` class instance as I accidentally left them in after moving the direct logging calls to the module instead of the `_external.py` file
+- Changed the properties in the `logger()` class instance to instead be direct variables as they didn't need to be properties
+- Corrected the incorrect logging definitions that were being used in the `enable`, `disable` and `close` functions of the `logger()` class instance
+- Removed the `classifiers` variable
+- The `Exception` class is now caught when parsing config method values instead of a being a naked try except block
+- With the change to how the cache and config are stored, the `deleteData()` method now accepts two different values, the first being `pyv`, to indicate what Python versions to delete the data files for. The second being `tsv`, to indicate what Tooltils versions to delete the data files for. A guide on how to use these parameters can be found in the API
+- The `deleteData()` method will now raise an exception if the current tooltils version or Python version data files do not exist, instead of running the code and catching whatever error the functions spit out
+- Modified `deleteData()` method docstring
+
+<br>
+
+**os**:
+- None
+
+<br>
+
+**os.info** (removed):
+- This module has been removed and instead added as a class to the os module under the name `info`
+- Heavily optimised how startup works, now the variables are set once they are obtained by the user instead of at startup, except for the known ones `python_version`, `name`, `bitsize`, `interpreter`, `platform` and `detailed_platform`
+- Modified `name`, `manufacturer` and `boot_drive` variables' docstrings
+- Changed module docstring
+- The second object (`platform_version[1]`) of the `platform_version` variable on Windows now returns the type of Windows installation, e.g. **"Home"** or **"Pro"**
+
+<br>
+
+**requests**:
+- None
+
+<br>
+
+**requests.urllib**:
+- None
+
+<br><br>
+
 ## 1.7.0 (28/2/2024)
 
 Going cold <br>
@@ -88,7 +165,7 @@ This will probably be the last tooltils update for a while unless there is some 
 - Return properties `file` and `output` now use the absolute paths of the files instead of the relative path
 - Removed the `full_output` return property in the `interpreter()` method
 - Slightly changed how the `cipher()` method works
-- Added a new formatter option to the `date()` method, you may now pass **"programmer"** to get an output that looks something like this **"February 27 2024, 23:08:49"**
+- Added a new formatter option to the `date()` method, you may now pass **"programmer"** to get an output that looks something like this **"Feb 27 2024, 23:08:49"**
 
 <br>
 
@@ -122,6 +199,8 @@ This will probably be the last tooltils update for a while unless there is some 
 - Added a new variable `release_description`, contains the text of the current version's description text as specified in the github version commit name or changelog version description
 - Deleted the variable `i` from the for loop block within the startup code before it has finished
 - Logging now includes the full function name when logging a message (e.g. tooltils.requests.request().send()/DEBUG etc.)
+
+<br>
 
 **os** `(previously sys)`:
 - Renamed the `sys` module to `os` as it better describes the application of the methods contained inside this module

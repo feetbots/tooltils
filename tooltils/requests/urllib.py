@@ -23,9 +23,9 @@ class _bm:
                           StatusCodeError, SSLCertificateFailed)
     from ..info import _loadConfig, version, _logger
     from ._helpers import ctx, prep_url, connected
-    from ..os.info import platform, python_version
+    from ..os import info
 
-    if python_version.split('.')[1] == '7':
+    if info.python_version.split('.')[1] == '7':
         GzipError = OSError
     else:
         from gzip import BadGzipFile
@@ -142,10 +142,10 @@ class request():
         else:
             self.agent: str = str(agent)
         if mask:
-            if _bm.platform.lower() == 'windows':
+            if _bm.info.platform.lower() == 'windows':
                 self.agent: str = 'Mozilla/5.0 (Windows NT 10.0; ' + \
                                   'rv:10.0) Gecko/20100101 Firefox/10.0'
-            elif _bm.platform.lower() == 'macos':
+            elif _bm.info.platform.lower() == 'macos':
                 self.agent: str = f'Mozilla/5.0 (Macintosh; Intel Mac OS ' + \
                                   '10.15; rv:10.0) Gecko/20100101 Firefox/10.0'
             else:

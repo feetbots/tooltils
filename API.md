@@ -1,4 +1,4 @@
-# <span style="font-family: Trebuchet MS;">tooltils – api | v1.7.0</span>
+# <span style="font-family: Trebuchet MS;">tooltils – api | v1.7.1</span>
 
 *<b>NOTE:</b> If a variable has a star sign in front of it, it can have a value of none*
 
@@ -383,7 +383,6 @@ Properties:
 - **`*long_description`** str – The long description of tooltils
 - **`location`** str – The path of the current installation of tooltils
 - **`lines`** int – The amount of lines of code in this tooltils installation
-- **`classifiers`** list[str] – The list of PyPi style tooltils classifiers
 - **`homepage`** str – The current home website of tooltils
 - **`homepage_issues`** str – The current issues directory of the home website of tooltils
 - **`releases`** list[str] – All current versions of tooltils
@@ -445,15 +444,16 @@ Return type: **None** <br>
 Returns: **Nothing** <br><br>
 
 **`deleteData()`** <br>
-Delete the stored data for a specific tooltils version or all present
+Delete the stored data for a specific python version of tooltils, a specific tooltils version, a combination of these or the entire tooltils storage directory
 
 Parameters:
-- **`version`** str = None – The version to be erased
+- **`pyv`** str = None – The Python version to be deleted
+- **`tsv`** str = None – The Tooltils version to be deleted
 
 Raisable exceptions:
 - **`TypeError`** – Input parameter type is incorrect
 - **`ValueError`** – Input parameter is invalid
-- **`FileNotFoundError`** – Unable to locate input parameter file
+- **`FileNotFoundError`** – Unable to locate tootlils data files
 
 Example:
 ```py
@@ -510,6 +510,32 @@ Returns: **Logger instance** <br><br>
 ## <span style="font-family: Trebuchet MS;">os</span>
 
 *Operating system specific methods, information and interaction*
+
+Properties:
+- **`info`** – Operating system information – *Details*:
+  - **Properties**:
+    - **`macOS_releases`** dict[str, str] – List of all current MacOS versions
+    - **`python_version`** str – Current Python interpreter version
+    - **`name`** str – The network and user name of the current operating system/computer
+    - **`bitsize`** int – The bit limit of the current Python interpreter
+    - **`interpreter`** str – Location of current Python interpreter
+    - **`platform`** str – Name of current operating system
+    - **`detailed_platform`** str – Version number and or name of your computer's current OS
+    - **`cpu`** str – Name of the currently in use cpu of your computer
+    - **`arch`** str – Computer architecture
+    - **`platform_version`** tuple[str] – Version number and or name of current OS
+    - **`model`** str – The model or manufacturer of your computer
+    - **`cores`** int – The amount of cores in your computer's cpu
+    - **`ram`** int – The amount of ram in megabytes in your computer
+    - **`manufacturer`** str – The creator of your computer
+    - **`*serial_number`** str – The identifiable code or tag string of your computer (This is unobtainable on Linux)
+    - **`boot_drive`** str – The location of the disk currently being used on your computer
+  - **Supported**:
+    - **`MacOS`**
+    - **`Windows`**
+    - **`Linux`** – Some distributions may not work
+
+Methods:
 
 **`exit(details)`** <br>
 Print some text and exit the current thread
@@ -714,35 +740,6 @@ Example:
 
 Return type: **str | None** <br>
 Returns: **Wifi Name** <br><br>
-
-## <span style="font-family: Trebuchet MS;">os.info</span>
-
-*Identifying system information*
-
-Supported:
-- **`MacOS`**
-- **`Linux`** – Some distributions may not work
-- **`Windows`**
-
-Properties:
-- **`macOS_releases`** dict[str, str] – List of all current MacOS versions
-- **`python_version`** str – Current Python interpreter version
-- **`name`** str – The network name of computer
-- **`bitsize`** int – The bit limit of the current Python interpreter
-- **`interpreter`** str – Location of current Python interpreter
-- **`platform`** str – Name of current operating system
-- **`detailed_platform`** str – Detailed name of current operating system
-- **`cpu`** str – Name of the currently in use cpu of your computer
-- **`arch`** str – Computer architecture
-- **`platform_version`** tuple[str] – Version number and or name of current OS
-- **`model`** str – The model or manufacturer of your computer
-- **`cores`** int – The amount of cores in your computer cpu
-- **`ram`** int – The amount of ram in megabytes in your computer
-- **`manufacturer`** str – The organisation or company that created your computer
-- **`*serial_number`** str – The identifiable code or tag string of your computer (This is unobtainable on Linux)
-- **`boot_drive`** str – The location of the boot drive currently being used on your computer
-
-<br><br>
 
 ## <span style="font-family: Trebuchet MS;">requests</span>
 

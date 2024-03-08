@@ -22,10 +22,9 @@ class _bm:
                           RequestRedirectError, RequestCodecError)
     from ..info import _loadCache, _loadConfig, _editCache, _deleteCacheKey, version, _makeFunc
     from ._helpers import ctx, prep_url, connected
-    from ..os.info import platform, python_version
-    from ..os import getCurrentWifiName
+    from ..os import getCurrentWifiName, info
 
-    if python_version.split('.')[1] == '7':
+    if info.python_version.split('.')[1] == '7':
         GzipError = OSError
     else:
         from gzip import BadGzipFile
@@ -598,9 +597,9 @@ class openConnection():
             agent: str = f'Python-tooltils/{_bm.version}'
 
         if mask:
-            if _bm.platform.lower() == 'windows':
+            if _bm.info.platform.lower() == 'windows':
                 agent: str = 'Windows NT 10.0; Win64; x64'
-            elif _bm.platform.lower() == 'macos':
+            elif _bm.info.platform.lower() == 'macos':
                 agent: str = 'Macintosh; Intel Mac OS X 14.2'
             else:
                 agent: str = 'X11; Ubuntu; Linux i686'

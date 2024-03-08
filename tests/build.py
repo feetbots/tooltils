@@ -13,7 +13,7 @@ if platform.startswith('win'):
 else:
     split: str = '/'
 
-version: str = '1.7.0'
+version: str = '1.7.1'
 basic:  bool = False
 
 try:
