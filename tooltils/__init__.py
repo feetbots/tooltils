@@ -1,5 +1,5 @@
 """
-# tooltils | v1.7.1
+# tooltils | v1.7.2
 
 A lightweight python utility package built on the standard library
 
@@ -11,7 +11,7 @@ A lightweight python utility package built on the standard library
 >>> data.end_data.url
 'https:/httpbin.org/get'
 >>> data.end_data.sent_headers
-{'User-Agent': 'Python-tooltils/1.7.1', 'Accept-Encoding': 'gzip, deflate', ...}
+{'User-Agent': 'Python-tooltils/1.7.2', 'Accept-Encoding': 'gzip, deflate', ...}
 >>> data.headers
 {'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate', 'Host': 'httpbin.org', ...}
 ```
@@ -20,7 +20,6 @@ A lightweight python utility package built on the standard library
 
 Read the full documentation within `API.md` included in the github project directory
 """
-
 
 import tooltils.requests as requests
 import tooltils.errors as errors
@@ -106,8 +105,7 @@ def style(text: str,
           fill: bool=False,
           crossed: bool=False,
           underline: bool=False,
-          double_underline: bool=False,
-          flush: bool=True
+          double_underline: bool=False
           ) -> str:
     """Create text in the specified colour and or style"""
 
@@ -129,10 +127,6 @@ def style(text: str,
 
     if fill:
         code += 10
-    if flush:
-        os.call('', shell=True)
-
-        _bm.logger._debug('A shell flush was called to the terminal', 'style')
 
     return '\u001b[{}{}m{}\u001b[0m'.format(code, style, text)
 

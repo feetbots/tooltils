@@ -1,5 +1,58 @@
 # Version History
 
+## 1.7.2 (13/3/2024)
+
+Infinite Bugs
+
+<br><br>
+
+**Major Changes:**
+- Code predictions and docstrings now work for the os module `info` class
+
+<br><br>
+
+**General**:
+- Fixed typo in the API
+
+<br>
+
+**Backend**:
+- Added a `.gitignore` file to the repository files to remove the `.DS_Store` file created by MacOS
+
+<br>
+
+**Main Module**:
+- Removed the `flush` parameter from the `style()` method because that function does not print text itself, rather it is stored in a string, so you may need to flush the text yourself
+
+<br>
+
+**errors**:
+- None
+
+<br>
+
+**info**:
+- Changed how the cache control works slightly for the `license` and `long_description` variables
+- Fixed the `deleteData()` method
+
+<br>
+
+**os**:
+- Changed `info` class `detailed_platform` variable docstring
+- The `info` class now has code predictions and docstrings for each variables for Python code highlighters
+
+<br>
+
+**requests**:
+- None
+
+<br>
+
+**requests.urllib**:
+- None
+
+<br><br>
+
 ## 1.7.1 (8/3/2024)
 
 Murphy's Law

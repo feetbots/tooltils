@@ -1,7 +1,7 @@
 """General installation information"""
 
 
-version: str = str('1.7.1')
+version: str = str('1.7.2')
 """The current installation version"""
 
 class _bm:
@@ -124,9 +124,9 @@ maintainer:          str = str('feetbots')
 """The current sustainer of tooltils"""
 maintainer_email:    str = str('pheetbots@gmail.com')
 """The email of the current sustainer of tooltils"""
-released:            str = str('8/3/2024')
+released:            str = str('13/3/2024')
 """The release date of the current version"""
-release_description: str = str('Murphy\'s Law')
+release_description: str = str('Infinite Bugs')
 """The description of the current release version"""
 description:         str = str('A lightweight python utility package built on the standard library')
 """The short description of tooltils"""
@@ -138,7 +138,7 @@ location:            str = str(_bm.split.join(__file__.split(_bm.split)[:-1]) + 
 """The path of the current installation of tooltils"""
 releases:  _bm.List[str] = ['1.0.0-beta', '1.1.0', '1.2.0', '1.3.0', '1.4.0', '1.4.1', '1.4.2',
                             '1.4.3', '1.4.4', '1.4.4-1', '1.5.0', '1.5.1', '1.5.2', '1.5.3',
-                            '1.6.0', '1.7.0', '1.7.1']
+                            '1.6.0', '1.7.0', '1.7.1', '1.7.2']
 """All current versions of tooltils"""
 
 def _checkLoaded():
@@ -329,7 +329,7 @@ def deleteData(pyv: str=None, tsv: str=None) -> None:
 
     if type(pyv) is not str and pyv:
         raise TypeError('Pyv must be a valid \'str\' instance')
-    if type(tsv) is not str and pyv:
+    if type(tsv) is not str and tsv:
         raise TypeError('Tsv must be a valid \'str\' instance')
 
     if not _bm.exists(_bm.baseDir):
@@ -367,18 +367,22 @@ def deleteData(pyv: str=None, tsv: str=None) -> None:
 
         _bm.logger._debug(f'User storage data for Python version {pyv} was deleted', 'info.deleteData')
     elif tsv:
-        for i in [i for i in _bm.listdir(_bm.baseDir) if 'temp' not in i]:
-            try:
-                if ('ts' + tsv) in i:
-                    if _bm.openCache:
-                        _bm.closeFiles()
-                    
-                    _bm.rmtree(i + _bm.split + 'ts' + tsv)
-            except FileNotFoundError:
-                continue
+        for i in [i for i in _bm.listdir(_bm.baseDir) if 'temp' not in i and \
+                                                         '.DS_Store' not in i]:
+            for i2 in _bm.listdir(_bm.baseDir + i):
+                try:
+                    if ('ts' + tsv) in i2:
+                        if _bm.openCache:
+                            _bm.closeFiles()
+                        
+                        _bm.rmtree(_bm.baseDir + i + _bm.split + i2)
+                except FileNotFoundError:
+                    continue
                 
         if _bm.openCache:
             raise FileNotFoundError('Tooltils version not found in tooltils data files')
+
+        _bm.logger._debug(f'User storage data for Tooltils version {tsv} was deleted', 'info.deleteData')
 
 class logger():
     """Create a logging instance for tooltils modules only"""
@@ -525,9 +529,9 @@ for i in (('global', 'configMethodCheck'), ('requests', 'verifiableCachingCheck'
 # try to get license and long_description
 
 _check:              bool = not _data['info']['disableOnlineContentFetch']
-license, long_description = None, None
+license, long_description = 0, 0
 
-if _check and not _loadCache('info')['licenseContent'] != None: # check if it is already cached
+if _check and _loadCache('info')['licenseContent'] == None: # check if it is already cached
     from ssl import create_default_context, CERT_NONE
     from http.client import HTTPSConnection
     from zipfile import ZipFile
@@ -573,6 +577,9 @@ if _check and not _loadCache('info')['licenseContent'] != None: # check if it is
 else:
     license          = _loadCache('info')['licenseContent']
     long_description = _loadCache('info')['readmeContent']
+
+if not license and not long_description:
+    _editCache('info', {"licenseContent": 0, "readmeContent": 0})
 
 def _getLines():
     def getFiles(dir: str) -> list:

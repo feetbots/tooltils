@@ -11,9 +11,6 @@ class _bm:
                           SubprocessTimeoutExpired, SubprocessLookupNotFound, 
                           SubprocessPermissionError)
     from .info import _logger
-
-    class info:
-        pass
     
     st = platform.lower().startswith
 
@@ -282,13 +279,21 @@ def getCurrentWifiName() -> _bm.Union[str, None]:
 
 # info classes
 class _info:
+    """Operating system information"""
+
     def __init__(self):
         self.python_version:    str = _bm.version.split(' (')[0].strip()
+        """Current Python interpreter version"""
         self.name:              str = _bm.gethostname()
+        """The network and user name of the current operating system/computer"""
         self.bitsize:           int = 64 if (_bm.maxsize > 2 ** 32) else 32
+        """The bit limit of the current Python interpreter"""
         self.interpreter:       str = _bm.executable
+        """Location of current Python interpreter"""
         self.platform:          str = _bm.platform
+        """Name of current operating system"""
         self.detailed_platform: str = _bm.dplatform
+        """Technical name of your computer's OS"""
 
         self.macOS_releases: _bm.Dict[str, str] = {
             "10.0":  "Cheetah",
@@ -312,6 +317,7 @@ class _info:
             "13":    "Ventura",
             "14":    "Sonoma"
         }
+        """List of all current MacOS versions"""
 
         self._sysinfo: list = []
 
@@ -325,26 +331,122 @@ class _info:
         self._boot_drive:       list = [False, '']
         self._platform_version: list = [False, ()]
     
+    @property
+    def cpu(self) -> str:
+        """Name of the currently in use cpu of your computer"""
+
+        return self._cpu[1]
+    
+    @cpu.setter
+    def cpu(self, value: str):
+        self._cpu[1] = value
+    
+    @property
+    def arch(self) -> str:
+        """Computer architecture"""
+
+        return self._arch[1]
+
+    @arch.setter
+    def arch(self, value: str):
+        self._arch[1] = value
+    
+    @property
+    def model(self) -> str:
+        """The model or manufacturer of your computer"""
+
+        return self._model[1]
+    
+    @model.setter
+    def model(self, value: str) -> str:
+        self._model[1] = value
+
+    @property
+    def cores(self) -> int:
+        """The amount of cores in your computer's cpu"""
+
+        return self._cores[1]
+
+    @cores.setter
+    def cores(self, value: int):
+        self._cores[1] = value
+    
+    @property
+    def ram(self) -> int:
+        """The amount of ram in megabytes in your computer"""
+
+        return self._ram[1]
+    
+    @ram.setter
+    def ram(self, value: int):
+        self._ram[1] = value
+    
+    @property
+    def manufacturer(self) -> str:
+        """The creator of your computer"""
+
+        return self._manufacturer[1]
+    
+    @manufacturer.setter
+    def manufacturer(self, value: str):
+        self._manufacturer[1] = value
+    
+    @property
+    def serial_number(self) -> str:
+        """The identifiable code or tag string of your computer (This is unobtainable on Linux)"""
+
+        return self._serial_number[1]
+    
+    @serial_number.setter
+    def serial_number(self, value: str) -> str:
+        self._serial_number[1] = value
+    
+    @property
+    def boot_drive(self) -> str:
+        """The location of the disk currently being used on your computer"""
+
+        return self._boot_drive[1]
+
+    @boot_drive.setter
+    def boot_drive(self, value: str):
+        self._boot_drive[1] = value
+    
+    @property
+    def platform_version(self) -> _bm.Tuple[str]:
+        """Version number and or name of current OS"""
+
+        return self._platform_version[1]
+    
+    @platform_version.setter
+    def platform_version(self, value: tuple):
+        self._platform_version[1] = value
+
 class _info_macOS(_info):
-    def strip(self, value: str) -> str:
+    """Operating system information"""
+
+    def _strip(self, value: str) -> str:
         return value.split(': ')[1]
 
-    def sysinfo(self) -> None:
+    def __sysinfo(self) -> None:
         if not self._sysinfo:
             self._sysinfo = list(filter(None, _bm.check(['system_profiler', 'SPHardwareDataType'])))
     
     @property
     def cpu(self) -> str:
-        self.sysinfo()
+        """Name of the currently in use cpu of your computer"""
+
+        self.__sysinfo()
 
         if not self._cpu[0]:
             self._cpu[0] = True
-            self._cpu[1] = self.strip(self._sysinfo[5])
+            self._cpu[1] = self._strip(self._sysinfo[5])
 
         return self._cpu[1]
 
     @property
     def arch(self) -> str:
+        """Computer architecture"""
+
         if not self._arch[0]:
             self._arch[0] = True
             self._arch[1] = _bm.check('arch')[0]
@@ -353,30 +455,36 @@ class _info_macOS(_info):
     
     @property
     def model(self) -> str:
-        self.sysinfo()
+        """The model or manufacturer of your computer"""
+
+        self.__sysinfo()
 
         if not self._model[0]:
             self._model[0] = True
-            self._model[1] = self.strip(self._sysinfo[2])
+            self._model[1] = self._strip(self._sysinfo[2])
 
         return self._model[1]
 
     @property
     def cores(self) -> int:
-        self.sysinfo()
+        """The amount of cores in your computer's cpu"""
+
+        self.__sysinfo()
 
         if not self._cores[0]:
             self._cores[0] = True
-            self._cores[1] = int(self.strip(self._sysinfo[6]).split(' (')[0])
+            self._cores[1] = int(self._strip(self._sysinfo[6]).split(' (')[0])
 
         return self._cores[1]
 
     @property
     def ram(self) -> str:
-        self.sysinfo()
+        """The amount of ram in megabytes in your computer"""
+
+        self.__sysinfo()
 
         if not self._ram[0]:
-            self._ram[1] = self.strip(self._sysinfo[7])
+            self._ram[1] = self._strip(self._sysinfo[7])
             self._ram[0] = True
     
             if 'GB' in self._ram[1]:
@@ -388,20 +496,26 @@ class _info_macOS(_info):
 
     @property
     def manufacturer(self) -> str:
+        """The creator of your computer"""
+
         return 'Apple Inc.'
 
     @property
     def serial_number(self) -> str:
-        self.sysinfo()
+        """The identifiable code or tag string of your computer (This is unobtainable on Linux)"""
+
+        self.__sysinfo()
 
         if not self._serial_number[0]:
             self._serial_number[0] = True
-            self._serial_number[1] = self.strip(self._sysinfo[10])
+            self._serial_number[1] = self._strip(self._sysinfo[10])
 
         return self._serial_number[1]
 
     @property
     def boot_drive(self) -> str:
+        """The location of the disk currently being used on your computer"""
+
         if not self._boot_drive[0]:
             self._boot_drive[0] = True
             self._boot_drive[1] = _bm.check(['bless', '--info', '--getBoot'])[0]
@@ -410,6 +524,8 @@ class _info_macOS(_info):
 
     @property
     def platform_version(self) -> _bm.Tuple[str]:
+        """Version number and or name of current OS"""
+
         if not self._platform_version[0]:
             pver: list = [_bm.check(['sw_vers', '-productVersion'])[0]]
 
@@ -427,32 +543,43 @@ class _info_macOS(_info):
         return self._platform_version[1]
 
 class _info_windows(_info):
-    def wmic(self, *cmds: tuple) -> str: 
+    """Operating system information"""
+
+    def _wmic(self, *cmds: tuple) -> str: 
         return [i.strip() for i in _bm.check('wmic ' + cmds[0] + ' get ' + cmds[1])][2]
 
-    def strip(self, value: str) -> str: 
+    def _strip(self, value: str) -> str: 
         return value.split(': ')[1].strip()
+
+    def __sysinfo(self) -> None:
+        if not self._sysinfo:
+            self._sysinfo = list(filter(None, _bm.check('systeminfo')))
     
     @property
     def cpu(self) -> str:
+        """Name of the currently in use cpu of your computer"""
+
         if not self._cpu[0]:
             self._cpu[0] = True
-            self._cpu[1] = self.wmic('cpu', 'name')
+            self._cpu[1] = self._wmic('cpu', 'name')
 
         return self._cpu[1]
 
     @property
     def arch(self) -> str:
+        """Computer architecture"""
+
         if not self._arch[0]:
             self._arch[0] = True
-            self._arch[1] = self.wmic('os', 'OSArchitecture').replace('Processor', '').strip()
+            self._arch[1] = self._wmic('os', 'OSArchitecture').replace('Processor', '').strip()
 
         return self._arch[1]
     
     @property
     def model(self) -> str:
-        if not self._sysinfo:
-            self._sysinfo = list(filter(None, _bm.check('systeminfo')))
+        """The model or manufacturer of your computer"""
+
+        self.__sysinfo()
 
         if not self._model[0]:
             self._model[0] = True
@@ -462,46 +589,53 @@ class _info_windows(_info):
 
     @property
     def cores(self) -> int:
+        """The amount of cores in your computer's cpu"""
+
         if not self._cores[0]:
             self._cores[0] = True
-            self._cores[1] = self.wmic('cpu', 'NumberOfCores')
+            self._cores[1] = self._wmic('cpu', 'NumberOfCores')
 
         return self._cores[1]
 
     @property
     def ram(self) -> str:
-        if not self._sysinfo:
-            self._sysinfo = list(filter(None, _bm.check('systeminfo')))
+        """The amount of ram in megabytes in your computer"""
+
+        self.__sysinfo()
 
         if not self._ram[0]:
             self._ram[0] = True
-            self._ram[1] = int(self.strip(self._sysinfo[23]).split(' ')[0].replace(',', ''))
+            self._ram[1] = int(self._strip(self._sysinfo[23]).split(' ')[0].replace(',', ''))
 
         return self._ram[1]
 
     @property
     def manufacturer(self) -> str:
-        if not self._sysinfo:
-            self._sysinfo = list(filter(None, _bm.check('systeminfo')))
+        """The creator of your computer"""
+
+        self.__sysinfo()
 
         if not self._manufacturer[0]:
             self._manufacturer[0] = True
-            self._manufacturer[1] = self.strip(self._sysinfo[11])
+            self._manufacturer[1] = self._strip(self._sysinfo[11])
 
         return self._manufacturer[1]
 
     @property
     def serial_number(self) -> str:
+        """The identifiable code or tag string of your computer (This is unobtainable on Linux)"""
+
         if not self._serial_number[0]:
             self._serial_number[0] = True
-            self._serial_number[1] = self.wmic('bios', 'SerialNumber')
+            self._serial_number[1] = self._wmic('bios', 'SerialNumber')
 
         return self._serial_number[1]
 
     @property
     def boot_drive(self) -> str:
-        if not self._sysinfo:
-            self._sysinfo = list(filter(None, _bm.check('systeminfo')))
+        """The location of the disk currently being used on your computer"""
+
+        self.__sysinfo()
 
         if not self._boot_drive[0]:
             self._boot_drive[0] = True
@@ -511,19 +645,24 @@ class _info_windows(_info):
 
     @property
     def platform_version(self) -> _bm.Tuple[str]:
-        if not self._sysinfo:
-            self._sysinfo = list(filter(None, _bm.check('systeminfo')))
+        """Version number and or name of current OS"""
+
+        self.__sysinfo()
 
         if not self._platform_version[0]:
             self._platform_version[0] = True
-            self._platform_version[1] = (self.strip(self._sysinfo[2]).split(' ')[0], 
-                                         self.strip(self._sysinfo[1]).split(' ')[-1])
+            self._platform_version[1] = (self._strip(self._sysinfo[2]).split(' ')[0], 
+                                         self._strip(self._sysinfo[1]).split(' ')[-1])
 
         return self._platform_version[1]
 
 class _info_linux(_info):
+    """Operating system information"""
+
     @property
     def cpu(self) -> str:
+        """Name of the currently in use cpu of your computer"""
+
         if not self._cpu[0]:
             self._cpu[0] = True
             self._cpu[1] = _bm.check('lscpu | grep \'Model:\'', True)[0].split(':')[1].strip()
@@ -532,6 +671,8 @@ class _info_linux(_info):
 
     @property
     def arch(self) -> str:
+        """Computer architecture"""
+
         if not self._arch[0]:
             self._arch[0] = True
             self._arch[1] = _bm.check('arch')[0]
@@ -540,6 +681,8 @@ class _info_linux(_info):
     
     @property
     def model(self) -> str:
+        """The model or manufacturer of your computer"""
+
         if not self._model[0]:
             self._model[0] = True
             self._model[1] = _bm.check(['cat', '/sys/devices/virtual/dmi/id/product_name'])[0]
@@ -548,6 +691,8 @@ class _info_linux(_info):
 
     @property
     def cores(self) -> int:
+        """The amount of cores in your computer's cpu"""
+
         if not self._cores[0]:
             self._cores[0] = True
             self._cores[1] = int(_bm.check('lscpu | grep \'Core(s) per socket:\'', True)[0].split(':')[1].strip())
@@ -556,6 +701,8 @@ class _info_linux(_info):
 
     @property
     def ram(self) -> str:
+        """The amount of ram in megabytes in your computer"""
+
         if not self._ram[0]:
             self._ram[0] = True
             self._ram[1] = round(int(_bm.check('cat /proc/meminfo | grep \'MemTotal:\'', True)[0].split(':')[1].strip().split(' ')[0]) / 1000)
@@ -564,6 +711,8 @@ class _info_linux(_info):
 
     @property
     def manufacturer(self) -> str:
+        """The creator of your computer"""
+
         if not self._manufacturer[0]:
             self._manufacturer[0] = True
             self._manufacturer[1] = _bm.check(['cat', '/sys/devices/virtual/dmi/id/sys_vendor'])[0]
@@ -572,6 +721,8 @@ class _info_linux(_info):
 
     @property
     def serial_number(self) -> str:
+        """The identifiable code or tag string of your computer (This is unobtainable on Linux)"""
+
         _bm.logger.warning('serial_number property is unobtainable on Linux systems', 
                            'os.info.__main__')
 
@@ -579,6 +730,8 @@ class _info_linux(_info):
 
     @property
     def boot_drive(self) -> str:
+        """The location of the disk currently being used on your computer"""
+
         if not self._boot_drive[0]:
             self._boot_drive[0] = True
             self._boot_drive[1] = _bm.check('df /boot | grep -Eo \'/dev/[^ ]+\'', True)[0]
@@ -587,6 +740,8 @@ class _info_linux(_info):
 
     @property
     def platform_version(self) -> _bm.Tuple[str]:
+        """Version number and or name of current OS"""
+
         if not self._platform_version[0]:
             sysinfo = _bm.check(['cat', '/etc/os-release'])
 
@@ -595,38 +750,21 @@ class _info_linux(_info):
 
         return self._platform_version[1]
 
+# class _base_info
+# super() class info
+# inherit variablez
 
 if _bm.platform.lower() == 'macos':
-    _info = _info_macOS()
+    info = _info_macOS()
 elif _bm.platform.lower() == 'windows':
-    _info = _info_windows()
+    info = _info_windows()
 elif _bm.platform.lower() == 'linux':
-    _info = _info_linux()
+    info = _info_linux()
 else:
-    _info = _info()
+    info = _info()
 
-info: _bm.info = _info
-"""
-Operating system information
-
-Properties:
-- `macOS_releases` dict[str, str] – List of all current MacOS versions
-- `python_version` str – Current Python interpreter version
-- `name` str – The network and user name of the current operating system/computer
-- `bitsize` int – The bit limit of the current Python interpreter
-- `interpreter` str – Location of current Python interpreter
-- `platform` str – Name of current operating system
-- `detailed_platform` str – Version number and or name of your computer's current OS
-- `cpu` str – Name of the currently in use cpu of your computer
-- `arch` str – Computer architecture
-- `platform_version` tuple[str] – Version number and or name of current OS
-- `model` str – The model or manufacturer of your computer
-- `cores` int – The amount of cores in your computer's cpu
-- `ram` int – The amount of ram in megabytes in your computer
-- `manufacturer` str – The creator of your computer
-- `*serial_number` str – The identifiable code or tag string of your computer (This is unobtainable on Linux)
-- `boot_drive` str – The location of the disk currently being used on your computer
-"""
+info: _info = info
+"""Operating system information"""
 
 
 for i in ('_info', '_info_macOS', '_info_windows', '_info_linux', 'i'):

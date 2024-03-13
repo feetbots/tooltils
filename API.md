@@ -1,4 +1,4 @@
-# <span style="font-family: Trebuchet MS;">tooltils – api | v1.7.1</span>
+# <span style="font-family: Trebuchet MS;">tooltils – api | v1.7.2</span>
 
 *<b>NOTE:</b> If a variable has a star sign in front of it, it can have a value of none*
 
@@ -47,7 +47,6 @@ Parameters:
 - **`crossed`** bool = False – Whether to cross the text
 - **`underline`** bool = False – Whether to underline the text
 - **`double_underline`** bool = False – Whether to double underline the text
-- **`flush`** bool = True – Whether to apply a fix to the terminal because of a display bug
 
 Raisable exceptions:
 - **`TypeError`** – Input parameter types are incorrect
@@ -520,7 +519,7 @@ Properties:
     - **`bitsize`** int – The bit limit of the current Python interpreter
     - **`interpreter`** str – Location of current Python interpreter
     - **`platform`** str – Name of current operating system
-    - **`detailed_platform`** str – Version number and or name of your computer's current OS
+    - **`detailed_platform`** str – Technical name of your computer's OS
     - **`cpu`** str – Name of the currently in use cpu of your computer
     - **`arch`** str – Computer architecture
     - **`platform_version`** tuple[str] – Version number and or name of current OS
@@ -910,7 +909,7 @@ Return properties:
 - **`*raw`** bytes – The raw byte content of the request response body
 - **`*text`** str – The decoded content of the request response body
 - **`*json`** dict – The converted Python JSON of the request response body (if applicable)
-- **`end_data**`** class – Information that was sent in the request but not returned – *Properties*:
+- **`end_data`** class – Information that was sent in the request but not returned – *Properties*:
   - **`url`** str – The url that was requested
   - **`*sent_headers`** dict[str, str] – The headers that were sent in the request
   - **`*agent`** str – The User-Agent of the request headers that were sent
