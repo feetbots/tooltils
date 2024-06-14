@@ -9,6 +9,8 @@ class TooltilsError(Exception):
     """Base class for tooltils specific errors"""
 
     def __init__(self, message: str=''):
+        """Base class for tooltils specific errors"""
+
         self.message: str = message
     
     def __str__(self):
@@ -21,6 +23,8 @@ class TooltilsMainError(TooltilsError):
     """Base class for tooltils main module specific errors"""
 
     def __init__(self, message: str=''):
+        """Base class for tooltils main module specific errors"""
+
         self.message: str = message
     
     def __str__(self):
@@ -33,6 +37,8 @@ class TooltilsInfoError(TooltilsError):
     """Base class for tooltils.info specific errors"""
 
     def __init__(self, message: str=''):
+        """Base class for tooltils.info specific errors"""
+
         self.message: str = message
     
     def __str__(self):
@@ -45,6 +51,8 @@ class TooltilsOSError(TooltilsError):
     """Base class for tooltils.os specific errors"""
 
     def __init__(self, message: str=''):
+        """Base class for tooltils.os specific errors"""
+
         self.message: str = message
     
     def __str__(self):
@@ -57,6 +65,8 @@ class SubprocessError(TooltilsOSError):
     """Base class for tooltils.os.system() specific errors"""
 
     def __init__(self, message: str=''):
+        """Base class for tooltils.os.system() specific errors"""
+
         self.message: str = message
     
     def __str__(self):
@@ -69,6 +79,8 @@ class SubprocessExecutionError(SubprocessError):
     """Child process execution failed"""
 
     def __init__(self, message: str=''):
+        """Child process execution failed"""
+
         self.message: str = message
     
     def __str__(self):
@@ -81,6 +93,8 @@ class SubprocessCodeError(SubprocessError):
     """Child process execution returned non-zero exit code"""
 
     def __init__(self, message: str='', code: int=0):
+        """Child process execution returned non-zero exit code"""
+
         self.message: str = message
         self.code:    int = code
     
@@ -96,6 +110,8 @@ class SubprocessTimeoutExpired(SubprocessError):
     """Child process execution timed out"""
     
     def __init__(self, message: str='', timeout: int=0):
+        """Child process execution timed out"""
+
         self.message: str = message
         self.timeout: int = timeout
     
@@ -111,6 +127,8 @@ class SubprocessLookupNotFound(SubprocessError):
     """Unable to locate program or shell command"""
 
     def __init__(self, message: str='', name: str=''):
+        """Unable to locate program or shell command"""
+
         self.message: str = message
         self.name:    str = name
     
@@ -126,6 +144,8 @@ class SubprocessPermissionError(SubprocessError):
     """Denied access to program or shell command"""
 
     def __init__(self, message: str='', name: str=''):
+        """Denied access to program or shell command"""
+
         self.message: str = message
         self.name:    str = name
     
@@ -137,22 +157,12 @@ class SubprocessPermissionError(SubprocessError):
         else:
             return 'Denied access to program or shell command'
 
-class TooltilsOSInfoError(TooltilsOSError):
-    """Base class for tooltils.os.info specific errors"""
-
-    def __init__(self, message: str=''):
-        self.message: str = message
-    
-    def __str__(self):
-        if self.message:
-            return self.message
-        else:
-            return 'A tooltils.os.info error occured'
-
 class TooltilsRequestsError(TooltilsError):
     """Base class for tooltils.requests specific errors"""
 
     def __init__(self, message: str=''):
+        """Base class for tooltils.requests specific errors"""
+
         self.message: str = message
     
     def __str__(self):
@@ -162,21 +172,25 @@ class TooltilsRequestsError(TooltilsError):
             return 'A tooltils.requests error occured'
 
 class RequestError(TooltilsRequestsError):
-    """Base class for tooltils.requests.request() specific errors"""
+    """Base class for requesting specific errors"""
 
     def __init__(self, message: str=''):
+        """Base class for requesting specific errors"""
+
         self.message: str = message
     
     def __str__(self):
         if self.message:
             return self.message
         else:
-            return 'A tooltils.requests.request() error occured'
+            return 'A request error occured'
 
 class ActiveRequestError(RequestError):
     """The request to the URL failed"""
 
     def __init__(self, message: str='', url: str=''):
+        """The request to the URL failed"""
+
         self.message: str = message
         self.url:     str = url
 
@@ -192,6 +206,8 @@ class InvalidRequestURL(RequestError):
     """URL cannot be used to make a valid request"""
 
     def __init__(self, message: str='', url: str=''):
+        """URL cannot be used to make a valid request"""
+
         self.message: str = message
         self.url:     str = url
     
@@ -207,6 +223,8 @@ class ConnectionError(RequestError):
     """Connection to URL failed"""
 
     def __init__(self, message: str='', url: str=''):
+        """Connection to URL failed"""
+
         self.message: str = message
         self.url:     str = url
     
@@ -222,6 +240,8 @@ class ConnectionTimeoutExpired(RequestError):
     """Request connection timeout expired"""
 
     def __init__(self, message: str='', timeout: int=0):
+        """Request connection timeout expired"""
+
         self.message: str = message
         self.timeout: int = timeout
     
@@ -302,6 +322,8 @@ class StatusCodeError(RequestError):
     """List of official HTTP response status codes"""
     
     def __init__(self, code: int=0, reason: str=''):
+        """Status code of URL response is not 200"""
+
         self.code:   int = code
         self.reason: str = reason
 
@@ -327,6 +349,8 @@ class SSLCertificateFailed(RequestError):
     """The currently used SSL certificate could not be used to verify requests"""
 
     def __init__(self, message: str=''):
+        """The currently used SSL certificate could not be used to verify requests"""
+
         self.message: str = message
     
     def __str__(self):
@@ -336,21 +360,25 @@ class SSLCertificateFailed(RequestError):
             return 'The currently used SSL certificate could not be used to verify requests'
 
 class InvalidWifiConnection(RequestError):
-    """No valid wifi connection could be found for the request"""
+    """No valid internet connection could be found for the request"""
 
     def __init__(self, message: str=''):
+        """No valid internet connection could be found for the request"""
+
         self.message: str = message
     
     def __str__(self):
         if self.message:
             return self.message
         else:
-            return 'No valid wifi connection could be found for the request'
+            return 'No valid internet connection could be found for the request'
 
 class RequestRedirectError(RequestError):
     """Request redirected too many times or entered a redirect loop"""
 
     def __init__(self, message: str='', limit: int=0):
+        """Request redirected too many times or entered a redirect loop"""
+
         self.message: str = message
         self.limit:   int = limit
     
@@ -365,9 +393,10 @@ class RequestRedirectError(RequestError):
 class RequestCodecError(RequestError):
     """Unable to decode request body"""
 
-    def __init__(self, 
-                 message: str='', 
+    def __init__(self, message: str='', 
                  encoding: _bm.Union[str, tuple]=('utf-8', 'ISO-8859-1')):
+        """Unable to decode request body"""
+
         self.message:                    str = message
         self.encoding: _bm.Union[str, tuple] = encoding
     

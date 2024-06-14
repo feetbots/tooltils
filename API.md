@@ -1,4 +1,4 @@
-# <span style="font-family: Trebuchet MS;">tooltils – api | v1.7.2</span>
+# <span style="font-family: Trebuchet MS;">tooltils – api | v1.8.0</span>
 
 *<b>NOTE:</b> If a variable has a star sign in front of it, it can have a value of none*
 
@@ -14,11 +14,11 @@
 
 **Methods:**
 
-**`length(file)`** <br>
+**`waveLength(file)`** <br>
 Get the length of a wave file in seconds
 
 Parameters:
-- **`file`** str - Path to WAVE file
+- **`file`** str – Path to WAVE file
 
 Raisable exceptions:
 - **`TypeError`** – Input parameter type is incorrect
@@ -27,12 +27,12 @@ Raisable exceptions:
 
 Example:
 ```py
->>> length = tooltils.length('song.wav') # song.wav is 5.15 seconds long
->>> length
-5.15
+>>> path = tooltils.requests.download('https://file-examples.com/storage/fe0e2ce82f660c1579f31b4/2017/11/file_example_WAV_1MG.wav', write_binary=True).path
+>>> tooltils.waveLength(path)
+5.9
 ```
 
-Return type: **float** <br>
+Return type: **int | float** <br>
 Returns: **Length of file in seconds** <br><br>
 
 **`style(text)`** <br>
@@ -47,6 +47,7 @@ Parameters:
 - **`crossed`** bool = False – Whether to cross the text
 - **`underline`** bool = False – Whether to underline the text
 - **`double_underline`** bool = False – Whether to double underline the text
+- **`clear`** bool = True – Whether to append an empty escape sequence to the string to clear any formatting afterwards
 
 Raisable exceptions:
 - **`TypeError`** – Input parameter types are incorrect
@@ -55,7 +56,7 @@ Example:
 ```py
 >>> text = tooltils.style('Hello World!', 'red', True, True, True)
 >>> text # text value can be stored and doesn't have to be printed right away
-'\u001b[41;1;3mHello World!\u001b[0m' # raw ANSI style text
+'\x1b[41;1;3mHello World!\x1b[0m' # raw ANSI style text, \u001b is printed as \x1b
 ```
 
 Return type: **str** <br>
@@ -72,8 +73,7 @@ Raisable exceptions:
 
 Example:
 ```py
->>> texts = tooltils.halve('Hello World!')
->>> texts
+>>> tooltils.halve('Hello World!')
 ['Hello ', 'World!']
 ```
 
@@ -93,28 +93,29 @@ Raisable exceptions:
 
 Example:
 ```py
->>> text = tooltils.cipher('Hello World!', 8)
->>> text
+>>> ciphered = tooltils.cipher('Hello World!', 8)
 'PmttwvEwztlw'
+>>> tooltils.cipher(ciphered, -8)
+'Hello World!'
 ```
 
 Return type: **str** <br>
 Returns: **Ciphered text** <br><br>
 
-**`mstrip(text, values)`** <br>
-Change some text from a dictionary pair of values
+**`cstrip(text, values)`** <br>
+Change text based off a dictionary of values or a string of individual characters
 
 Parameters:
 - **`text`** str – Text to be changed
-- **`values`** dict – List of characters to change
+- **`values`** str | dict – List of characters to change
+- **`strict`** bool = True – Whether the characters should be capitalised the same
 
 Raisable exceptions:
 - **`TypeError`** – Input parameter types are incorrect
 
 Example:
 ```py
->>> text = tooltils.mstrip('Hello World!', {'Hell': 'Heaven', 'World': 'Earth'})
->>> text
+>>> tooltils.cstrip('Hello World!', {'Hell': 'Heaven', 'World': 'Earth'})
 'Heaveno Earth!'
 ```
 
@@ -127,7 +128,7 @@ Convert epoch to human formatted date
 Parameters:
 - **`epoch`** float = time.time() – Epoch in seconds to use
 - **`timezone`** str = ‘local’ – Timezone offset to use (e.g. ‘+11:00’, ‘local’ means your current timezone, ‘gm’ means no offset time)
-- **`format`** str = ‘standard’ – How to format the output date (‘standard’, ‘fancy’)
+- **`format`** int = 0 – How to format the output date (0=standard, 1=fancy, 2=programmer)
 
 Raisable exceptions:
 - **`TypeError`** – Input parameter types are incorrect
@@ -136,9 +137,14 @@ Raisable exceptions:
 
 Example:
 ```py
->>> date = tooltils.date(format='fancy')
->>> date
-'11:52 AM on the 3rd of January, 2024'
+>>> tooltils.date(format=0)
+'2024/04/06 01:11:52'
+>>> tooltils.date(format=1)
+'2:41 PM on the 5th of April, 2024'
+>>> tooltils.date(format=2)
+'Apr 6 2024, 04:32:09'
+>>> tooltils.date(timezone='-04:00', format=2)
+'Apr 5 2024, 13:32:09'
 ```
 
 Return type: **str** <br>
@@ -156,9 +162,12 @@ Raisable exceptions:
 
 Example:
 ```py
->>> epoch = tooltils.epoch('11:52 AM on the 3rd of January, 2024')
->>> epoch
+>>> tooltils.epoch('2024/04/06 01:11:52')
+1712326312
+>>> tooltils.epoch('11:52 AM on the 3rd of January, 2024')
 1704243120
+>>> tooltils.epoch('Apr 6 2024, 01:14:44')
+1712326484
 ```
 
 Return type: **int** <br>
@@ -176,8 +185,7 @@ Raisable exceptions:
 
 Example:
 ```py
->>> array = tooltils.squeeze(['', 'Hello World!', 'a bug', '', 'test'])
->>> array
+>>> tooltils.squeeze(['', 'Hello World!', 'a bug', '', 'test'])
 ['Hello World!', 'a bug', 'test']
 ```
 
@@ -196,8 +204,7 @@ Raisable exceptions:
 
 Example:
 ```py
->>> key = tooltils.reverseDictSearch({'hello': True, 'world': True, '!': False}, True)
->>> key
+>>> tooltils.reverseDictSearch({'hello': True, 'world': True, '!': False}, True)
 ('hello', 'world')
 ```
 
@@ -215,8 +222,7 @@ Raisable exceptions:
 
 Example:
 ```py
->>> values = tooltils.getArrayValues(['hello', ['world', {'hello world': ['hello']}, ['world']]])
->>> values
+>>> tooltils.getArrayValues(['hello', ['world', {'hello world': ['hello']}, ['world']]])
 ('hello', 'world', 'hello', 'world')
 ```
 
@@ -224,12 +230,13 @@ Return type: **tuple** <br>
 Returns: **All base-level values in the array** <br><br>
 
 **`timeTest(method)`** <br>
-Run a method with optional kwargs {accuracy} amount of times, sum then divide by {accuracy} for precise run time
+Run a method {accuracy} amount of times, sum then divide by {accuracy} for precise run time
 
 Parameters:
 - **`method`** function – The method to test
-- **`params`** dict = {} – Kwargs for the method
 - **`accuracy`** int = 10 – The amount of times to test the method
+- **`*args`** – Args for the method
+- **`*kwargs`** – Kwargs for the method
 
 Raisable exceptions:
 - **`TypeError`** – Input parameter types are incorrect
@@ -237,33 +244,14 @@ Raisable exceptions:
 
 Example:
 ```py
->>> time = tooltils.timeTest(tooltils.requests.get, {'url': 'httpbin.org/get'}, 20)
->>> time
-0.9137420050014043 # legitimate requests time test from feetbots' pc
+# with connection caching enabled
+# legitimate timings, updated each version release
+>>> tooltils.timeTest(tooltils.requests.get, 20, 'httpbin.org/get')
+0.9515502750007727
 ```
 
 Return type: **float** <br>
 Returns: **Average run-time the input method based on the accuracy** <br><br>
-
-**`varName(**vars)`** <br>
-Get the namespace name of one or more variables
-
-Parameters:
-- **`**vars`** dict – The variables to get the name for
-
-Example:
-```py
->>> data = 'Hello World!'
->>> name = tooltils.varName(data=data)
->>> name
-'data'
-```
-
-Raisable exceptions:
-- None
-
-Return type: **str | list[str]** <br>
-Returns: **Names of variables input** <br><br>
 
 **`tgzOpen(file)`** <br>
 Open a gzipped tar file
@@ -281,9 +269,8 @@ Raisable exceptions:
 
 Example:
 ```py
->>> path = tgzOpen('tooltils-v1.7.0.tar.gz')
->>> path
-'/Users/feetbots/Documents/projects/tooltils/tests/tooltils-v1.7.0'
+>>> tgzOpen('tooltils-v1.8.0.tar.gz')
+'/Users/feetbots/Documents/projects/tooltils/tests/tooltils-v1.8.0'
 ```
 
 Return type: **str** <br>
@@ -294,8 +281,8 @@ Sort an array by it's length
 
 Parameters:
 - **`array`** list | tuple | set | dict – The array object to sort
-- **`fromLowest`** = True – Whether to return the sorted object starting from the shortest item
-- **`sortByKey`** = False – Whether to sort by the keys of the array if it is a dictionary
+- **`fromLowest`** bool = True – Whether to return the sorted object starting from the shortest item
+- **`sortByKey`** bool = False – Whether to sort by the keys of the array if it is a dictionary
 
 Raisable exceptions:
 - **`TypeError`** – Input parameter types are incorrect
@@ -303,13 +290,134 @@ Raisable exceptions:
 
 Example:
 ```py
->>> array = lengthSort(['11111', '5', '44', '333', '2222'])
->>> array
+>>> lengthSort(['11111', '5', '44', '333', '2222'])
 ['5', '44', '333', '2222', '11111']
 ```
 
 Return type: **list | tuple | set | dict** <br>
 Returns: **Sorted input array** <br><br>
+
+**`dirVars(object)`** <br>
+Get all of the attributes of an object and store/print them formatted
+
+Parameters:
+- **`object`** object – The object to access all the attributes from
+- **`output`** bool = True – Whether to print out each formatted attribute value individually
+- **`includePythonFuncs`** bool = False – Whether to include the Python function attributes (ones beginning with **"_"**)
+- **`format`** str = ‘%(name)s: %(value)s\n’ – The format to use for each object attribute
+
+Raisable exceptions:
+- **`TypeError`** – Input parameter types are incorrect
+
+Example:
+```py
+>>> dirVars(tooltils.os.info)
+arch: arm64
+bitsize: 64
+boot_drive: /dev/disk3s3
+cores: 8
+cpu: Apple M1
+detailed_platform: Darwin
+interpreter: /Users/ebots/Documents/homebrew/bin/python3.12
+macOS_releases: {'10.0': 'Cheetah', '10.1': 'Puma', '10.2': 'Jaguar', '10.3': 'Panther', '10.4': 'Tiger', '10.5': 'Leopard', '10.6': 'Snow Leopard', '10.7': 'Lion', '10.8': 'Mountain Lion', '10.9': 'Mavericks', '10.10': 'Yosemite', '10.11': 'El Capitan', '10.12': 'Sierra', '10.13': 'High Sierra', '10.14': 'Mojave', '10.15': 'Catalina', '11': 'Big Sur', '12': 'Monterey', '13': 'Ventura', '14': 'Sonoma'}
+manufacturer: Apple Inc.
+model: MacBook Air
+name: ebots
+platform: MacOS
+platform_version: ('14.3.1', 'Sonoma')
+python_version: 3.12.1
+ram: 8192
+serial_number: PYTHON69420
+```
+
+Return type: **str | None** <br>
+Returns: **Nothing or the formatted text containing the object attributes** <br><br>
+
+**`subtractableList()`** <br>
+To create a list that can be subtracted from using an iterable that isn't a string or dictionary
+
+Inherits from:
+- **`list`** – Generic Python list data type
+
+Example:
+```py
+>>> list1 = subtractableList(['5', '4', '3', '2', '1', '1'])
+>>> list1 - ['3', '1', '2']
+['5', '4']
+```
+
+Return type: **tooltils.subtractableList** <br>
+Returns: **Custom subtractable list instance** <br><br>
+
+**`duplicateKeysDict()`** <br>
+Create a dictionary that allows for duplicate keys
+This class also implements some dunder and custom methods not present in the normal Python dict
+
+Parameters:
+- **`iterable`** Iterable | GeneratorType – The iterable to convert to a duplicate key dict
+
+Return methods:
+- **`.update(dictionary: dict)`** None – Update the dictionary from the elements of another dictionary or duplicate key dictionary
+- **`.pop(key: Any, amount: int=-1)`** None – 
+- **`.items()`** Generator – Return the dictionary as a key value tuple pair iterable
+- **`.keys()`** Generator – Return the keys of the dictionary
+- **`.values()`** Generator – Return the values of the dictionary
+- **`.copy()`** duplicateKeysDict – Shallow copy the dictionary
+- **`.shallow_copy()`** duplicateKeysDict – Shallow copy the dictionary
+- **`.deep_copy()`** duplicateKeysDict – Deep copy the dictionary (not thread safe and consumes more memory)
+- **`.clear()`** None – Empty the dictionary
+- **`.get(key: Any, default: Any=None)`** tuple | Any – Return the value(s) of the key in the dictionary, if not found, return default
+- **`.reverse()`** None – Reverse the dictionary
+- **`.flip()`** None – Flip the dictionary key and value pairs (k, v -> v, k)
+
+Raisable exceptions:
+- **`TypeError`** – Input parameter types are incorrect
+- **`ValueError`** – Input parameter types are invalid
+
+Features:
+- Allowing for multiple instances of the same key
+- Allowing the dictionary to be added or subtracted from another iterable or dict
+- Allowing the dictionary to be multiplied
+- Allowing for the dictionary to be accurately compared against in an equals statement
+- Allowing for the length of the dictionary to be accessed with the in-built Python `len()` method
+- Allowing the dictionary to be reversed using the in-built Python `reversed()` class
+- Allowing the dictionary to be subscripted (duplicateKeysDict['key'])
+- Allowing the dictionary to be iterated over in a loop
+- Allowing the dictionary to be used as kwargs in functions (print("Hello World!", **duplicateKeysDict))
+
+Example:
+```py
+>>> customDict = tooltils.duplicateKeysDict([("Key1", True), ("Key1", False), ("Key2", False)])
+>>> customDict
+{'Key1': True, 'Key1': False, 'Key2': False}
+>>> customDict['Key1']
+(True, False)
+>>> customDict['Key2']
+False
+>>> 'Key2' in customDict
+True
+>>> customDict - {'Key1': True}
+{'Key2': False}
+>>> len(customDict)
+3
+>>> customDict.pop('Key1', amount=1)
+>>> customDict
+{'Key1': False, 'Key2': False}
+>>> customDict.items()
+<generator object duplicateKeysDict.items.<locals>.<genexpr> at 0x1054d04c0>
+>>> customDict.flip()
+>>> customDict
+{False: 'Key1', False: 'Key2'}
+>>> customDict.clear()
+>>> customDict
+{}
+>>> customDict.update({True: False})
+>>> customDict
+{True: False}
+```
+
+Return type: **tooltils.duplicateKeysDict** <br>
+Returns: **Custom duplicate key dictionary instance** <br><br>
 
 **`interpreter(file)`** <br>
 Custom top-level Python interpreter to add useful typing features
@@ -336,7 +444,7 @@ Raisable exceptions:
 - **`FileExistsError`** – Output file exists already
 - **`FileNotFoundError`** – Problem locating output file
 
-Current features:
+Features:
 - **Ternary Operations** – Javascript like ternary operators
 - **JS Comments** – Javascript like comments using `//` as a prefix
 
@@ -367,7 +475,7 @@ Returns: **Interpreter instance** <br><br>
 
 ## <span style="font-family: Trebuchet MS;">info</span>
 
-*General installation information*
+*Installation information and management*
 
 Properties:
 - **`author`** str – The current owner of tooltils
@@ -397,12 +505,6 @@ Parameters:
 Raisable exceptions:
 - **`ValueError`** – Input parameter is invalid
 
-Example:
-```py
->>> tooltils.info.clearCache()
-None # cache json file in storage has been reset to default
-```
-
 Return type: **None** <br>
 Returns: **Nothing** <br><br>
 
@@ -415,12 +517,6 @@ Parameters:
 Raisable exceptions:
 - **`ValueError`** – Input parameter is invalid
 
-Example:
-```py
->>> tooltils.info.clearConfig()
-None # config json file in storage has been reset to default
-```
-
 Return type: **None** <br>
 Returns: **Nothing** <br><br>
 
@@ -432,12 +528,6 @@ Parameters:
 
 Raisable exceptions:
 - None
-
-Example:
-```py
->>> tooltils.info.clearData()
-None # the cache and config json files have been reset to the default
-```
 
 Return type: **None** <br>
 Returns: **Nothing** <br><br>
@@ -458,30 +548,34 @@ Example:
 ```py
 >>> tooltils.info.deleteData()
 None # the .tooltils folder has been deleted
+>>> tooltils.info.deleteData(pyv='3.12')
+None # the tooltils data folders under the Python version 3.12 have been deleted
+>>> tooltils.info.deleteData(tsv='1.8.0')
+None # the tooltils data folders under the tooltils version 1.8.0 have been deleted (in every Python version folder)
+>>> tooltils.info.deleteData(pyv='3.12', tsv='1.8.0')
+None # the tooltils data folders under the python version 3.12 and tooltils version 1.8.0 have been deleted
 ```
 
 Return type: **None** <br>
 Returns: **Nothing** <br><br>
 
 **`logger()`** <br>
-Create a logging instance for tooltils modules only
+Initialise a specialised logger for Tooltils
 
 Parameters:
 - **`module`** str = ‘ALL’ – The name of module to initiliase logging for
-- **`level`** str | int | LoggingLevel = ‘ALL’ – The starting level of the logging range
-- **`level2`** str | int | LoggingLevel = ‘ALL’ – The ending level of the logging range
+- **`level`** str | int = ‘ALL’ – The starting level of the logging range
+- **`level2`** str | int = ‘ALL’ – The ending level of the logging range
 
 Return properties:
 - **`module`** str – The name of module logging is initiliased for
-- **`level`** str | int | LoggingLevel – The starting level of the logging range
-- **`level2`** str | int | LoggingLevel – The ending level of the logging range
+- **`level`** int – The starting level of the logging range
+- **`level2`** int – The ending level of the logging range
 - **`enabled`** bool – Whether the logging instance is enabled
-- **`closed`** bool – Whether the logging instance has been closed
 
 Return methods:
 - **`enable()`** – Enable the logger instance
 - **`disable()`** – Disable the logger instance
-- **`close()`** – Close the logger instance
 
 Raisable exceptions:
 - **`TypeError`** – Input parameter types are incorrect
@@ -490,17 +584,18 @@ Raisable exceptions:
 Example:
 ```py
 >>> logger = tooltils.info.logger()
-[01:11:56] [tooltils.info/DEBUG]: Initiated logger for <tooltils> with range DEBUG -> CRITICAL
+[07:00:14] [tooltils.info.logger() | DEBUG]: Initiated logger for <all> with range DEBUG -> CRITICAL
 >>> logger
-<Logger instance: [on] -> [TOOLTILS]>
+<Logger instance: [on] -> [all]>
 >>> req = tooltils.requests.get('httpbin.org/get')
-[01:14:01] [tooltils.requests/DEBUG]: Setting up https/1.1 GET request to <httpbin.org:443>
-[01:14:01] [tooltils.requests/DEBUG]: Sending headers: {'Connection': 'close', 'User-Agent': 'Python-tooltils/1.7.0', 'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate'}
-[01:14:02] [tooltils.requests/DEBUG]: Request response body was not gzipped
-[01:14:02] [tooltils.requests/DEBUG]: Server replied with [200 OK]
-[01:14:02] [tooltils.requests/DEBUG]: Connection to server has been discarded
+[07:00:14] [tooltils.requests.request() | DEBUG | R0]: Setting up https/1.1 GET request to <httpbin.org:443>
+[07:00:16] [tooltils.requests.request().send() | DEBUG | R0]: The connection was opened
+[07:00:16] [tooltils.requests.request().send() | DEBUG | R0]: Sending request
+[07:00:16] [tooltils.requests.request().send() | DEBUG | R0]: Request response body was not gzipped
+[07:00:16] [tooltils.requests.request().send() | DEBUG | R0]: Obtained request response from server
+[07:00:16] [tooltils.requests.request().send() | DEBUG | R0]: The connection was closed
 >>> req
-<GET httpbin.org [200]>
+<GET httpbin.org/get [200]>
 ```
 
 Return type: **tooltils.info.logger** <br>
@@ -553,7 +648,7 @@ Goodbye! # current thread code execution stops
 ```
 
 Return type: **NoReturn** <br>
-Returns: **Nothing** <br><br>
+Returns: **Nothing / Doesn't return** <br><br>
 
 **`clear()`** <br>
 Clear the terminal history
@@ -563,11 +658,6 @@ Parameters:
 
 Raisable exceptions:
 - None
-
-Example:
-```py
->>> tooltils.os.clear() # terminal history cleared
-```
 
 Return type: **None** <br>
 Returns: **None** <br><br>
@@ -581,7 +671,7 @@ Parameters:
 - **`timeout`** int | float = 10 – How long the command/program should last before cancelling
 - **`check`** bool = False – Whether to raise an error if the returncode is not 0
 - **`capture`** bool = True – Whether to capture the output of the command/program
-- **`print`** bool = True – Whether command/program can print to stdout
+- **`output`** bool = True – Whether command/program can print to stdout
 
 Return properties:
 - **`cmds`** str | list | tuple – Command/programs that were called
@@ -589,7 +679,7 @@ Return properties:
 - **`timeout`** int | float – How long the command/program should last before cancelling
 - **`check`** bool – Whether to raise an error if the returncode is not 0
 - **`capture`** bool – Whether to capture the the output of the command/program
-- **`print`** bool – Whether command/program can print to stdout
+- **`output`** bool – Whether command/program can print to stdout
 - **`code`** int – Exit code of command/program
 - **`raw`** bytes – Raw bytes text of stdout output
 - **`text`** str – String containing text of stdout output
@@ -665,7 +755,7 @@ Parameters:
 - **`shell`** bool = False – Whether to use the shell (sh)
 - **`timeout`** int | float = 10 – How long the process should last
 - **`check`** bool = False – Whether to raise an error if the returncode is not 0
-- **`print`** bool = True – Whether command/program can print to stdout
+- **`output`** bool = True – Whether command/program can print to stdout
 
 Raisable exceptions:
 - **`TypeError`** – Input parameter types are incorrect
@@ -703,11 +793,9 @@ Supported:
 
 Example:
 ```py
->>> ids = tooltils.os.pID('chrome')
->>> ids
+>>> tooltils.os.pID('chrome')
 (30716, 22172, 4884, 3696, 26024, 29140)
->>> ids = tooltils.os.pID('chrome', strict=True)
->>> ids
+>>> tooltils.os.pID('chrome', strict=True)
 ()
 ```
 
@@ -732,8 +820,7 @@ Supported:
 
 Example:
 ```py
->>> name = tooltils.os.getCurrentWifiName()
->>> name
+>>> tooltils.os.getCurrentWifiName()
 'NetComm 9055'
 ```
 
@@ -764,9 +851,13 @@ Raisable exceptions:
 
 Example:
 ```py
->>> ctx = tooltils.requests.ctx()
->>> ctx
+>>> tooltils.requests.ctx()
 <ssl.SSLContext object at 0x00000206D4E30FD0>
+>>> ctx = tooltils.requests.ctx(verify=False)
+>>> ctx.check_hostname
+False
+>>> ctx.verify_mode
+0 # ssl.CERT_NONE
 ```
 
 Return type: **ssl.SSLContext** <br>
@@ -782,13 +873,6 @@ Parameters:
 
 Raisable exceptions:
 - None
-
-Example:
-```py
->>> status = tooltils.requests.connected()
->>> status
-True
-```
 
 Return type: **bool** <br>
 Returns: **The result of the internet test** <br><br>
@@ -808,8 +892,7 @@ Raisable exceptions:
 
 Example:
 ```py
->>> url = tooltils.requests.prep_url('httpbin.org/get/')
->>> url
+>>> tooltils.requests.prep_url('http://httpbin.org/get/', https=True)
 'https://httpbin.org/get'
 ```
 
@@ -848,13 +931,6 @@ Parameters:
 Raisable exceptions:
 - None
 
-Example:
-```py
->>> status = tooltils.requests.verifiable()
->>> status
-True # connected to a normal private home wifi
-```
-
 Return type: **bool** <br>
 Returns: **Whether requests can use a valid ssl certificate** <br><br>
 
@@ -874,13 +950,6 @@ Return properties:
 Raisable exceptions:
 - **`TypeError`** – Input parameter types are incorrect
 - **`ValueError`** – Input parameter type is invalid
-
-Example:
-```py
->>> advancedContext = tooltils.requests.advancedContext()
->>> advancedContext
-<tooltils.requests.advancedContext object at 0x00000249B35617F0>
-```
 
 Return type: **tooltils.requests.advancedContext** <br>
 Returns: **Advanced requesting context class** <br><br>
@@ -929,13 +998,17 @@ Raisable exceptions:
 
 Example:
 ```py
->>> import http
->>> conn = http.client.HTTPSConnection('httpbin.org')
->>> conn.send('GET', '')
+# note that tooltilsResponse is not intended to be called directly
+# but is structured like this to look nice in a Pylinter
+>>> from http.client import HTTPSConnection
+>>> conn = HTTPSConnection('httpbin.org')
+>>> conn.send('GET', '/get')
 >>> data = conn.getresponse()
->>> resp = tooltils.requests.tooltilsResponse(data, 'httpbin.org', 'GET')
+>>> resp = tooltils.requests.tooltilsResponse(data, 'httpbin.org/get', 'GET')
 >>> resp.status_code
 '200 OK'
+>>> resp.headers
+{'Date': 'Fri, 05 Apr 2024 18:03:16 GMT', 'Content-Type': 'application/json', 'Content-Length': '314', 'Connection': 'close', 'Server': 'gunicorn/19.9.0', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': 'true'}
 ```
 
 Return type: **tooltils.requests.tooltilsResponse** <br>
@@ -1215,7 +1288,229 @@ Return methods:
         - **`ValueError`** – The input pos was bigger than the length of the request response body or it was smaller than zero
     - **`.close()`** None - This method does nothing and only exists for cross compatibility
   - **Raisable Exceptions**:
-    - **`tooltils.errors.InvalidRequestURL`** – The specificed URL could not be used to make a valid request
+    - **`tooltils.errors.InvalidRequestURL`** – The specified URL could not be used to make a valid request
+    - **`tooltils.errors.ConnectionError`** – General connection failed error
+    - **`tooltils.errors.ActiveRequestError`** – The request returned malformed data
+    - **`tooltils.errors.SSLCertificateFailed`** – Unable to verify SSL certificate
+    - **`tooltils.errors.StatusCodeError`** – HTTP error status code response
+    - **`tooltils.errors.InvalidWifiConnection`** – No valid internet connection present
+    - **`tooltils.errors.ConnectionTimeoutExpired`** – Connection timed out
+    - **`tooltils.errors.RequestRedirectError`** – Requested url redirected too many times or entered a redirect loop
+    - **`tooltils.errors.RequestCodecError`** – None of the specified codecs were able to decode the response received from the server
+
+Raisable exceptions:
+- **`TypeError`** – Input parameter types are incorrect
+- **`ValueError`** – Input parameter types are invalid
+- **`FileNotFoundError`** – Unable to locate input parameter file argument
+- **`FileExistsError`** – Output file already exists
+- **`tooltils.errors.InvalidRequestURL`** – The specified URL could not be used to make a valid request
+- **`tooltils.errors.ConnectionError`** – General connection failed error
+- **`tooltils.errors.ActiveRequestError`** – The request returned malformed data
+- **`tooltils.errors.SSLCertificateFailed`** – Unable to verify SSL certificate
+- **`tooltils.errors.StatusCodeError`** – HTTP error status code response
+- **`tooltils.errors.InvalidWifiConnection`** – No valid internet connection present
+- **`tooltils.errors.ConnectionTimeoutExpired`** – Connection timed out
+- **`tooltils.errors.RequestRedirectError`** – Requested url redirected too many times or entered a redirect loop
+- **`tooltils.errors.RequestCodecError`** – None of the specified codecs were able to decode the response received from the server
+
+Example:
+```py
+>>> req = tooltils.requests.request('httpbin.org/basic-auth/user/pass', 'GET', auth=('user', 'pass'),
+                                    mask=True, proxy='localhost:12345') # this assumes you have a server set up on localhost at port 12345
+>>> req
+<GET httpbin.org [Unsent]>
+>>> data = req.send()
+>>> req
+<GET httpbin.org [200]>
+>>> req.redirected
+False
+>>> data.status_code
+'200 OK'
+>>> data.reason
+'OK'
+>>> data.code
+200
+>>> data.json
+{'authenticated': True, 'user': 'user', ...}
+>>> data.rdata
+<http.client.HTTPResponse object at 0x0000016E67467A60>
+```
+
+Return type: **tooltils.requests.request** <br>
+Returns: **A request class** <br><br>
+
+*The http method functions do not include the `file_name`, `write_binary` or `override` parameters unless otherwise specified*
+
+<br>
+
+**`get(url)`** <br>
+Send a GET request
+
+*Calls `request(method='GET', ...).send()` and returns the result*
+
+<br>
+
+**`post(url)`** <br>
+Send a POST request
+
+*Calls `request(method='POST', ...).send()` and returns the result*
+
+<br>
+
+**`download(url)`** <br>
+Download a file onto the disk
+
+*Calls `request(method='DOWNLOAD', ...).send()` and returns the result* <br>
+*This uses the `file_name`, `write_binary` and `override` parameters aswell as any request ones*
+
+<br>
+
+**`head(url)`** <br>
+Send a HEAD request
+
+*Calls `request(method='HEAD', ...).send()` and returns the result*
+
+<br>
+
+**`put(url)`** <br>
+Send a PUT request
+
+*Calls `request(method='PUT', ...).send()` and returns the result*
+
+<br>
+
+**`patch(url)`** <br>
+Send a PATCH request
+
+*Calls `request(method='PATCH', ...).send()` and returns the result*
+
+<br>
+
+**`options(url)`** <br>
+Send an OPTIONS request
+
+*Calls `request(method='OPTIONS', ...).send()` and returns the result*
+
+<br>
+
+**`trace(url)`** <br>
+Send a TRACE request
+
+*Calls `request(method='TRACE', ...).send()` and returns the result* <br>
+*This function does not use the `data` or `cookies` arguments, see [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html#name-trace)*
+
+<br>
+
+**`delete(url)`** <br>
+Send a DELETE request
+
+*Calls `request(method='DELETE', ...).send()` and returns the result*
+
+<br><br>
+
+## <span style="font-family: Trebuchet MS;">requests.urllib</span>
+
+*HTTP/1.1 simple interface - `urllib.request`*
+
+Properties:
+- **`defaultVerificationMethod`** bool – The config value for the verify parameter in request methods
+
+Methods:
+
+**`request(url, method)`** <br>
+Open a single-use connection to a URL
+
+Parameters:
+- **`url`** str – URL to send the request to
+- **`method`** str – The http method to use in the request (GET, POST, DOWNLOAD, HEAD, PUT, PATCH, OPTIONS, TRACE, DELETE)
+- **`port`** int = (443 if https else 80) – The port to send the request on
+- **`https`** bool = True – Whether https should be used in the request
+- **`verify`** bool = `config.defaultVerificationMethod` – Whether to verify the request using a certificate
+- **`redirects`** bool = True – Whether to allow redirects
+- **`redirect_loops`** bool = False – Whether to allow redirect looping
+- **`auth`** tuple = None – Authentication in a username password tuple format
+- **`data`** dict = None – JSON data to send with the request
+- **`headers`** dict = None – Headers to add to the request (Overwrites defaults if the same are present)
+- **`cookies`** dict = None – Cookies to include in the headers
+- **`cert`** str = None – Path to certificate.pem file (Will use default if None)
+- **`file_name`** str = None – Path to download the file (Will use URL file name if None)
+- **`write_binary`** bool = False – Whether to write the downloaded file as binary
+- **`override`** bool = False – Whether the output file should be overrid
+- **`timeout`** int | float = 15 – How long the request should last in seconds before it should be terminated
+- **`encoding`** str | tuple = (‘utf-8’, ‘ISO-8859-1’) – Codec(s) to use to decode the response text
+- **`mask`** bool = False – Whether to use an anonymous user agent header (firefox's user agent)
+- **`agent`** str = None – Overwrite for the agent header
+- **`proxy`** str = None – The proxy to send the request on
+- **`advContext`** tooltils.requests.advancedContext = None – A tooltils advanced context class
+
+Return properties:
+- **`url`** str – The URL that the request was sent to
+- **`method`** str – The http method used in the request
+- **`port`** int – The port the request was sent on
+- **`https`** bool – Whether https was used with the request
+- **`verify`** bool – Whether the request was verified with a certificate
+- **`redirects`** bool – Whether the requested URL was allowed to redirect the request
+- **`redirect_loops`** bool = False – Whether the requested URL was allowed to loop redirects recursively
+- **`*auth`** tuple – Authentication used in the request
+- **`*data`** dict – JSON data that was sent with the request
+- **`headers`** dict – The headers sent as the configuration of the request
+- **`cookies`** dict – Cookies that were sent with the request
+- **`cert`** str – Path to certificate.pem file (Will use default if None)
+- **`*file_name`** str – Path to download the file (Will use URL file name if None)
+- **`write_binary`** bool – Whether to write the downloaded file as binary
+- **`override`** bool – Whether the output file should be overrid
+- **`timeout`** int | float – How long the request lasts in seconds before it should be terminated
+- **`encoding`** str | tuple – Codec(s) used to decode the response text
+- **`mask`** bool – Whether the user agent header was anonymised
+- **`*agent`** str – The overwritten agent header for the request
+- **`*proxy`** str – The proxy that was used to send the request on
+- **`*advContext`** tooltils.requests.advancedContext – A tooltils advanced context class
+- **`sent`** bool – Whether the request has been sent
+- **`rID`** int – The ID for the current connection
+- **`redirected`** bool – Whether the request was redirected
+- **`redirectLimit`** int – The amount of redirects the url can make before an exception is raised
+- **`extraLogs`** bool – If extra detailed logs should be output
+- **`*SSLContext`** ssl.SSLContext – A custom SSLContext instance
+
+Return methods:
+- **`.send()`** – Send the request to the url – *Details*:
+  - **Return Properties**:
+    - **`code`** int – The status code of the request
+    - **`reason`** str – The reason of the request's status code
+    - **`status_code`** str – The status code and reason of the request combined
+    - **`*text`** str – The text of the request response
+    - **`*raw`** bytes – The raw, encoded text of the request response
+    - **`*json`** dict – The json of the request response containing all the data
+    - **`*path`** str – The path of the downloaded file (if the method was DOWNLOAD)
+    - **`rdata`** http.client.HTTPResponse – The http base response class containing all the data read
+    - **`end_data**`** class – Information that was sent in the request but not returned – *Properties*:
+      - **`url`** str – The url that was requested
+      - **`*sent_headers`** dict[str, str] – The headers that were sent in the request
+      - **`*agent`** str – The User-Agent of the request headers that were sent
+    - **`.read()`** bytes – Read the request file and return the raw data
+    - **`.readlines()`** list[str] – Read the request file and return the data as a list split at every newline
+  - **Return Methods**:
+    - **`.read()`** bytes – Read the request response body or up to amt bytes – *Details*:
+      - **Parameters**:
+        - **`amt`** int = None – The length of data to read (will read whole body if None)
+      - **Raisable Exceptions**:
+        - **`TypeError`** – Input parameter type is incorrect
+        - **`ValueError`** – The input amt was bigger than the length of the request response body
+    - **`.readlines()`** list[str] - Read the request response body or up to amt bytes and return as a list split at every newline – *Details*:
+      - **Parameters**:
+        - **`amt`** int = None – The length of data to read (will read whole body if None)
+      - **Raisable Exceptions**:
+        - **`TypeError`** – Input parameter type is incorrect
+        - **`ValueError`** – The input amt was bigger than the length of the request response body
+    - **`.seek(pos)`** None - Read the request response body or up to amt bytes and return as a list split at every newline – *Details*:
+      - **Parameters**:
+        - **`pos`** int = None – The position of the request response body to go to
+      - **Raisable Exceptions**:
+        - **`TypeError`** – Input parameter type is incorrect
+        - **`ValueError`** – The input pos was bigger than the length of the request response body or it was smaller than zero
+    - **`.close()`** None - This method does nothing and only exists for cross compatibility
+  - **Raisable Exceptions**:
+    - **`tooltils.errors.InvalidRequestURL`** – The specified URL could not be used to make a valid request
     - **`tooltils.errors.ConnectionError`** – General connection failed error
     - **`tooltils.errors.ActiveRequestError`** – The request returned malformed data
     - **`tooltils.errors.SSLCertificateFailed`** – Unable to verify SSL certificate
@@ -1332,148 +1627,6 @@ Send a TRACE request
 Send a DELETE request
 
 *Calls `request(method='DELETE', ...).send()` and returns the result*
-
-<br><br>
-
-## <span style="font-family: Trebuchet MS;">requests.urllib</span>
-
-*Internet requesting access methods - `urllib.request` version*
-
-Properties:
-- **`status_codes`** dict – List of official valid HTTP response status codes (100-511)
-- **`defaultVerificationMethod`** bool – The config value for the verify parameter in request methods
-
-Methods:
-
-**`NoRedirects()`** <br>
-An opener to prevent redirects in urllib requests
-
-**You can install this as an opener to use in urllib to prevent redirects by the requested url**
-
-Example:
-- *See lines 197-201 in `tooltils.requests.urllib.py`*
-
-<br>
-
-**`request(url, method)`** <br>
-Initiate and send a request to a url
-
-Parameters:
-- **`url`** str – URL to send the request to
-- **`method`** str – The http method to make the request with
-- **`auth`** tuple = None – Authentication in a username password pair
-- **`data`** dict = None – JSON data to send with the request
-- **`headers`** dict = None – Headers to add to the request (Overwrites defaults if the same are present)
-- **`cookies`** dict = None – Cookies to include in the headers
-- **`cert`** str = None – Path to certificate.pem file (Will use default if None)
-- **`file_name`** str = None – Path to download the file (Will use URL file name if None)
-- **`timeout`** int = 10 – When to terminate the request
-- **`encoding`** str = ‘utf-8’ – Codec used to decode the response text
-- **`mask`** bool = False – Decide whether to use an anonymous user agent header
-- **`agent`** str = None – Overwrite for the agent header
-- **`verify`** bool = `config.defaultVerificationMethod` – Whether to check the hostname and verify the request
-- **`redirects`** bool = True – Whether to allow redirects
-- **`override`** bool – Whether the output file should be overrid if the request method is **"DOWNLOAD"**
-
-Return properties:
-- **`verified`** bool – Whether the request was verified with SSL
-- **`port`** int = 443 – The port used to send the request on
-- **`https`** bool = True - Whether https was used for the request
-- **`redirects`** bool – Whether url redirects are enabled
-- **`mask`** bool – Whether the user agent header should be replaced with a more conventional one (firefox browser)
-- **`method`** str – The method used in the request
-- **`*data`** dict – Data to send with the request
-- **`*cookies`** dict – Cookies to include in the request header
-- **`*cert`** str – The location of the certificate used in the request
-- **`*auth`** tuple – The authentication of the request [user pass tuple pair] (none if not specified)
-- **`timeout`** int – The amount of seconds the request should last for before being terminated
-- **`*file_name`** str – The name and directory of the file if the download method is being used
-- **`agent`** str – The user agent to send in the headers of the request
-- **`headers`** dict – The data sent as the configuration of the request
-- **`encoding`** str – The text encoding to use when decoding the response text
-- **`url`** str – The configured url used to sent the request to
-- **`override`** bool – Whether the output file was overrid if the request method was **"DOWNLOAD"**
-- **`sent`** bool – Whether the request has been used
-- **`code`** int – The status code of the request
-- **`reason`** str – The reason of the request's status code
-- **`status_code`** str – The status code and reason of the requets combined
-- **`*text`** str – The text of the request response
-- **`*raw`** bytes – The encoded text of the request response
-- **`*html`** str – The html of the request url
-- **`*path`** str – The output path of the file if the download method was used
-- **`*json`** dict – The json of the request response containing all the data
-- **`rdata`** http.client.HTTPResponse – The http base response class containing all the data read
-
-Return methods:
-- **`.send()`** <i>self</i> – Send the request to the url
-- **`.read()`** – Read the request file and return the raw data
-- **`.readlines()`** list – Read the request file and return the data as a list split at every newline
-
-Raisable exceptions:
-- **`TypeError`** – Input parameter types are incorrect
-- **`ValueError`** – Input parameter type is invalid
-- **`FileNotFoundError`** – Unable to locate input parameter file argument
-- **`FileExistsError`** – Output file already exists
-- **`tooltils.errors.InvalidRequestURL`** – The specificed URL could not be used to make a valid request
-- **`tooltils.errors.ConnectionError`** – General connection failed error
-- **`tooltils.errors.SSLCertificateFailed`** – Unable to verify SSL certificate
-- **`tooltils.errors.StatusCodeError`** – HTTP error status code response
-- **`tooltils.errors.InvalidWifiConnection`** – No valid internet connection present
-- **`tooltils.errors.ConnectionTimeoutExpired`** – Connection timed out
-
-Example:
-- There is not another example for this method because the simplistic request interface is the same
-
-Return type: **tooltils.requests.urllib.request** <br>
-Returns: **A request class** <br><br>
-
-**`get(url)`** <br>
-Send a GET request
-
-*Calls `.requests.urllib.request(method='GET', ...).send()` and returns the result*
-
-<br><br>
-
-**`post(url)`** <br>
-Send a POST request
-
-*Calls `.requests.urllib.request(method='POST', ...).send()` and returns the result*
-
-<br><br>
-
-**`download(url)`** <br>
-Download a file onto the disk
-
-*Calls `.requests.urllib.request(method='DOWNLOAD', ...).send()` and returns the result* <br>
-*This uses the `file_name` and `override` parameters aswell as any request ones*
-
-<br><br>
-
-**`head(url)`** <br>
-Send a HEAD request
-
-*Calls `.requests.urllib.request(method='HEAD', ...).send()` and returns the result*
-
-<br><br>
-
-**`put(url)`** <br>
-Send a PUT request
-
-*Calls `.requests.urllib.request(method='PUT', ...).send()` and returns the result*
-
-<br><br>
-
-**`patch(url)`** <br>
-Send a PATCH request
-
-*Calls `.requests.urllib.request(method='PATCH', ...).send()` and returns the result*
-
-<br><br>
-
-**`delete(url)`** <br>
-Send a DELETE request
-
-*Calls `.requests.urllib.request(method='DELETE', ...).send()` and returns the result*
 
 <br><br>
 
@@ -1669,22 +1822,6 @@ Returns:
 - Message with name: **"Unable to locate program or shell command '<i>[name]</i>'"**
 - Specified Message <br><br>
 
-**`TooltilsOSInfoError`** <br>
-Base class for tooltils.os.info module specific errors
-
-Parent class: `TooltilsOSError` <br>
-
-Parameters:
-- **`message`** str = ‘’ – The text to print instead of the default message
-
-Return properties:
-- **`message`** str – The text to print instead of the default message
-
-Return type: **str** <br>
-Returns:
-- Default Message: **"A tooltils.os.info error occured"**
-- Specified Message <br><br>
-
 **`TooltilsRequestsError`** <br>
 Base class for tooltils.requests module specific errors
 
@@ -1699,6 +1836,22 @@ Return properties:
 Return type: **str** <br>
 Returns:
 - Default Message: **"A tooltils.requests error occured"**
+- Specified Message <br><br>
+
+**`RequestError`** <br>
+Base class for requesting specific errors
+
+Parent class: `TooltilsRequestsError` <br>
+
+Parameters:
+- **`message`** str = ‘’ – The text to print instead of the default message
+
+Return properties:
+- **`message`** str – The text to print instead of the default message
+
+Return type: **str** <br>
+Returns:
+- Default Message: **"A requesting error occured"**
 - Specified Message <br><br>
 
 **`ActiveRequestError`** <br>
@@ -1867,25 +2020,26 @@ Returns:
 The default structure for the config is as follows:
 
 ```json
-"errors": {},
 "global": {
-    "disableConfigMethodValues": false,
-    "configMethodCheck": 20
-},
-"info": {
+    "loggingFormat": "[\u001b[3;1m%(time)s\u001b[0m] [\u001b[5;1m%(module)s.%(caller)s\u001b[0m | \u001b[3;1m%(level)s\u001b[0m%(rID)s]: %(message)s",
+    "loggingTimeFormat": "%H:%M:%S",
     "disableOnlineContentFetch": false,
+    "disableConfigMethodValues": true,
+    "configMethodCheck": 20,
+    "lazyLoading": true
 },
 "main": {},
+"info": {},
+"os": {},
 "requests": {
     "defaultVerificationMethod": true,
     "verifiableCachingCheck": 20,
     "connectedCachingCheck": 20,
-    "verifiableCaching": false,
+    "verifiableCaching": true,
     "connectedCaching": false,
     "redirectLimit": 20
 },
-"sys.info": {},
-"sys": {}
+"errors": {}
 ```
 
 <br>
@@ -1904,6 +2058,139 @@ The above example sets the verify parameter default in `requests` methods to the
 
 ```jsonc
 "requests": {
-    "defaultVerificationMethod": "$f tooltils.sys.getCurrentWifiName()" // tooltils function
+    "defaultVerificationMethod": "$f tooltils.sys.getCurrentWifiName()"
 }
 ```
+
+**Logging format**
+
+The default format is a garbled mess, but it can be broken into 3 main components:
+- Text styling (escape characters)
+- Modulus operator formatting
+- Plain text
+
+**Text Styling:** <br>
+The symbols as seen by **"\u001b"**, is an ANSI escape sequence, this one in particular being used to escape text. An opening square bracket follows, then the style codes, each seperated by a semicolon, then the character **"m"** to indicate the end of the escape sequence. Any text that follows this escape sequence will be styled accordingly. Note that the escape sequence will not clear itself, you will have to print another one like this **"\u001b[0m"** to clear any text formatting.
+
+Example: 
+- **"\u001b[1;3mtext"** – This string would be printed as: ***text***
+- **"\u001b[31;1mtext"** – This string would be printed as: <span style="color:red;font-weight:bold;">text</span> (Unfortunately github doesn't support colours in markdown, so imagine it is red)
+
+**Modulus Operator Formatting:** <br>
+In Python, there is a feature where you can format strings, with custom name specifiers to signify different items. This is especially useful as it is able to be created from user input, allowing for boundless use of these format specifiers.
+They are created by initiating with a percent sign, then an opening bracket, the name of the specifier, a closing bracket, then the character **"s"**.
+
+Example:
+- `var = '%(text)s' % {"text": "Hello World!"}`, the variable `var` would become **"Hello World!"**, and if the format specifier was not in the string, no error would be raised and the variable `var` would be empty.
+
+**Plain text:** <br>
+The text within the format string that does not match the categories listed above, this is just general formatting that will be printed as is to the stream.
+
+Example:
+- Square brackets surrounding formatting text to indicate stuff like the time and seperate it as a component of the logging message.
+
+## <span style="font-family: Trebuchet MS;">CLI</span>
+
+**General Information**
+
+The CLI can be used by calling the module directly through the Python interpreter.
+`python -m tooltils`
+
+<br>
+
+*There are 9 commands currently:* <br><br>
+
+**`help`** <br>
+Show a list of commands or details of a specific command
+
+Aliases: `commands`
+
+Arguments:
+- `-c` – Show details for a specific command, not required, must be type **str**
+
+<br>
+
+**`info`** <br>
+Print installation information or a specific value
+
+No aliases
+
+Arguments:
+- `-v` – Print a specific information variable, not required, must be type **str**
+
+<br>
+
+**`cache`** <br>
+Show the cache data
+
+No aliases
+
+No arguments
+
+<br>
+
+**`config`** <br>
+Show the config data
+
+No aliases
+
+No arguments
+
+<br>
+
+**`clearCache`** <br>
+Clear the cache data
+
+No aliases
+
+No arguments
+
+<br>
+
+**`clearConfig`** <br>
+Clear the config data
+
+No aliases
+
+No arguments
+
+<br>
+
+**`clearData`** <br>
+Clear the cache and config data
+
+No aliases
+
+No arguments
+
+<br>
+
+**`deleteData`** <br>
+Delete the data files
+
+No aliases
+
+Arguments:
+- `-pyv` – The Python version to delete the data for, not required, must be type **str**
+- `-tsv` – The Tooltils version to delete the data for, not required, must be type **str**
+
+<br>
+
+**`configEdit`** <br>
+Edit a config table
+
+No aliases
+
+Arguments:
+- `-loggingFormat` – The log output format, not required, must be type **str**
+- `-loggingTimeFormat` – The log output time format, not required, must be type **str**
+- `-disableOnlineContentFetch` – Whether to disable accessing the license and readme on startup, not required, must be type **bool**
+- `-disableConfigMethodValues` – Whether to disable the config method value system, not required, must be type **bool**
+- `-configMethodCheck` – How many times for each startup to wait until checking the config method value again, not required, must be type **int**
+- `-lazyLoading` – Whether to import all of the standard modules required on code run, not required, must be type **bool**
+- `-defaultVerificationMethod` – The default verification value for requests, not required, any type
+- `-verifiableCachingCheck` – How many calls of the verifiable method before checking the result again, not required, must be type **int**
+- `-connectedCachingCheck` – How many calls of the connected method before checking the result again, not required, must be type **int**
+- `-verifiableCaching` – Whether caching is enabled for the verifiable method, not required, must be type **bool**
+- `-connectedCaching` – Whether caching is enabled for the connected method, not required, must be type **bool**
+- `-redirectLimit` – How many times a request can redirect before an exception is raised, not required, must be type **int**

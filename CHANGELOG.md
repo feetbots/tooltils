@@ -1,5 +1,155 @@
 # Version History
 
+## 1.8.0 (14/6/2024)
+
+THE biggest update yet
+
+<br><br>
+
+**Major Changes:**
+- Python imports are now lazy loaded, this should give a much faster import time for Tooltils and decrease the python cache file size
+- Brought the requests.urllib module up to the state of the normal requests module and added some new features to the requests.urllib module
+- Fixed some requests bugs and improved logging and redirects for requesting
+- Maintenence and optimisation
+- Logging is now completely built off of my own custom system, allowing for more reliable use, text formatting and a whole world of other possibilities
+- Added a command line interface to be able to do all things related to the cache and config, and to view installation information. It is launched by calling the module directly through the Python interpreter (`python -m tooltils`)
+
+<br><br>
+
+**General**:
+- All standard Python module imports are now lazy loaded to boost import performance time, though there is a new config option `universal.lazyLoading`, which can be set to False to disable this behaviour
+- Cleaned up unneeded imports from all modules
+- Added missing exception class `RequestError` to the API
+- Changed one of the features list items in the README
+- Logging now has better formatting and text style variation
+- Added a new config value, `global.loggingFormat`, information on how to customise it can be found in the config section in the API
+- Moved config value `info.disableOnlineContentFetch` to the `global` section of the config
+- General fixes and maintenence on all methods changed in this update
+- All methods now have parameter description docstrings that appear on Pylinters
+- Added more detailed examples for some methods in the API
+- Removed examples for most methods for the info module in the API as there was no relative information to go off of to show the effect of the functions
+- Added the `typing.Callable` type hint to any parameters that take a method
+- Added a new best features section to the README
+
+<br>
+
+**CLI (new)**:
+- Added a command line interface to be able to do all things related to the cache and config, and to view installation information. It is launched by calling the module directly through the Python interpreter (`python -m tooltils`)
+- Added a CLI section to the CHANGELOG and API
+
+<br>
+
+**Backend**:
+- Removed `.gitignore` file as MacOS creates the `.DS_Store` file each time and due to the way gitignore works, it won't be removed unless I explicitly remove it
+- Changed how the variables are set for the requests module `openConnection()` to be more optimised
+- Removed the non-API listed parameter `_redirectData` in the requests module `openConnection().send()` class method, and instead it is now included in the `**params**` argument that is meant for providing single use request data
+- The `filter` parameter is now passed as **"data"** in the tests/build.py file to avoid the deprecation warning giving by Pylance
+- Made testing easier
+- Changed all appearances of non-tooltils attributes within modules to include an underscore prefix at the start to help differentiate them from tooltils variables in Python linters
+- Removed unnecessary variable `sMonths` in the backend variables section of the main module for the methods `date()` and `epoch()`
+- Added the `functools.lru_cache` decorater to some methods in the main module for a very slight performance boost
+- Tooltils now uses it's own logging system independent of the Python module `logging` as the recommended use for logging was the info module `logger()` class anyway
+- Reorganised config and cache table values
+- Added the ability to pass the errors module to the info module `logger()` class, and also added more options for passing module names
+- Optimisations to all changed content
+- Added a `.__repr__()` return method to all class instances, which uses the same code as `.__str__()`
+- Fixed a bug where the config would be read based off of the default config instead of the file content
+- Types are now compared with the `isinstance(a, (b))` method instead of `type(a) is b` as in pre 3.11 Python, it is around 40% faster
+- Renamed the `global` section of the cache and config to `universal`
+- All strings with multiple characters are now typed with double quotes, and single character strings use single quotes. This is to be consistent with C++ as I am currently learning
+
+<br>
+
+**Main Module**:
+- Added the method `dirVars()`, to get all of the attributes of a Python object and either print them or store them in a formatted matter
+- Removed unnecessary `enumerate()` call in the the `interpreter()` class code
+- Removed bogus `FileDescriptorOrPath` type hint for all methods
+- Renamed `length()` function to `waveLength()`
+- Improved exceptions for the `waveLength()` function
+- The `waveLength()` function now includes a return type hint for `int`
+- Optimised `waveLength()` function slightly
+- Made some slight optimisations to the `timeTest()` function
+- Added the `clear` parameter to the `style()` method to indicate whether an empty escape sequence should be appended to the string to clear any formatting afterwards
+- The default value for the `timezone` parameter in the `date()` method is now None to indicate the current timezone to be used
+- Removed the `varName()` method
+- Removed logging calls for the `tgzOpen()` method
+- Added a new class, `subtractableList`, for creating lists that can be subtracted from using an iterable that isn't a string or dictionary
+- Added a new class, `duplicateKeysDict`, to create a custom dictionary that can have duplicate keys inside, also implementing some cool features not present in the normal Python dict
+- The `timeTest()` method now uses a different order of function parameters, and now also takes *args and **kwargs to apply to the method being tested
+- Removed file suffix check in the `tgzOpen()` method
+- The `mstrip()` method has been renamed to `cstrip()` and now accepts a string as the `values` argument, when a string is passed, it clears the input text of each individual charcater in the string. It now also accepts the `strict` argument for if the input characters should match their case. E.g. `cstrip("Hello World!", "eLoR", strict=True)` -> `"Hll Wrld!"`
+
+<br>
+
+**errors**:
+- Changed `InvalidWifiConnection` class docstring
+- Exception docstrings now show on Python syntax highlighters when called
+- Removed `TooltilsOSInfoError` exception
+- Changed `RequestError` class docstring
+
+<br>
+
+**info**:
+- Changed module docstring
+- Fixed a bug in the `logger()` class
+- Improved logging
+- Changed `logger` class docstring
+- Removed `closed` and `.close()` attributes from the `logger()` class
+- The level attributes of the `logger()` class will now always be set to the numerical value of the logging level
+- Added the ability to use the context manager protocol with the `logger()` class
+- The `deleteData()` method may not log to the stream if the currently in use data files had been deleted
+
+<br>
+
+**os**:
+- Renamed the `print` parameter for the `system()` and `call()` methods to `output`
+- Changed some logging calls for the `system()` method
+- When the operating system is BSD, the `info.platform` variable will become the type of BSD, and the `info.detailed_platform` will become **"BSD"**. The same goes for Linux operating systems
+- The `system.__str__()` and `.__repr__()` now return the command's exit code instead of the memory address of the command class instance (self)
+
+<br>
+
+**requests**:
+- Added a new parameter to the `openConnection()`, `openConnection().change()`, `openConnection().send()` and `request()` class methods, `onStatusError`, which by default is set to the tooltils.errors module `StatusCodeError` class, but can be set to any exception, or None if you don't want an error to be raised when the request status is >= 400
+- Fixed a minor issue where if you used the `request()` class with the **"DOWNLOAD"** method, it would instead become a GET request
+- Added state checkers to the `openConnection().send()` class method to make sure the connection state is correctly managed; If you try to make a request while the connection is closed, it will now raise an error
+- An exception is no longer raised when the page doesn't have a forward slash at the start in the `openConnection().send()` and `request()` class methods
+- Optimisations
+- Removed all uses of the `HTTP_Port` type hint for the `port` parameters in requesting methods
+- Improved requesting error messages and made them look nicer in the exception traceback
+- The request will now always be closed with the `request()` class when used with a context manager
+- Only `OSError` is caught for gzip file related errors instead of a different exception for Python versions above 3.7
+- The `verifiable()` method now catches a general `Exception` statement instead of specific requesting errors
+- Fixed a bug where if a request redirected on a `.send()` call with one time use request data, it wouldn't use the specified request data from the `.send()` call
+- A redirect to the same host of a request will use the already existing connection reference instead of opening a new connection
+- The `override` parameter now works properly for `openConnection` and `request`
+- Fixed some redirect bugs
+- Changed how logging works for a redirected request, it now no longer floods the output and instead, condenses the important information into one debug call per redirect
+- Modified logging calls for requests
+- The connection state is now correctly managed when an error is raised on a request
+- Fixed a bug where cookies would be added to the request headers incorrectly
+- Request added headers are now overridable
+- Fixed port formatting error when a setup message is logged with a request
+- Each stage of a request is now sent instead of the one function `http.client.HTTPSConnection.request()`, improving the accuracy of logging for the `openConnection()` and `request()` classes. This change does not apply to the urllib module
+- Fixed the `advancedContext.redirectLimit` parameter not working for requests
+- Added a new config value `connectionCaching`, to control whether connections should be cached and used again later
+- The request ID for logging now starts at 1 instead of 0
+- An obscure `OSError` windows related error is now caught when your computer's internet connection becomes invalid while trying to connect to a host
+- The request ID logging format is now printed as **"C{ID}"** instead of **"R{ID}"** as it makes more sense for `openConnection` when sending multiple requests
+- Added a `.__eq__()`, `.__str__()` and `.__repr__()` method to the `advancedContext` class
+
+<br>
+
+**requests.urllib**:
+- The interface for this module is now the same as the default requests module (without `openConnection`)
+- The method of creating a request has changed, allowing for http use and individual request openers, rather than been applied for all requests (even outside of tooltils)
+- Removed the `NoRedirects` class
+- Fixed a bug where a request wouldn't be redirected if `redirects` was passed as True in `request()`
+- Fixed type hints for the `request()` class return properties
+- Improved code readability
+
+<br><br>
+
 ## 1.7.2 (13/3/2024)
 
 Infinite Bugs
@@ -23,6 +173,7 @@ Infinite Bugs
 
 **Main Module**:
 - Removed the `flush` parameter from the `style()` method because that function does not print text itself, rather it is stored in a string, so you may need to flush the text yourself
+- Removed logging from the `interpreter()` class method
 
 <br>
 

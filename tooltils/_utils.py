@@ -1,13 +1,12 @@
-"""External backend file meant to handle functions that would cause import errors"""
-
-
-from importlib import import_module
-from ast import literal_eval
+"""External file to handle config methods"""
 
 
 module = None
 
 def run(funcName: str, args: str):
+    from importlib import import_module
+    from ast import literal_eval
+
     global module
 
     try:
@@ -20,11 +19,11 @@ def run(funcName: str, args: str):
             if len(funcName.split('.')) == 2:
                 return getattr(module, funcName.split('.')[1])(*args)
             else:
-                return getattr(getattr(module, funcName.split('.')[1]), funcName.split('.')[2])(*args)
+                return getattr(getattr(module, funcName.split('.')[1]), 
+                               funcName.split('.')[2])(*args)
         else:
             for k, v in globals()['__builtins__'].items():
                 if k == funcName:
                     return v(*args)
     except Exception:
         return None
-
